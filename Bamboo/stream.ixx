@@ -6,22 +6,32 @@ import bamboo.core;
 namespace bamboo {
 
     template <class S, class T, class... Args>
-    concept has_custom_load = requires(S& s, T& v, Args&&... a) { load(s, v, std::forward<Args>(a)...); };
+    concept has_custom_load = requires(S& stream, T&& value, Args&&... args) {
+        load(stream, std::forward<T>(value), std::forward<Args>(args)...);
+    };
 
     template <class S>
-    concept has_binary_read = requires(S& s, char* c, usize n) { s.read(c, n); };
+    concept has_binary_read = requires(S& stream, char* ptr, usize size) {
+        stream.read(ptr, size);
+    };
 
     struct load_impl_t {
         template <class S, class T, class... Args>
-        static void operator()(S& stream, T& value, Args&&... args) {
+        static void operator()(S& stream, T&& value, Args&&... args) {
+            using RawT = std::remove_reference_t<T>;
+
             if constexpr (has_custom_load<S, T, Args...>) {
-                load(stream, value, std::forward<Args>(args)...);
+                load(stream, std::forward<T>(value), std::forward<Args>(args)...);
             }
-            else if constexpr (has_binary_read<S> && std::is_arithmetic_v<T> && sizeof...(args) == 0) {
-                stream.read(reinterpret_cast<char*>(&value), sizeof(T));
+            else if constexpr (has_binary_read<S> && std::is_arithmetic_v<RawT> && sizeof...(Args) == 0) {
+                static_assert(
+                    std::is_lvalue_reference_v<T> && !std::is_const_v<RawT>,
+                    "Cannot load into a const or rvalue arithmetic type."
+                );
+                stream.read(reinterpret_cast<char*>(&value), sizeof(RawT));
             }
             else {
-                static_assert(false, "load() required for non-arithmetic types.");
+                static_assert(false, "No viable load() found.");
                 std::unreachable();
             }
         }
@@ -42,9 +52,14 @@ namespace bamboo {
         }
 
         template <class T, class... Args>
-        Stream& load(this auto&& self, T& value, Args&&... args) {
-            load_impl(self, value, std::forward<Args>(args)...);
+        Stream& load(this auto& self, T&& value, Args&&... args) {
+            load_impl(self, std::forward<T>(value), std::forward<Args>(args)...);
             return self;
+        }
+
+        template <class T>
+        Stream& operator>>(this auto& self, T&& value) {
+            return self.load(std::forward<T>(value));
         }
     };
 

@@ -6,9 +6,19 @@ import bamboo.stream;
 
 namespace bamboo::mfa {
 
+    template <usize Size>
+    struct Ignore {
+        friend void load(Stream& stream, Ignore) {
+            stream.ignore(Size);
+        }
+    };
+
+    template <usize Size>
+    static constexpr Ignore<Size> ignore;
+
     template <LiteralString Expected>
     struct Signature {
-        friend void load(Stream& stream, Signature&) {
+        friend void load(Stream& stream, Signature) {
             std::array<char, Expected.size()> buffer;
             stream.read(buffer.data(), buffer.size());
 
@@ -21,11 +31,23 @@ namespace bamboo::mfa {
         }
     };
 
+    template <LiteralString Expected>
+    static constexpr Signature<Expected> signature;
+
     export struct Header {
-        Signature<"MFU2"> sign;
+        i16 runtime_version;
+        i16 runtime_subversion;
+        i32 product_version;
+        i32 product_build;
+        i32 language;
 
         friend void load(Stream& stream, Header& header) {
-            stream.load(header.sign);
+            stream >> signature<"MFU2">
+                >> header.runtime_version
+                >> header.runtime_subversion
+                >> header.product_version
+                >> header.product_build
+                >> header.language;
         }
     };
 
