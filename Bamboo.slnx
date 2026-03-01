@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Bamboo/Bamboo.vcxproj" Id="1f509264-062e-48e3-9bf1-00da2e9cec16" />
+</Solution>
