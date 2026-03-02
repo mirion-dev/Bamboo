@@ -1,43 +1,73 @@
 export module bamboo.stream;
 
 import std;
-import bamboo.core;
 
 namespace bamboo {
 
-    template <class S, class T, class... Args>
-    concept has_custom_load = requires(S& stream, T&& value, Args&&... args) {
-        load(stream, std::forward<T>(value), std::forward<Args>(args)...);
-    };
+    namespace load_impl {
 
-    template <class S>
-    concept has_binary_read = requires(S& stream, char* ptr, usize size) {
-        stream.read(ptr, size);
-    };
+        enum class strategy {
+            none,
+            custom_load,
+            binary_read,
+            binary_read_array
+        };
 
-    struct load_impl_t {
         template <class S, class T, class... Args>
-        static void operator()(S& stream, T&& value, Args&&... args) {
-            using RawT = std::remove_reference_t<T>;
+        concept has_custom_load = requires(S& stream, T&& value, Args&&... args) {
+            load(stream, std::forward<T>(value), std::forward<Args>(args)...);
+        };
 
-            if constexpr (has_custom_load<S, T, Args...>) {
-                load(stream, std::forward<T>(value), std::forward<Args>(args)...);
-            }
-            else if constexpr (has_binary_read<S> && std::is_arithmetic_v<RawT> && sizeof...(Args) == 0) {
-                static_assert(
-                    std::is_lvalue_reference_v<T> && !std::is_const_v<RawT>,
-                    "Cannot load into a const or rvalue arithmetic type."
-                );
-                stream.read(reinterpret_cast<char*>(&value), sizeof(RawT));
-            }
-            else {
-                static_assert(false, "No viable load() found.");
-                std::unreachable();
-            }
-        }
-    };
+        template <class S>
+        concept has_binary_read = requires(S& stream, char* ptr, std::streamsize size) {
+            stream.read(ptr, size);
+        };
 
-    static constexpr load_impl_t load_impl;
+        template <class T>
+        concept binary_readable = !std::is_const_v<T> && (std::is_arithmetic_v<T> || std::is_enum_v<T>);
+
+        template <class S, class T, class... Args>
+        static constexpr strategy classifier{
+            has_custom_load<S, T, Args...>
+            ? strategy::custom_load
+
+            : has_binary_read<S>
+            && std::is_lvalue_reference_v<T> && binary_readable<std::remove_reference_t<T>>
+            && sizeof...(Args) == 0
+            ? strategy::binary_read
+
+            : has_binary_read<S>
+            && std::is_pointer_v<std::decay_t<T>> && binary_readable<std::remove_pointer_t<std::decay_t<T>>>
+            && sizeof...(Args) == 1 && (std::convertible_to<Args, std::streamsize> && ...)
+            ? strategy::binary_read_array
+
+            : strategy::none
+        };
+
+        struct fn {
+            template <class S, class T, class... Args>
+                requires (classifier<S, T, Args...> != strategy::none)
+            static void operator()(S& stream, T&& value, Args&&... args) {
+                static constexpr strategy STRATEGY{ classifier<S, T, Args...> };
+                if constexpr (STRATEGY == strategy::custom_load) {
+                    load(stream, std::forward<T>(value), std::forward<Args>(args)...);
+                }
+                else if constexpr (STRATEGY == strategy::binary_read) {
+                    stream.read(reinterpret_cast<char*>(&value), sizeof(value));
+                }
+                else if constexpr (STRATEGY == strategy::binary_read_array) {
+                    stream.read(reinterpret_cast<char*>(value), sizeof(*value) * args...);
+                }
+                else {
+                    static_assert(false);
+                    std::unreachable();
+                }
+            }
+        };
+
+    }
+
+    static constexpr load_impl::fn load_fn;
 
     export class Stream : public std::fstream {
     public:
@@ -45,7 +75,7 @@ namespace bamboo {
             this->exceptions(std::ios::failbit | std::ios::badbit);
         }
 
-        Stream(std::string path) :
+        Stream(const std::string& path) :
             Stream{} {
 
             this->open(std::u8string{ path.begin(), path.end() }, std::ios::binary | std::ios::in);
@@ -53,7 +83,7 @@ namespace bamboo {
 
         template <class T, class... Args>
         Stream& load(this auto& self, T&& value, Args&&... args) {
-            load_impl(self, std::forward<T>(value), std::forward<Args>(args)...);
+            load_fn(self, std::forward<T>(value), std::forward<Args>(args)...);
             return self;
         }
 
