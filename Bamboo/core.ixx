@@ -4,6 +4,8 @@ import std;
 
 namespace bamboo {
 
+    static_assert(sizeof(float) == 4 && sizeof(double) == 8 && sizeof(wchar_t) == 2, "Unsupported data model.");
+
     export {
 
         using i8 = std::int8_t;
