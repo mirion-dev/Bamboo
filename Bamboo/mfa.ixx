@@ -6,35 +6,32 @@ import bamboo.stream;
 
 namespace bamboo::mfa {
 
-    template <usize Size, class T = char>
-        requires std::is_default_constructible_v<T>
-    struct IgnoreN {
-        template <class... Args>
-        friend void load(Stream& stream, IgnoreN, Args&&... args) {
-            if constexpr (std::is_scalar_v<T>) {
-                stream.ignore(sizeof(T) * Size);
-            }
-            else {
-                T dummy;
-                for (usize i{}; i < Size; ++i) {
-                    stream.load(dummy, std::forward<Args>(args)...);
-                }
-            }
+    template <usize Size>
+    struct IgnoreBytes {
+        void load(Stream& stream) const {
+            stream.ignore(Size);
         }
     };
 
-    template <usize Size, class T = char>
-    static constexpr IgnoreN<Size, T> ignore_n;
+    template <usize Size>
+    static constexpr IgnoreBytes<Size> ignore_bytes;
 
     template <class T>
-    using Ignore = IgnoreN<1, T>;
+        requires std::is_default_constructible_v<T>
+    struct Ignore {
+        template <class... Args>
+        void load(Stream& stream, Args&&... args) const {
+            T dummy;
+            stream.load(dummy, std::forward<Args>(args)...);
+        }
+    };
 
     template <class T>
     static constexpr Ignore<T> ignore;
 
     template <LiteralString Expected>
     struct Signature {
-        friend void load(Stream& stream, Signature) {
+        void load(Stream& stream) const {
             std::array<char, Expected.size()> buffer;
             stream.load(buffer.data(), buffer.size());
 
@@ -51,19 +48,25 @@ namespace bamboo::mfa {
     static constexpr Signature<Expected> signature;
 
     template <class T, usize N>
-        requires std::is_arithmetic_v<T>
     struct Array : std::array<T, N> {
-        friend void load(Stream& stream, Array& self) {
-            stream.load(self.data(), N);
+        void load(Stream& stream) {
+            if constexpr (dense_layout_v<T>) {
+                stream.load(this->data(), N);
+            }
+            else {
+                for (auto& i : *this) {
+                    stream >> i;
+                }
+            }
         }
     };
 
-    template <class T, class S = i32>
-        requires std::is_arithmetic_v<T>
+    template <class T, std::integral S = i32>
+        requires dense_layout_v<T>
     struct Vector : std::vector<T> {
         static constexpr usize MAX_SIZE{ 1000000 };
 
-        friend void load(Stream& stream, Vector& self, std::streamsize size) {
+        void load(Stream& stream, std::streamsize size) {
             if (size < 0) {
                 throw std::runtime_error{ std::format("Vector size cannot be negative. Found {}.", size) };
             }
@@ -78,23 +81,23 @@ namespace bamboo::mfa {
                 };
             }
 
-            self.resize(size);
-            stream.load(self.data(), size);
+            this->resize(size);
+            stream.load(this->data(), size);
         }
 
-        friend void load(Stream& stream, Vector& self) {
+        void load(Stream& stream) {
             S size;
             stream >> size;
-            stream.load(self, size);
+            stream.load(*this, size);
         }
     };
 
     struct String : std::wstring {
-        friend void load(Stream& stream, String& self) {
+        void load(Stream& stream) {
             i16 size;
-            stream >> size >> ignore_n<2>;
-            self.resize(size);
-            stream.load(self.data(), size);
+            stream >> size >> ignore_bytes<2>;
+            resize(size);
+            stream.load(data(), size);
         }
     };
 
@@ -107,16 +110,16 @@ namespace bamboo::mfa {
         String app_name;
         String editor_filename;
 
-        friend void load(Stream& stream, Header& self) {
+        void load(Stream& stream) {
             stream >> signature<"MFU2">
-                >> self.runtime_version
-                >> self.runtime_subversion
-                >> self.product_version
-                >> self.product_build
-                >> self.language
-                >> self.app_name
+                >> runtime_version
+                >> runtime_subversion
+                >> product_version
+                >> product_build
+                >> language
+                >> app_name
                 >> ignore<String>
-                >> self.editor_filename
+                >> editor_filename
                 >> ignore<Vector<char>>;
         }
     };
