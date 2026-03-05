@@ -30,15 +30,15 @@ namespace bamboo {
     struct LiteralString {
         std::array<char, N> data;
 
-        constexpr LiteralString(const char (&data)[N]) noexcept {
+        consteval LiteralString(const char (&data)[N]) noexcept {
             std::ranges::copy(data, this->data.data());
         }
 
-        constexpr operator std::string_view() const noexcept {
+        consteval operator std::string_view() const noexcept {
             return { data.data(), size() };
         }
 
-        constexpr usize size() const noexcept {
+        consteval usize size() const noexcept {
             return N - 1;
         }
     };

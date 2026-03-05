@@ -6,81 +6,39 @@ import bamboo.stream;
 
 namespace bamboo::mfa {
 
-    template <usize Size>
-    struct IgnoreBytes {
-        void load(Stream& stream) const {
-            stream.ignore(Size);
-        }
-    };
+    static void verify_size(std::integral auto size) {
+        static constexpr usize MAX_SIZE{ 1000000 };
 
-    template <usize Size>
-    static constexpr IgnoreBytes<Size> ignore_bytes;
+        if (size < 0) {
+            throw std::runtime_error{ std::format("Array size cannot be negative. Found {}.", size) };
+        }
+
+        if (size > MAX_SIZE) {
+            throw std::runtime_error{
+                std::format("Array size is too large. Found {} but max allowed {}.", size, MAX_SIZE)
+            };
+        }
+    }
 
     template <class T>
-        requires std::is_default_constructible_v<T>
-    struct Ignore {
-        template <class... Args>
-        void load(Stream& stream, Args&&... args) const {
-            T dummy;
-            stream.load(dummy, std::forward<Args>(args)...);
+        requires !dense_layout_v<T>
+    static void load(Stream& stream, T* ptr, usize size) {
+        for (usize i{}; i < size; ++i) {
+            stream >> ptr[i];
         }
-    };
-
-    template <class T>
-    static constexpr Ignore<T> ignore;
-
-    template <LiteralString Expected>
-    struct Signature {
-        void load(Stream& stream) const {
-            std::array<char, Expected.size()> buffer;
-            stream.load(buffer.data(), buffer.size());
-
-            std::string_view expected{ Expected }, actual{ buffer };
-            if (expected != actual) {
-                throw std::runtime_error{
-                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
-                };
-            }
-        }
-    };
-
-    template <LiteralString Expected>
-    static constexpr Signature<Expected> signature;
+    }
 
     template <class T, usize N>
     struct Array : std::array<T, N> {
         void load(Stream& stream) {
-            if constexpr (dense_layout_v<T>) {
-                stream.load(this->data(), N);
-            }
-            else {
-                for (auto& i : *this) {
-                    stream >> i;
-                }
-            }
+            stream.load(this->data(), N);
         }
     };
 
     template <class T, std::integral S = i32>
-        requires dense_layout_v<T>
     struct Vector : std::vector<T> {
-        static constexpr usize MAX_SIZE{ 1000000 };
-
-        void load(Stream& stream, std::streamsize size) {
-            if (size < 0) {
-                throw std::runtime_error{ std::format("Vector size cannot be negative. Found {}.", size) };
-            }
-
-            if (size > MAX_SIZE) {
-                throw std::runtime_error{
-                    std::format(
-                        "Vector size is too large. Found {} but max allowed {}. Try to increase Vector::MAX_SIZE.",
-                        size,
-                        MAX_SIZE
-                    )
-                };
-            }
-
+        void load(Stream& stream, S size) {
+            mfa::verify_size(size);
             this->resize(size);
             stream.load(this->data(), size);
         }
@@ -96,10 +54,29 @@ namespace bamboo::mfa {
         void load(Stream& stream) {
             i16 size;
             stream >> size >> ignore_bytes<2>;
+            mfa::verify_size(size);
             resize(size);
             stream.load(data(), size);
         }
     };
+
+    template <LiteralString Expected>
+    struct Signature {
+        void load(Stream& stream) const {
+            Array<char, Expected.size()> buffer;
+            stream >> buffer;
+
+            std::string_view expected{ Expected }, actual{ buffer };
+            if (expected != actual) {
+                throw std::runtime_error{
+                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
+                };
+            }
+        }
+    };
+
+    template <LiteralString Expected>
+    static constexpr Signature<Expected> signature;
 
     export struct Header {
         i16 runtime_version;

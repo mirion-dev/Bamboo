@@ -1,6 +1,7 @@
 export module bamboo.stream;
 
 import std;
+import bamboo.core;
 
 namespace bamboo {
 
@@ -13,7 +14,7 @@ namespace bamboo {
     concept binary_readable = !std::is_const_v<T> && dense_layout_v<T>;
 
     template <class S>
-    concept has_binary_read = requires(S& stream, char* ptr, std::streamsize size) {
+    concept has_binary_read = requires(S& stream, char* ptr, usize size) {
         stream.read(ptr, size);
     };
 
@@ -44,7 +45,7 @@ namespace bamboo {
 
         : has_binary_read<S>
         && std::is_pointer_v<std::decay_t<T>> && binary_readable<std::remove_pointer_t<std::decay_t<T>>>
-        && sizeof...(Args) == 1 && (std::convertible_to<Args, std::streamsize> && ...)
+        && sizeof...(Args) == 1 && (std::convertible_to<Args, usize> && ...)
         ? load_mode::read_array
 
         : has_member_load<S, T, Args...>
@@ -56,9 +57,12 @@ namespace bamboo {
         : load_mode::none
     };
 
+    template <class S, class T, class... Args>
+    concept loadable = select_load_mode<S, T, Args...> != load_mode::none;
+
     struct load_fn {
         template <class S, class T, class... Args>
-            requires (select_load_mode<S, T, Args...> != load_mode::none)
+            requires loadable<S, T, Args...>
         static void operator()(S& stream, T&& value, Args&&... args) {
             static constexpr load_mode MODE{ select_load_mode<S, T, Args...> };
             if constexpr (MODE == load_mode::read) {
@@ -105,5 +109,34 @@ namespace bamboo {
             return self.load(std::forward<T>(value));
         }
     };
+
+    template <usize N>
+    struct IgnoreBytes {
+        void load(Stream& stream) const {
+            stream.ignore(N);
+        }
+    };
+
+    export template <usize N>
+    constexpr IgnoreBytes<N> ignore_bytes;
+
+    template <class T>
+    struct Ignore {
+        template <class... Args>
+            requires (dense_layout_v<T> && sizeof...(Args) == 0
+                || std::is_default_constructible_v<T> && loadable<Stream&, T, Args...>)
+        void load(Stream& stream, Args&&... args) const {
+            if constexpr (dense_layout_v<T> && sizeof...(Args) == 0) {
+                stream >> ignore_bytes<sizeof(T)>;
+            }
+            else {
+                T dummy;
+                stream.load(dummy, args...);
+            }
+        }
+    };
+
+    export template <class T>
+    constexpr Ignore<T> ignore;
 
 }
