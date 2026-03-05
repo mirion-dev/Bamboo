@@ -92,7 +92,7 @@ namespace bamboo {
             exceptions(failbit | badbit);
         }
 
-        Stream(const std::string& path) :
+        Stream(std::string_view path) :
             Stream{} {
 
             open(std::u8string{ path.begin(), path.end() }, binary | in);

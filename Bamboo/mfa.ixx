@@ -1,3 +1,7 @@
+module;
+
+#include <spdlog/spdlog.h>
+
 export module bamboo.mfa;
 
 import std;
@@ -54,6 +58,7 @@ namespace bamboo::mfa {
         void load(Stream& stream) {
             i16 size;
             stream >> size >> ignore_bytes<2>;
+
             mfa::verify_size(size);
             resize(size);
             stream.load(data(), size);
@@ -98,6 +103,12 @@ namespace bamboo::mfa {
                 >> ignore<String>
                 >> editor_filename
                 >> ignore<Vector<char>>;
+
+            spdlog::info(
+                "Finished header parsing. Application: {} (Build {}).",
+                bamboo::to_string(app_name),
+                product_build
+            );
         }
     };
 

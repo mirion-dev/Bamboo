@@ -43,4 +43,9 @@ namespace bamboo {
         }
     };
 
+    export std::string to_string(std::wstring_view str) noexcept {
+        std::u8string u8{ std::filesystem::path{ str.begin(), str.end() }.u8string() };
+        return { reinterpret_cast<char*>(u8.data()), u8.size() };
+    }
+
 }
