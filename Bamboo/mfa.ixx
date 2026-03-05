@@ -10,19 +10,54 @@ import bamboo.stream;
 
 namespace bamboo::mfa {
 
-    static void verify_size(std::integral auto size) {
-        static constexpr usize MAX_SIZE{ 1000000 };
+#pragma region utils
 
-        if (size < 0) {
-            throw std::runtime_error{ std::format("Array size cannot be negative. Found {}.", size) };
+    class Timer {
+        std::string _message;
+        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
+
+    public:
+        Timer(std::string_view message) noexcept :
+            _message{ message } {
+
+            spdlog::info("Started {}.", _message);
         }
 
-        if (size > MAX_SIZE) {
+        ~Timer() noexcept {
+            using namespace std::chrono;
+            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
+            spdlog::info("Finished {} ({}s).", _message, duration);
+        }
+
+        Timer(Timer&& other) noexcept = default;
+        Timer& operator=(Timer&& other) noexcept = default;
+    };
+
+    template <std::integral T>
+    class Size {
+        static constexpr usize MAX_SIZE{ 1000000 };
+
+        T _value{};
+
+    public:
+        operator T() const noexcept {
+            return _value;
+        }
+
+        void load(Stream& stream) {
+            stream >> _value;
+
+            if (_value < 0) {
+                throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", _value) };
+        }
+
+            if (_value > MAX_SIZE) {
             throw std::runtime_error{
-                std::format("Array size is too large. Found {} but max allowed {}.", size, MAX_SIZE)
+                    std::format("Container size is too large. Found {} but max allowed {}.", _value, MAX_SIZE)
             };
         }
     }
+    };
 
     template <class T>
         requires !dense_layout_v<T>
@@ -31,6 +66,10 @@ namespace bamboo::mfa {
             stream >> ptr[i];
         }
     }
+
+#pragma endregion
+
+#pragma region basic containers
 
     template <class T, usize N>
     struct Array : std::array<T, N> {
@@ -42,13 +81,12 @@ namespace bamboo::mfa {
     template <class T, std::integral S = i32>
     struct Vector : std::vector<T> {
         void load(Stream& stream, S size) {
-            mfa::verify_size(size);
             this->resize(size);
             stream.load(this->data(), size);
         }
 
         void load(Stream& stream) {
-            S size;
+            Size<S> size;
             stream >> size;
             stream.load(*this, size);
         }
@@ -56,14 +94,14 @@ namespace bamboo::mfa {
 
     struct String : std::wstring {
         void load(Stream& stream) {
-            i16 size;
+            Size<i16> size;
             stream >> size >> ignore_bytes<2>;
-
-            mfa::verify_size(size);
             resize(size);
             stream.load(data(), size);
         }
     };
+
+#pragma endregion
 
     template <LiteralString Expected>
     struct Signature {
@@ -106,27 +144,6 @@ namespace bamboo::mfa {
 
             spdlog::info("Application \"{}\" (Build {}).", bamboo::to_string(app_name), product_build);
         }
-    };
-
-    export class Timer {
-        std::string _message;
-        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
-
-    public:
-        Timer(std::string_view message) noexcept :
-            _message{ message } {
-
-            spdlog::info("Started {}.", _message);
-        }
-
-        ~Timer() noexcept {
-            using namespace std::chrono;
-            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _message, duration);
-        }
-
-        Timer(Timer&& other) noexcept = default;
-        Timer& operator=(Timer&& other) noexcept = default;
     };
 
     export struct File {
