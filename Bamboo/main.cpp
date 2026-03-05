@@ -7,10 +7,8 @@ import bamboo.mfa;
 int main() {
     try {
         bamboo::Stream stream{ "" };
-        bamboo::mfa::Header header;
-
-        spdlog::info("Start parsing.");
-        stream.load(header);
+        bamboo::mfa::File file;
+        stream >> file;
     }
     catch (const std::exception& error) {
         spdlog::error(error.what());

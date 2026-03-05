@@ -83,7 +83,7 @@ namespace bamboo::mfa {
     template <LiteralString Expected>
     static constexpr Signature<Expected> signature;
 
-    export struct Header {
+    struct Header {
         i16 runtime_version;
         i16 runtime_subversion;
         i32 product_version;
@@ -104,11 +104,39 @@ namespace bamboo::mfa {
                 >> editor_filename
                 >> ignore<Vector<char>>;
 
-            spdlog::info(
-                "Finished header parsing. Application: {} (Build {}).",
-                bamboo::to_string(app_name),
-                product_build
-            );
+            spdlog::info("Application \"{}\" (Build {}).", bamboo::to_string(app_name), product_build);
+        }
+    };
+
+    export class Timer {
+        std::string _message;
+        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
+
+    public:
+        Timer(std::string_view message) noexcept :
+            _message{ message } {
+
+            spdlog::info("Started {}.", _message);
+        }
+
+        ~Timer() noexcept {
+            using namespace std::chrono;
+            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
+            spdlog::info("Finished {} ({}s).", _message, duration);
+        }
+
+        Timer(Timer&& other) noexcept = default;
+        Timer& operator=(Timer&& other) noexcept = default;
+    };
+
+    export struct File {
+        Header header;
+
+        void load(Stream& stream) {
+            {
+                Timer _{ "parsing header" };
+                stream >> header;
+            }
         }
     };
 
