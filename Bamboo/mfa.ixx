@@ -59,6 +59,12 @@ namespace bamboo::mfa {
 
 #pragma region basic containers
 
+    struct Color {
+        using dense_layout = void;
+
+        u8 r, g, b, a;
+    };
+
     template <class T, usize N>
     struct Array : std::array<T, N> {
         void load(Stream& stream) {
@@ -269,7 +275,7 @@ namespace bamboo::mfa {
         i16 hotspot_y;
         i16 action_x;
         i16 action_y;
-        u32 transparent_color;
+        Color transparent_color;
         Vector<char> data;
 
         void load(Stream& stream) {
@@ -307,6 +313,65 @@ namespace bamboo::mfa {
         }
     };
 
+    struct Setting {
+        String app_name;
+        String author;
+        String description;
+        String copyright;
+        String company;
+        String version;
+        i32 app_width;
+        i32 app_height;
+        Color border_color;
+        u32 display_flags;
+        u32 graphic_flags;
+        String help_file;
+        i32 score;
+        i32 lives;
+        i32 frame_rate;
+        i32 build_type;
+        String build_filename;
+        String about;
+        Vector<String> binary_files;
+        //Vector<Control> controls;
+        //Menu menu;
+        i32 window_menu;
+        Vector<i64> menu_images;
+        //Vector<Value> global_numbers;
+        //Vector<Value> global_strings;
+        //Events<true> global_events;
+        i32 graphic_mode;
+        Vector<u32> icons;
+        //Vector<Qualifier> qualifiers;
+        //Vector<Extension> extensions;
+
+        void load(Stream& stream) {
+            stream >> app_name
+                >> author
+                >> description
+                >> copyright
+                >> company
+                >> version
+                >> app_width
+                >> app_height
+                >> border_color
+                >> display_flags
+                >> graphic_flags
+                >> help_file
+                >> ignore<String>
+                >> score
+                >> lives
+                >> frame_rate
+                >> build_type
+                >> build_filename
+                >> ignore<String>
+                >> ignore<String>
+                >> about
+                >> ignore<i32>
+                >> binary_files;
+        }
+    };
+
     export struct File {
         Header header;
         FontBank font_bank;
@@ -314,6 +379,7 @@ namespace bamboo::mfa {
         MusicBank music_bank;
         ImageBank icon_bank;
         ImageBank image_bank;
+        Setting setting;
 
         void load(Stream& stream) {
             {
@@ -339,6 +405,10 @@ namespace bamboo::mfa {
             {
                 Timer _{ "parsing image bank" };
                 stream >> image_bank;
+            }
+            {
+                Timer _{ "parsing setting" };
+                stream >> setting;
             }
         }
     };

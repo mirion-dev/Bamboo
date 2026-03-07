@@ -7,7 +7,7 @@ namespace bamboo {
 
     export template <class T>
     constexpr bool dense_layout_v{
-        std::is_arithmetic_v<T> || std::is_enum_v<T> || std::is_trivially_copyable_v<T> && requires { T::dense_layout; }
+        std::is_arithmetic_v<T> || std::is_enum_v<T> || std::is_trivially_copyable_v<T> && requires { typename T::dense_layout; }
     };
 
     template <class T>
