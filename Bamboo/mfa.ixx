@@ -33,31 +33,19 @@ namespace bamboo::mfa {
         Timer& operator=(Timer&& other) noexcept = default;
     };
 
-    template <std::integral T>
-    class Size {
-        static constexpr usize MAX_SIZE{ 1000000 };
+    static void verify_size(std::integral auto size) {
+        static constexpr usize MAX_SIZE{ 100'000'000 };
 
-        T _value{};
-
-    public:
-        operator T() const noexcept {
-            return _value;
+        if (size < 0) {
+            throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
         }
 
-        void load(Stream& stream) {
-            stream >> _value;
-
-            if (_value < 0) {
-                throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", _value) };
-            }
-
-            if (_value > MAX_SIZE) {
-                throw std::runtime_error{
-                    std::format("Container size is too large. Found {} but max allowed {}.", _value, MAX_SIZE)
-                };
-            }
+        if (size > MAX_SIZE) {
+            throw std::runtime_error{
+                std::format("Container size is too large. Found {} but max allowed {}.", size, MAX_SIZE)
+            };
         }
-    };
+    }
 
     template <class T>
         requires !dense_layout_v<T>
@@ -80,22 +68,22 @@ namespace bamboo::mfa {
 
     template <class T, std::integral S = i32>
     struct Vector : std::vector<T> {
-        void load(Stream& stream, S size) {
+        void load(Stream& stream) {
+            S size;
+            stream >> size;
+
+            mfa::verify_size(size);
             this->resize(size);
             stream.load(this->data(), size);
-        }
-
-        void load(Stream& stream) {
-            Size<S> size;
-            stream >> size;
-            stream.load(*this, size);
         }
     };
 
     struct String : std::wstring {
         void load(Stream& stream) {
-            Size<i16> size;
+            i16 size;
             stream >> size >> ignore_bytes<2>;
+
+            mfa::verify_size(size);
             resize(size);
             stream.load(data(), size);
         }
@@ -188,7 +176,7 @@ namespace bamboo::mfa {
                 >> buffer;
 
             name = buffer.data();
-            spdlog::info("Read font \"{}\".", bamboo::to_string(name));
+            spdlog::debug("Read font \"{}\".", bamboo::to_string(name));
         }
     };
 
@@ -199,9 +187,43 @@ namespace bamboo::mfa {
         }
     };
 
+    struct Sound {
+        u32 handle;
+        u32 checksum;
+        i32 references;
+        i32 size;
+        u32 flags;
+        i32 frequency;
+        Vector<wchar_t> name;
+        Vector<char> data;
+
+        void load(Stream& stream) {
+            stream >> handle
+                >> checksum
+                >> references
+                >> size
+                >> flags
+                >> frequency
+                >> name;
+
+            i32 data_size{ flags & 0x0040 ? size : size - static_cast<i32>(name.size() * sizeof(wchar_t)) };
+            data.resize(data_size);
+            stream.load(data.data(), data_size);
+            spdlog::debug("Read sound \"{}\".", bamboo::to_string({ name.begin(), name.end() }));
+        }
+    };
+
+    struct SoundBank : Vector<Sound> {
+        void load(Stream& stream) {
+            stream >> signature<"APMS"> >> static_cast<Vector&>(*this);
+            spdlog::info("Read {} sound(s).", size());
+        }
+    };
+
     export struct File {
         Header header;
         FontBank font_bank;
+        SoundBank sound_bank;
 
         void load(Stream& stream) {
             {
@@ -211,6 +233,10 @@ namespace bamboo::mfa {
             {
                 Timer _{ "parsing font bank" };
                 stream >> font_bank;
+            }
+            {
+                Timer _{ "parsing sound bank" };
+                stream >> sound_bank;
             }
         }
     };
