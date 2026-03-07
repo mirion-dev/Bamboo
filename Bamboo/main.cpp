@@ -5,7 +5,10 @@ import bamboo.stream;
 import bamboo.mfa;
 
 int main() {
+#ifdef _DEBUG
     spdlog::set_level(spdlog::level::debug);
+#endif
+
     try {
         bamboo::Stream stream{ "" };
         bamboo::mfa::File file;

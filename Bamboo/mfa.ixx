@@ -84,7 +84,7 @@ namespace bamboo::mfa {
     struct String : std::wstring {
         void load(Stream& stream) {
             i16 size;
-            stream >> size >> ignore_bytes<2>;
+            stream >> size >> ignore<i16>;
 
             mfa::verify_size(size);
             resize(size);
@@ -256,11 +256,64 @@ namespace bamboo::mfa {
         }
     };
 
+    struct Image {
+        u32 handle;
+        u32 checksum;
+        i32 references;
+        i32 size;
+        i16 width;
+        i16 height;
+        i8 graphic_mode;
+        u8 flags;
+        i16 hotspot_x;
+        i16 hotspot_y;
+        i16 action_x;
+        i16 action_y;
+        u32 transparent_color;
+        Vector<char> data;
+
+        void load(Stream& stream) {
+            stream >> handle
+                >> checksum
+                >> references
+                >> size
+                >> width
+                >> height
+                >> graphic_mode
+                >> flags
+                >> ignore<i16>
+                >> hotspot_x
+                >> hotspot_y
+                >> action_x
+                >> action_y
+                >> transparent_color;
+            stream.load(data, size);
+        }
+    };
+
+    struct ImageBank : Vector<Image> {
+        i32 graphic_mode;
+        i16 palette_version;
+        Vector<u32, i16> palette;
+
+        void load(Stream& stream) {
+            stream >> signature<"AGMI">
+                >> graphic_mode
+                >> palette_version
+                >> palette
+                >> static_cast<Vector&>(*this);
+
+            spdlog::info("Read {} image(s).", size());
+        }
+    };
+
     export struct File {
         Header header;
         FontBank font_bank;
         SoundBank sound_bank;
         MusicBank music_bank;
+        ImageBank icon_bank;
+        ImageBank image_bank;
 
         void load(Stream& stream) {
             {
@@ -278,6 +331,14 @@ namespace bamboo::mfa {
             {
                 Timer _{ "parsing music bank" };
                 stream >> music_bank;
+            }
+            {
+                Timer _{ "parsing icon bank" };
+                stream >> icon_bank;
+            }
+            {
+                Timer _{ "parsing image bank" };
+                stream >> image_bank;
             }
         }
     };
