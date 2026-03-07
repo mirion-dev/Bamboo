@@ -131,7 +131,7 @@ namespace bamboo {
             }
             else {
                 T dummy;
-                stream.load(dummy, args...);
+                stream.load(dummy, std::forward<Args>(args)...);
             }
         }
     };
