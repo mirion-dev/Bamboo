@@ -71,7 +71,10 @@ namespace bamboo::mfa {
         void load(Stream& stream) {
             S size;
             stream >> size;
+            stream.load(*this, size);
+        }
 
+        void load(Stream& stream, S size) {
             mfa::verify_size(size);
             this->resize(size);
             stream.load(this->data(), size);
@@ -194,22 +197,22 @@ namespace bamboo::mfa {
         i32 size;
         u32 flags;
         i32 frequency;
-        Vector<wchar_t> name;
+        std::wstring name;
         Vector<char> data;
 
         void load(Stream& stream) {
+            Vector<wchar_t> buffer;
             stream >> handle
                 >> checksum
                 >> references
                 >> size
                 >> flags
                 >> frequency
-                >> name;
+                >> buffer;
+            stream.load(data, flags & 0x0040 ? size : size - static_cast<i32>(buffer.size() * sizeof(wchar_t)));
 
-            i32 data_size{ flags & 0x0040 ? size : size - static_cast<i32>(name.size() * sizeof(wchar_t)) };
-            data.resize(data_size);
-            stream.load(data.data(), data_size);
-            spdlog::debug("Read sound \"{}\".", bamboo::to_string({ name.begin(), name.end() }));
+            name = { std::from_range, buffer };
+            spdlog::debug("Read sound \"{}\".", bamboo::to_string(name));
         }
     };
 
@@ -220,10 +223,44 @@ namespace bamboo::mfa {
         }
     };
 
+    struct Music {
+        u32 handle;
+        u32 checksum;
+        i32 references;
+        i32 size;
+        u32 flags;
+        i32 frequency;
+        std::wstring name;
+        Vector<char> data;
+
+        void load(Stream& stream) {
+            Vector<wchar_t> buffer;
+            stream >> handle
+                >> checksum
+                >> references
+                >> size
+                >> flags
+                >> frequency
+                >> buffer;
+            stream.load(data, size);
+
+            name = { std::from_range, buffer };
+            spdlog::debug("Read music \"{}\".", bamboo::to_string(name));
+        }
+    };
+
+    struct MusicBank : Vector<Music> {
+        void load(Stream& stream) {
+            stream >> signature<"ASUM"> >> static_cast<Vector&>(*this);
+            spdlog::info("Read {} music(s).", size());
+        }
+    };
+
     export struct File {
         Header header;
         FontBank font_bank;
         SoundBank sound_bank;
+        MusicBank music_bank;
 
         void load(Stream& stream) {
             {
@@ -237,6 +274,10 @@ namespace bamboo::mfa {
             {
                 Timer _{ "parsing sound bank" };
                 stream >> sound_bank;
+            }
+            {
+                Timer _{ "parsing music bank" };
+                stream >> music_bank;
             }
         }
     };
