@@ -49,14 +49,14 @@ namespace bamboo::mfa {
 
             if (_value < 0) {
                 throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", _value) };
-        }
+            }
 
             if (_value > MAX_SIZE) {
-            throw std::runtime_error{
+                throw std::runtime_error{
                     std::format("Container size is too large. Found {} but max allowed {}.", _value, MAX_SIZE)
-            };
+                };
+            }
         }
-    }
     };
 
     template <class T>
@@ -146,13 +146,71 @@ namespace bamboo::mfa {
         }
     };
 
+    struct Font {
+        u32 handle;
+        u32 checksum;
+        i32 references;
+        i32 size;
+        i32 height;
+        i32 width;
+        i32 escapement;
+        i32 orientation;
+        i32 weight;
+        u8 italic;
+        u8 underline;
+        u8 strike_out;
+        i8 charset;
+        i8 out_precision;
+        i8 clip_precision;
+        i8 quality;
+        i8 pitch_family;
+        std::wstring name;
+
+        void load(Stream& stream) {
+            Array<wchar_t, 32> buffer;
+            stream >> handle
+                >> checksum
+                >> references
+                >> size
+                >> height
+                >> width
+                >> escapement
+                >> orientation
+                >> weight
+                >> italic
+                >> underline
+                >> strike_out
+                >> charset
+                >> out_precision
+                >> clip_precision
+                >> quality
+                >> pitch_family
+                >> buffer;
+
+            name = buffer.data();
+            spdlog::info("Read font \"{}\".", bamboo::to_string(name));
+        }
+    };
+
+    struct FontBank : Vector<Font> {
+        void load(Stream& stream) {
+            stream >> signature<"ATNF"> >> static_cast<Vector&>(*this);
+            spdlog::info("Read {} font(s).", size());
+        }
+    };
+
     export struct File {
         Header header;
+        FontBank font_bank;
 
         void load(Stream& stream) {
             {
                 Timer _{ "parsing header" };
                 stream >> header;
+            }
+            {
+                Timer _{ "parsing font bank" };
+                stream >> font_bank;
             }
         }
     };
