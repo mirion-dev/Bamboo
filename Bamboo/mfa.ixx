@@ -90,10 +90,15 @@ namespace bamboo::mfa {
 
     struct String : std::wstring {
         void load(Stream& stream) {
-            i16 size;
-            stream >> size >> ignore<i16>;
+            static constexpr u32 UNICODE_{ 1u << 31 };
 
-            mfa::verify_size(size);
+            i32 size;
+            stream >> size;
+            if (!(size & UNICODE_)) {
+                throw std::runtime_error{ "ASCII string is unsupported." };
+            }
+
+            size &= ~UNICODE_;
             mfa::verify_size<wchar_t>(size);
             resize(size);
             stream.load(data(), size);
@@ -194,11 +199,13 @@ namespace bamboo::mfa {
     struct FontBank : Vector<Font> {
         void load(Stream& stream) {
             stream >> signature<"ATNF"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} font(s).", size());
+            spdlog::info("Read {} fonts.", size());
         }
     };
 
     struct Sound {
+        static constexpr u32 DECOMPRESSED{ 1 << 6 };
+
         u32 handle;
         u32 checksum;
         i32 references;
@@ -217,7 +224,7 @@ namespace bamboo::mfa {
                 >> flags
                 >> frequency
                 >> buffer;
-            stream.load(data, flags & 0x0040 ? size : size - static_cast<i32>(buffer.size() * sizeof(wchar_t)));
+            stream.load(data, flags & DECOMPRESSED ? size : size - static_cast<i32>(buffer.size() * 2));
 
             name = { std::from_range, buffer };
             spdlog::debug("Read sound \"{}\".", bamboo::to_string(name));
@@ -227,7 +234,7 @@ namespace bamboo::mfa {
     struct SoundBank : Vector<Sound> {
         void load(Stream& stream) {
             stream >> signature<"APMS"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} sound(s).", size());
+            spdlog::info("Read {} sounds.", size());
         }
     };
 
@@ -260,7 +267,7 @@ namespace bamboo::mfa {
     struct MusicBank : Vector<Music> {
         void load(Stream& stream) {
             stream >> signature<"ASUM"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} music(s).", size());
+            spdlog::info("Read {} music.", size());
         }
     };
 
@@ -311,7 +318,7 @@ namespace bamboo::mfa {
                 >> palette
                 >> static_cast<Vector&>(*this);
 
-            spdlog::info("Read {} image(s).", size());
+            spdlog::info("Read {} images.", size());
         }
     };
 
