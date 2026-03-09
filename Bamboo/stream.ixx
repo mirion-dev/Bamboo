@@ -6,12 +6,13 @@ import bamboo.core;
 namespace bamboo {
 
     export template <class T>
-    constexpr bool dense_layout_v{
-        std::is_arithmetic_v<T> || std::is_enum_v<T> || std::is_trivially_copyable_v<T> && requires { typename T::dense_layout; }
+    constexpr bool is_dense_layout_v{
+        std::is_arithmetic_v<T> || std::is_enum_v<T>
+        || std::is_trivially_copyable_v<T> && requires { typename T::dense_layout; }
     };
 
     template <class T>
-    concept binary_readable = !std::is_const_v<T> && dense_layout_v<T>;
+    concept binary_readable = !std::is_const_v<T> && is_dense_layout_v<T>;
 
     template <class S>
     concept has_binary_read = requires(S& stream, char* ptr, usize size) {
@@ -123,10 +124,10 @@ namespace bamboo {
     template <class T>
     struct Ignore {
         template <class... Args>
-            requires (dense_layout_v<T> && sizeof...(Args) == 0
+            requires (is_dense_layout_v<T> && sizeof...(Args) == 0
                 || std::is_default_constructible_v<T> && loadable<Stream&, T, Args...>)
         void load(Stream& stream, Args&&... args) const {
-            if constexpr (dense_layout_v<T> && sizeof...(Args) == 0) {
+            if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
                 stream >> ignore_bytes<sizeof(T)>;
             }
             else {

@@ -33,8 +33,9 @@ namespace bamboo::mfa {
         Timer& operator=(Timer&& other) noexcept = default;
     };
 
+    template <class T>
     static void verify_size(std::integral auto size) {
-        static constexpr usize MAX_SIZE{ 100'000'000 };
+        static constexpr usize MAX_SIZE{ is_dense_layout_v<T> ? 100'000'000 / sizeof(T) : 100'000 };
 
         if (size < 0) {
             throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
@@ -42,13 +43,13 @@ namespace bamboo::mfa {
 
         if (size > MAX_SIZE) {
             throw std::runtime_error{
-                std::format("Container size is too large. Found {} but max allowed {}.", size, MAX_SIZE)
+                std::format("Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE)
             };
         }
     }
 
     template <class T>
-        requires !dense_layout_v<T>
+        requires !is_dense_layout_v<T>
     static void load(Stream& stream, T* ptr, usize size) {
         for (usize i{}; i < size; ++i) {
             stream >> ptr[i];
@@ -81,7 +82,7 @@ namespace bamboo::mfa {
         }
 
         void load(Stream& stream, S size) {
-            mfa::verify_size(size);
+            mfa::verify_size<T>(size);
             this->resize(size);
             stream.load(this->data(), size);
         }
@@ -93,6 +94,7 @@ namespace bamboo::mfa {
             stream >> size >> ignore<i16>;
 
             mfa::verify_size(size);
+            mfa::verify_size<wchar_t>(size);
             resize(size);
             stream.load(data(), size);
         }
