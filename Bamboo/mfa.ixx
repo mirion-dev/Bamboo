@@ -17,31 +17,23 @@ namespace bamboo::mfa {
         using bamboo::Stream::Stream;
     };
 
-#pragma region utils
+    struct Color {
+        using dense_layout = void;
 
-    class Timer {
-        std::string _message;
-        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
-
-    public:
-        Timer(std::string_view message) noexcept :
-            _message{ message } {
-
-            spdlog::info("Started {}.", _message);
-        }
-
-        ~Timer() noexcept {
-            using namespace std::chrono;
-            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _message, duration);
-        }
-
-        Timer(Timer&& other) noexcept = default;
-        Timer& operator=(Timer&& other) noexcept = default;
+        u8 r, g, b, a;
     };
 
     template <class T>
-    static void verify_size(std::integral auto size) {
+        requires !is_dense_layout_v<T>
+    static void load(Stream& stream, T* ptr, usize size) {
+        for (usize i{}; i < size; ++i) {
+            stream >> ptr[i];
+        }
+    }
+
+    static void safe_load(Stream& stream, auto& container, std::integral auto size) {
+        using T = std::remove_pointer_t<decltype(container.data())>;
+
         static constexpr usize MAX_SIZE{ is_dense_layout_v<T> ? 100'000'000 / sizeof(T) : 100'000 };
 
         if (size < 0) {
@@ -53,25 +45,10 @@ namespace bamboo::mfa {
                 std::format("Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE)
             };
         }
-    }
 
-    template <class T>
-        requires !is_dense_layout_v<T>
-    static void load(Stream& stream, T* ptr, usize size) {
-        for (usize i{}; i < size; ++i) {
-            stream >> ptr[i];
+        container.resize(size);
+        stream.load(container.data(), size);
         }
-    }
-
-#pragma endregion
-
-#pragma region basic containers
-
-    struct Color {
-        using dense_layout = void;
-
-        u8 r, g, b, a;
-    };
 
     template <class T, usize N>
     struct Array : std::array<T, N> {
@@ -89,9 +66,7 @@ namespace bamboo::mfa {
         }
 
         void load(Stream& stream, S size) {
-            mfa::verify_size<T>(size);
-            this->resize(size);
-            stream.load(this->data(), size);
+            mfa::safe_load(stream, *this, size);
         }
     };
 
@@ -102,17 +77,41 @@ namespace bamboo::mfa {
             i32 size;
             stream >> size;
             if (!(size & UNICODE_)) {
-                throw std::runtime_error{ "ASCII string is unsupported." };
+                throw std::runtime_error{ "ASCII strings are unsupported." };
             }
 
-            size &= ~UNICODE_;
-            mfa::verify_size<wchar_t>(size);
-            resize(size);
-            stream.load(data(), size);
+            mfa::safe_load(stream, *this, size & ~UNICODE_);
         }
     };
 
-#pragma endregion
+    struct TerminatedString : std::wstring {
+        void load(Stream& stream) {
+            i32 size;
+            stream >> size;
+            mfa::safe_load(stream, *this, size);
+            if (empty() || back() != '\0') {
+                throw std::runtime_error{ "A terminated string must be null-terminated." };
+            }
+
+            pop_back();
+        }
+    };
+
+    template <usize N>
+        requires (N > 0)
+    struct PaddedString : std::wstring {
+        void load(Stream& stream) {
+            resize(N);
+            stream.load(data(), N);
+
+            usize end{ find(L'\0') };
+            if (end == -1) {
+                throw std::runtime_error{ "A padded string must be null-terminated." };
+            }
+
+            resize(end);
+        }
+    };
 
     template <LiteralString Expected>
     struct Signature {
@@ -175,10 +174,9 @@ namespace bamboo::mfa {
         i8 clip_precision;
         i8 quality;
         i8 pitch_family;
-        std::wstring name;
+        PaddedString<32> name;
 
         void load(Stream& stream) {
-            Array<wchar_t, 32> buffer;
             stream >> handle
                 >> checksum
                 >> references
@@ -196,9 +194,8 @@ namespace bamboo::mfa {
                 >> clip_precision
                 >> quality
                 >> pitch_family
-                >> buffer;
+                >> name;
 
-            name = buffer.data();
             spdlog::debug("Read font \"{}\".", bamboo::to_string(name));
         }
     };
@@ -219,21 +216,20 @@ namespace bamboo::mfa {
         i32 size;
         u32 flags;
         i32 frequency;
-        std::wstring name;
+        TerminatedString name;
         Vector<char> data;
 
         void load(Stream& stream) {
-            Vector<wchar_t> buffer;
             stream >> handle
                 >> checksum
                 >> references
                 >> size
                 >> flags
                 >> frequency
-                >> buffer;
-            stream.load(data, flags & DECOMPRESSED ? size : size - static_cast<i32>(buffer.size() * 2));
+                >> name;
+            stream.load(data, flags & DECOMPRESSED ? size : size - static_cast<i32>((name.size() + 1) * 2));
 
-            name = { std::from_range, buffer };
+            --handle;
             spdlog::debug("Read sound \"{}\".", bamboo::to_string(name));
         }
     };
@@ -252,21 +248,19 @@ namespace bamboo::mfa {
         i32 size;
         u32 flags;
         i32 frequency;
-        std::wstring name;
+        TerminatedString name;
         Vector<char> data;
 
         void load(Stream& stream) {
-            Vector<wchar_t> buffer;
             stream >> handle
                 >> checksum
                 >> references
                 >> size
                 >> flags
                 >> frequency
-                >> buffer;
-            stream.load(data, size - static_cast<i32>(buffer.size() * 2));
+                >> name;
+            stream.load(data, size - static_cast<i32>((name.size() + 1) * 2));
 
-            name = { std::from_range, buffer };
             spdlog::debug("Read music \"{}\".", bamboo::to_string(name));
         }
     };
@@ -385,7 +379,27 @@ namespace bamboo::mfa {
                 >> about
                 >> ignore<i32>
                 >> binary_files;
+    };
+
+    class Timer {
+        std::string _message;
+        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
+
+    public:
+        Timer(std::string_view message) noexcept :
+            _message{ message } {
+
+            spdlog::info("Started {}.", _message);
         }
+
+        ~Timer() noexcept {
+            using namespace std::chrono;
+            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
+            spdlog::info("Finished {} ({}s).", _message, duration);
+        }
+
+        Timer(Timer&& other) noexcept = default;
+        Timer& operator=(Timer&& other) noexcept = default;
     };
 
     export struct File {
