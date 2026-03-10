@@ -264,7 +264,7 @@ namespace bamboo::mfa {
                 >> flags
                 >> frequency
                 >> buffer;
-            stream.load(data, size);
+            stream.load(data, size - static_cast<i32>(buffer.size() * 2));
 
             name = { std::from_range, buffer };
             spdlog::debug("Read music \"{}\".", bamboo::to_string(name));
