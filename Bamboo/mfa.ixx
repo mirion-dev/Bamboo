@@ -48,7 +48,7 @@ namespace bamboo::mfa {
 
         container.resize(size);
         stream.load(container.data(), size);
-        }
+    }
 
     template <class T, usize N>
     struct Array : std::array<T, N> {
@@ -304,6 +304,10 @@ namespace bamboo::mfa {
                 >> action_y
                 >> transparent_color;
             stream.load(data, size);
+
+            if (stream.build < 284) {
+                ++handle;
+            }
         }
     };
 
@@ -320,6 +324,15 @@ namespace bamboo::mfa {
                 >> static_cast<Vector&>(*this);
 
             spdlog::info("Read {} images.", size());
+        }
+    };
+
+    struct Control {
+        i32 type;
+        Vector<i32> data;
+
+        void load(Stream& stream) {
+            stream >> type >> data;
         }
     };
 
@@ -343,7 +356,7 @@ namespace bamboo::mfa {
         String build_filename;
         String about;
         Vector<String> binary_files;
-        //Vector<Control> controls;
+        Vector<Control> controls;
         //Menu menu;
         i32 window_menu;
         Vector<i64> menu_images;
@@ -378,7 +391,9 @@ namespace bamboo::mfa {
                 >> ignore<String>
                 >> about
                 >> ignore<i32>
-                >> binary_files;
+                >> binary_files
+                >> controls;
+        }
     };
 
     class Timer {
