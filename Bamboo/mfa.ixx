@@ -84,13 +84,22 @@ namespace bamboo::mfa {
         }
     };
 
-    struct TerminatedString : std::wstring {
+    struct NString : std::wstring {
+        void load(Stream& stream) {
+            wchar_t ch;
+            while (stream >> ch, ch != '\0') {
+                push_back(ch);
+            }
+        }
+    };
+
+    struct LNString : std::wstring {
         void load(Stream& stream) {
             i32 size;
             stream >> size;
             mfa::safe_load(stream, *this, size);
             if (empty() || back() != '\0') {
-                throw std::runtime_error{ "A terminated string must be null-terminated." };
+                throw std::runtime_error{ "A LNString must be null-terminated." };
             }
 
             pop_back();
@@ -99,14 +108,14 @@ namespace bamboo::mfa {
 
     template <usize N>
         requires (N > 0)
-    struct PaddedString : std::wstring {
+    struct FixedString : std::wstring {
         void load(Stream& stream) {
             resize(N);
             stream.load(data(), N);
 
             usize end{ find(L'\0') };
             if (end == -1) {
-                throw std::runtime_error{ "A padded string must be null-terminated." };
+                throw std::runtime_error{ "A FixedString must be null-terminated." };
             }
 
             resize(end);
@@ -174,7 +183,7 @@ namespace bamboo::mfa {
         i8 clip_precision;
         i8 quality;
         i8 pitch_family;
-        PaddedString<32> name;
+        FixedString<32> name;
 
         void load(Stream& stream) {
             stream >> handle
@@ -216,7 +225,7 @@ namespace bamboo::mfa {
         i32 size;
         u32 flags;
         i32 frequency;
-        TerminatedString name;
+        LNString name;
         Vector<char> data;
 
         void load(Stream& stream) {
@@ -248,7 +257,7 @@ namespace bamboo::mfa {
         i32 size;
         u32 flags;
         i32 frequency;
-        TerminatedString name;
+        LNString name;
         Vector<char> data;
 
         void load(Stream& stream) {
