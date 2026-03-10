@@ -1,7 +1,6 @@
 #include <spdlog/spdlog.h>
 
 import std;
-import bamboo.stream;
 import bamboo.mfa;
 
 int main() {
@@ -10,7 +9,7 @@ int main() {
 #endif
 
     try {
-        bamboo::Stream stream{ "" };
+        bamboo::mfa::Stream stream{ "" };
         bamboo::mfa::File file;
         stream >> file;
     }

@@ -10,6 +10,13 @@ import bamboo.stream;
 
 namespace bamboo::mfa {
 
+    export class Stream : public bamboo::Stream {
+    public:
+        i32 build{};
+
+        using bamboo::Stream::Stream;
+    };
+
 #pragma region utils
 
     class Timer {
@@ -394,6 +401,7 @@ namespace bamboo::mfa {
             {
                 Timer _{ "parsing header" };
                 stream >> header;
+                stream.build = header.product_build;
             }
             {
                 Timer _{ "parsing font bank" };

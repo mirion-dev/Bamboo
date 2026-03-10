@@ -100,20 +100,20 @@ namespace bamboo {
         }
 
         template <class T, class... Args>
-        Stream& load(this auto& self, T&& value, Args&&... args) {
+        auto& load(this auto& self, T&& value, Args&&... args) {
             bamboo::load(self, std::forward<T>(value), std::forward<Args>(args)...);
             return self;
         }
 
         template <class T>
-        Stream& operator>>(this auto& self, T&& value) {
+        auto& operator>>(this auto& self, T&& value) {
             return self.load(std::forward<T>(value));
         }
     };
 
     template <usize N>
     struct IgnoreBytes {
-        void load(Stream& stream) const {
+        void load(auto& stream) const {
             stream.ignore(N);
         }
     };
@@ -123,10 +123,10 @@ namespace bamboo {
 
     template <class T>
     struct Ignore {
-        template <class... Args>
+        template <class S, class... Args>
             requires (is_dense_layout_v<T> && sizeof...(Args) == 0
-                || std::is_default_constructible_v<T> && loadable<Stream&, T, Args...>)
-        void load(Stream& stream, Args&&... args) const {
+                || std::is_default_constructible_v<T> && loadable<S&, T, Args...>)
+        void load(S& stream, Args&&... args) const {
             if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
                 stream >> ignore_bytes<sizeof(T)>;
             }
