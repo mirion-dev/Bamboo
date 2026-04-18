@@ -244,7 +244,7 @@ namespace bamboo::mfa {
         stream.load(value.name, string_type_pascal_c);
         stream.load(value.data, value.size - (value.name.size() + 1) * 2);
 
-        spdlog::debug("Read music \"{}\".", bamboo::to_string(value.name));
+        spdlog::debug("Read music \"{}\".", to_string(value.name));
     }
 
     static void load(Stream& stream, MusicBank& value) {
@@ -337,6 +337,7 @@ namespace bamboo::mfa {
     };
 
     export void load(Stream& stream, File& value) {
+        Timer _{ "parsing MFA file" };
         {
             Timer _{ "parsing header" };
             stream >> value.header;

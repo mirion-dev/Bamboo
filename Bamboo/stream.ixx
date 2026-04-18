@@ -8,7 +8,7 @@ namespace bamboo {
     export template <class T>
     constexpr bool is_dense_layout_v{
         std::is_arithmetic_v<T> || std::is_enum_v<T>
-        || std::is_trivially_copyable_v<T> && requires { typename T::dense_layout; }
+        || std::is_trivially_copyable_v<T> && requires { typename T::is_dense_layout; }
         || std::is_array_v<T> && is_dense_layout_v<std::remove_all_extents_t<T>>
     };
 
@@ -30,22 +30,19 @@ namespace bamboo {
     struct Loadable;
 
     template <class S, class T, class... Args>
-    struct IndirectlyLoadable : std::false_type {};
+    static constexpr bool indirectly_loadable_v{};
 
     template <class S, class T, class Size, class... Args>
-    struct IndirectlyLoadable<S, T, Size, Args...> : std::bool_constant<
+    static constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
             std::is_pointer_v<std::decay_t<T>> && std::convertible_to<Size, usize>
             && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
-        > {};
+    };
 
     template <class S, class T, class... Args>
     struct Loadable<S, T, Args...> : std::bool_constant<
             has_member_load<S, T, Args...> || has_non_member_load<S, T, Args...>
-            || IndirectlyLoadable<S, T, Args...>::value || binary_readable<T> && sizeof...(Args) == 0
+            || binary_readable<T> && sizeof...(Args) == 0 || indirectly_loadable_v<S, T, Args...>
         > {};
-
-    template <class S, class T, class... Args>
-    concept indirectly_loadable = IndirectlyLoadable<S, T, Args...>::value;
 
     export template <class S, class T, class... Args>
     concept loadable = Loadable<S, T, Args...>::value;
@@ -77,11 +74,11 @@ namespace bamboo {
             else if constexpr (has_non_member_load<S, T, Args...>) {
                 load(stream, std::forward<T>(value), std::forward<Args>(args)...);
             }
-            else if constexpr (indirectly_loadable<S, T, Args...>) {
-                Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
+            else if constexpr (binary_readable<T> && sizeof...(Args) == 0) {
+                stream.read(reinterpret_cast<char*>(&value), sizeof(T));
             }
             else {
-                stream.read(reinterpret_cast<char*>(&value), sizeof(T));
+                Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
             }
         }
     };

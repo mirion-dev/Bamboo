@@ -6,7 +6,7 @@ import bamboo.core;
 namespace bamboo {
 
     export struct Color {
-        using dense_layout = void;
+        using is_dense_layout = void;
 
         u8 r, g, b, a;
     };
