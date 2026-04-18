@@ -1,6 +1,7 @@
 #include <spdlog/spdlog.h>
 
 import std;
+import bamboo.general;
 import bamboo.mfa;
 
 int main() {
@@ -9,9 +10,9 @@ int main() {
 #endif
 
     try {
-        bamboo::mfa::Stream stream{ "" };
-        bamboo::mfa::File file;
-        stream >> file;
+        bamboo::mfa::Stream mfa_stream{ "" };
+        bamboo::File file;
+        mfa_stream >> file;
     }
     catch (const std::exception& error) {
         spdlog::error(error.what());

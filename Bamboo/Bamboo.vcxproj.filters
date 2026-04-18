@@ -5,5 +5,6 @@
     <ClCompile Include="core.ixx" />
     <ClCompile Include="mfa.ixx" />
     <ClCompile Include="stream.ixx" />
+    <ClCompile Include="general.ixx" />
   </ItemGroup>
 </Project>

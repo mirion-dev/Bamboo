@@ -1,12 +1,14 @@
 module;
 
 #include <spdlog/spdlog.h>
+#undef pascal
 
 export module bamboo.mfa;
 
 import std;
 import bamboo.core;
 import bamboo.stream;
+import bamboo.general;
 
 namespace bamboo::mfa {
 
@@ -17,21 +19,7 @@ namespace bamboo::mfa {
         using bamboo::Stream::Stream;
     };
 
-    struct Color {
-        using dense_layout = void;
-
-        u8 r, g, b, a;
-    };
-
-    template <class T>
-        requires !is_dense_layout_v<T>
-    static void load(Stream& stream, T* ptr, usize size) {
-        for (usize i{}; i < size; ++i) {
-            stream >> ptr[i];
-        }
-    }
-
-    static void safe_load(Stream& stream, auto& container, std::integral auto size) {
+    static void resize_load(Stream& stream, auto& container, std::integral auto size) {
         using T = std::remove_pointer_t<decltype(container.data())>;
 
         static constexpr usize MAX_SIZE{ is_dense_layout_v<T> ? 100'000'000 / sizeof(T) : 100'000 };
@@ -42,7 +30,11 @@ namespace bamboo::mfa {
 
         if (size > MAX_SIZE) {
             throw std::runtime_error{
-                std::format("Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE)
+                std::format(
+                    "Container size is too large. Found {} but max allowed {} for this type.",
+                    size,
+                    MAX_SIZE
+                )
             };
         }
 
@@ -51,27 +43,47 @@ namespace bamboo::mfa {
     }
 
     template <class T, usize N>
-    struct Array : std::array<T, N> {
-        void load(Stream& stream) {
-            stream.load(this->data(), N);
-        }
-    };
+    static void load(Stream& stream, std::array<T, N>& value) {
+        stream.load(value.data(), N);
+    }
+
+    template <std::integral T>
+    struct SizeType {};
+
+    template <std::integral T>
+    static constexpr SizeType<T> size_type;
+
+    template <class T>
+    static void load(Stream& stream, std::vector<T>& value, std::integral auto size) {
+        mfa::resize_load(stream, value, size);
+    }
 
     template <class T, std::integral S = i32>
-    struct Vector : std::vector<T> {
-        void load(Stream& stream) {
-            S size;
-            stream >> size;
-            stream.load(*this, size);
-        }
+    static void load(Stream& stream, std::vector<T>& value, SizeType<S> = {}) {
+        S size;
+        stream >> size;
+        stream.load(value, size);
+    }
 
-        void load(Stream& stream, S size) {
-            mfa::safe_load(stream, *this, size);
-        }
+    enum class StringTypeEnum {
+        pascal,
+        c,
+        pascal_c,
+        fixed_c
     };
 
-    struct String : std::wstring {
-        void load(Stream& stream) {
+    template <StringTypeEnum Type, usize N = {}>
+    struct StringType {};
+
+    static constexpr StringType<StringTypeEnum::pascal> string_type_pascal;
+    static constexpr StringType<StringTypeEnum::c> string_type_c;
+    static constexpr StringType<StringTypeEnum::pascal_c> string_type_pascal_c;
+    template <usize N>
+    static constexpr StringType<StringTypeEnum::fixed_c, N> string_type_fixed_c;
+
+    template <StringTypeEnum Type = {}, usize N = {}>
+    static void load(Stream& stream, std::wstring& value, StringType<Type, N> = {}) {
+        if constexpr (Type == StringTypeEnum::pascal) {
             static constexpr u32 UNICODE_{ 1u << 31 };
 
             i32 size;
@@ -79,393 +91,281 @@ namespace bamboo::mfa {
             if (!(size & UNICODE_)) {
                 throw std::runtime_error{ "ASCII strings are unsupported." };
             }
-
-            mfa::safe_load(stream, *this, size & ~UNICODE_);
+            resize_load(stream, value, size & ~UNICODE_);
         }
-    };
-
-    struct NString : std::wstring {
-        void load(Stream& stream) {
+        else if constexpr (Type == StringTypeEnum::c) {
+            value.clear();
             wchar_t ch;
             while (stream >> ch, ch != '\0') {
-                push_back(ch);
+                value.push_back(ch);
             }
         }
-    };
-
-    struct LNString : std::wstring {
-        void load(Stream& stream) {
+        else if constexpr (Type == StringTypeEnum::pascal_c) {
             i32 size;
             stream >> size;
-            mfa::safe_load(stream, *this, size);
-            if (empty() || back() != '\0') {
-                throw std::runtime_error{ "A LNString must be null-terminated." };
+            resize_load(stream, value, size);
+            if (value.empty() || value.back() != '\0') {
+                throw std::runtime_error{ "A Pascal-C string must be null-terminated." };
             }
-
-            pop_back();
+            value.pop_back();
         }
-    };
+        else if constexpr (Type == StringTypeEnum::fixed_c) {
+            resize_load(stream, value, N);
+            usize end{ value.find(L'\0') };
+            if (end == -1) {
+                throw std::runtime_error{ "A fixed C string must be null-terminated." };
+            }
+            value.resize(end);
+        }
+        else {
+            static_assert(false, "Unknown StringTypeEnum.");
+        }
+    }
+
+    template <class T, class... Args>
+    struct Skip {};
+
+    template <class T, class... Args>
+    static constexpr Skip<T, Args...> skip;
+
+    template <class T, class... Args>
+        requires (is_dense_layout_v<T> && sizeof...(Args) == 0
+            || std::is_default_constructible_v<T> && loadable<Stream, T&, Args...>)
+    static void load(Stream& stream, Skip<T, Args...>, Args&&... args) {
+        if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
+            stream.ignore(sizeof(T));
+        }
+        else {
+            T dummy;
+            stream.load(dummy, std::forward<Args>(args)...);
+        }
+    }
 
     template <usize N>
-        requires (N > 0)
-    struct FixedString : std::wstring {
-        void load(Stream& stream) {
-            resize(N);
-            stream.load(data(), N);
+    struct StringLiteral : std::array<char, N - 1> {
+        consteval StringLiteral(const char (&data)[N]) noexcept {
+            std::ranges::copy_n(data, N - 1, this->data());
+        }
 
-            usize end{ find(L'\0') };
-            if (end == -1) {
-                throw std::runtime_error{ "A FixedString must be null-terminated." };
-            }
-
-            resize(end);
+        consteval operator std::string_view() const noexcept {
+            return { this->data(), this->size() };
         }
     };
 
-    template <LiteralString Expected>
-    struct Signature {
-        void load(Stream& stream) const {
-            Array<char, Expected.size()> buffer;
-            stream >> buffer;
+    template <StringLiteral Expected>
+    struct Signature {};
 
-            std::string_view expected{ Expected }, actual{ buffer };
-            if (expected != actual) {
-                throw std::runtime_error{
-                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
-                };
-            }
-        }
-    };
-
-    template <LiteralString Expected>
+    template <StringLiteral Expected>
     static constexpr Signature<Expected> signature;
 
-    struct Header {
-        i16 runtime_version;
-        i16 runtime_subversion;
-        i32 product_version;
-        i32 product_build;
-        i32 language;
-        String app_name;
-        String editor_filename;
+    template <StringLiteral Expected>
+    static void load(Stream& stream, Signature<Expected>) {
+        std::array<char, Expected.size()> buffer;
+        stream >> buffer;
 
-        void load(Stream& stream) {
-            stream >> signature<"MFU2">
-                >> runtime_version
-                >> runtime_subversion
-                >> product_version
-                >> product_build
-                >> language
-                >> app_name
-                >> ignore<String>
-                >> editor_filename
-                >> ignore<Vector<char>>;
-
-            spdlog::info("Application \"{}\" (Build {}).", bamboo::to_string(app_name), product_build);
+        std::string_view expected{ Expected }, actual{ buffer };
+        if (expected != actual) {
+            throw std::runtime_error{
+                std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
+            };
         }
-    };
+    }
 
-    struct Font {
-        u32 handle;
-        u32 checksum;
-        i32 references;
-        i32 size;
-        i32 height;
-        i32 width;
-        i32 escapement;
-        i32 orientation;
-        i32 weight;
-        u8 italic;
-        u8 underline;
-        u8 strike_out;
-        i8 charset;
-        i8 out_precision;
-        i8 clip_precision;
-        i8 quality;
-        i8 pitch_family;
-        FixedString<32> name;
+    static void load(Stream& stream, Header& value) {
+        stream >> signature<"MFU2">
+            >> value.runtime_version
+            >> value.runtime_subversion
+            >> value.product_version
+            >> value.product_build
+            >> value.language
+            >> value.app_name
+            >> skip<std::wstring>
+            >> value.editor_filename
+            >> skip<std::vector<char>>;
 
-        void load(Stream& stream) {
-            stream >> handle
-                >> checksum
-                >> references
-                >> size
-                >> height
-                >> width
-                >> escapement
-                >> orientation
-                >> weight
-                >> italic
-                >> underline
-                >> strike_out
-                >> charset
-                >> out_precision
-                >> clip_precision
-                >> quality
-                >> pitch_family
-                >> name;
+        spdlog::info("Application \"{}\" (Build {}).", to_string(value.app_name), value.product_build);
+    }
 
-            spdlog::debug("Read font \"{}\".", bamboo::to_string(name));
+    static void load(Stream& stream, Font& value) {
+        stream >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.height
+            >> value.width
+            >> value.escapement
+            >> value.orientation
+            >> value.weight
+            >> value.italic
+            >> value.underline
+            >> value.strike_out
+            >> value.charset
+            >> value.out_precision
+            >> value.clip_precision
+            >> value.quality
+            >> value.pitch_family;
+        stream.load(value.name, string_type_fixed_c<32>);
+
+        spdlog::debug("Read font \"{}\".", to_string(value.name));
+    }
+
+    static void load(Stream& stream, FontBank& value) {
+        stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
+        spdlog::info("Read {} fonts.", value.size());
+    }
+
+    static void load(Stream& stream, Sound& value) {
+        stream >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.flags
+            >> value.frequency;
+        stream.load(value.name, string_type_pascal_c);
+        stream.load(value.data, value.size - (value.flags & Sound::DECOMPRESSED ? 0 : (value.name.size() + 1) * 2));
+
+        --value.handle;
+
+        spdlog::debug("Read sound \"{}\".", to_string(value.name));
+    }
+
+    static void load(Stream& stream, SoundBank& value) {
+        stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
+        spdlog::info("Read {} sounds.", value.size());
+    }
+
+    static void load(Stream& stream, Music& value) {
+        stream >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.flags
+            >> value.frequency;
+        stream.load(value.name, string_type_pascal_c);
+        stream.load(value.data, value.size - (value.name.size() + 1) * 2);
+
+        spdlog::debug("Read music \"{}\".", bamboo::to_string(value.name));
+    }
+
+    static void load(Stream& stream, MusicBank& value) {
+        stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
+        spdlog::info("Read {} music.", value.size());
+    }
+
+    static void load(Stream& stream, Image& value) {
+        stream >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.width
+            >> value.height
+            >> value.graphic_mode
+            >> value.flags
+            >> skip<i16>
+            >> value.hotspot_x
+            >> value.hotspot_y
+            >> value.action_x
+            >> value.action_y
+            >> value.transparent_color;
+        stream.load(value.data, value.size);
+
+        if (stream.build < 284) {
+            ++value.handle;
         }
-    };
+    }
 
-    struct FontBank : Vector<Font> {
-        void load(Stream& stream) {
-            stream >> signature<"ATNF"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} fonts.", size());
-        }
-    };
+    static void load(Stream& stream, ImageBank& value) {
+        stream >> signature<"AGMI">
+            >> value.graphic_mode
+            >> value.palette_version;
+        stream.load(value.palette, size_type<i16>);
+        stream >> static_cast<std::vector<Image>&>(value);
 
-    struct Sound {
-        static constexpr u32 DECOMPRESSED{ 1 << 6 };
+        spdlog::info("Read {} images.", value.size());
+    }
 
-        u32 handle;
-        u32 checksum;
-        i32 references;
-        i32 size;
-        u32 flags;
-        i32 frequency;
-        LNString name;
-        Vector<char> data;
+    static void load(Stream& stream, Control& value) {
+        stream >> value.type >> value.data;
+    }
 
-        void load(Stream& stream) {
-            stream >> handle
-                >> checksum
-                >> references
-                >> size
-                >> flags
-                >> frequency
-                >> name;
-            stream.load(data, flags & DECOMPRESSED ? size : size - static_cast<i32>((name.size() + 1) * 2));
-
-            --handle;
-            spdlog::debug("Read sound \"{}\".", bamboo::to_string(name));
-        }
-    };
-
-    struct SoundBank : Vector<Sound> {
-        void load(Stream& stream) {
-            stream >> signature<"APMS"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} sounds.", size());
-        }
-    };
-
-    struct Music {
-        u32 handle;
-        u32 checksum;
-        i32 references;
-        i32 size;
-        u32 flags;
-        i32 frequency;
-        LNString name;
-        Vector<char> data;
-
-        void load(Stream& stream) {
-            stream >> handle
-                >> checksum
-                >> references
-                >> size
-                >> flags
-                >> frequency
-                >> name;
-            stream.load(data, size - static_cast<i32>((name.size() + 1) * 2));
-
-            spdlog::debug("Read music \"{}\".", bamboo::to_string(name));
-        }
-    };
-
-    struct MusicBank : Vector<Music> {
-        void load(Stream& stream) {
-            stream >> signature<"ASUM"> >> static_cast<Vector&>(*this);
-            spdlog::info("Read {} music.", size());
-        }
-    };
-
-    struct Image {
-        u32 handle;
-        u32 checksum;
-        i32 references;
-        i32 size;
-        i16 width;
-        i16 height;
-        i8 graphic_mode;
-        u8 flags;
-        i16 hotspot_x;
-        i16 hotspot_y;
-        i16 action_x;
-        i16 action_y;
-        Color transparent_color;
-        Vector<char> data;
-
-        void load(Stream& stream) {
-            stream >> handle
-                >> checksum
-                >> references
-                >> size
-                >> width
-                >> height
-                >> graphic_mode
-                >> flags
-                >> ignore<i16>
-                >> hotspot_x
-                >> hotspot_y
-                >> action_x
-                >> action_y
-                >> transparent_color;
-            stream.load(data, size);
-
-            if (stream.build < 284) {
-                ++handle;
-            }
-        }
-    };
-
-    struct ImageBank : Vector<Image> {
-        i32 graphic_mode;
-        i16 palette_version;
-        Vector<u32, i16> palette;
-
-        void load(Stream& stream) {
-            stream >> signature<"AGMI">
-                >> graphic_mode
-                >> palette_version
-                >> palette
-                >> static_cast<Vector&>(*this);
-
-            spdlog::info("Read {} images.", size());
-        }
-    };
-
-    struct Control {
-        i32 type;
-        Vector<i32> data;
-
-        void load(Stream& stream) {
-            stream >> type >> data;
-        }
-    };
-
-    struct Setting {
-        String app_name;
-        String author;
-        String description;
-        String copyright;
-        String company;
-        String version;
-        i32 app_width;
-        i32 app_height;
-        Color border_color;
-        u32 display_flags;
-        u32 graphic_flags;
-        String help_file;
-        i32 score;
-        i32 lives;
-        i32 frame_rate;
-        i32 build_type;
-        String build_filename;
-        String about;
-        Vector<String> binary_files;
-        Vector<Control> controls;
-        //Menu menu;
-        i32 window_menu;
-        Vector<i64> menu_images;
-        //Vector<Value> global_numbers;
-        //Vector<Value> global_strings;
-        //Events<true> global_events;
-        i32 graphic_mode;
-        Vector<u32> icons;
-        //Vector<Qualifier> qualifiers;
-        //Vector<Extension> extensions;
-
-        void load(Stream& stream) {
-            stream >> app_name
-                >> author
-                >> description
-                >> copyright
-                >> company
-                >> version
-                >> app_width
-                >> app_height
-                >> border_color
-                >> display_flags
-                >> graphic_flags
-                >> help_file
-                >> ignore<String>
-                >> score
-                >> lives
-                >> frame_rate
-                >> build_type
-                >> build_filename
-                >> ignore<String>
-                >> ignore<String>
-                >> about
-                >> ignore<i32>
-                >> binary_files
-                >> controls;
-        }
-    };
+    static void load(Stream& stream, Setting& value) {
+        stream >> value.app_name
+            >> value.author
+            >> value.description
+            >> value.copyright
+            >> value.company
+            >> value.version
+            >> value.app_width
+            >> value.app_height
+            >> value.border_color
+            >> value.display_flags
+            >> value.graphic_flags
+            >> value.help_file
+            >> skip<std::wstring>
+            >> value.score
+            >> value.lives
+            >> value.frame_rate
+            >> value.build_type
+            >> value.build_filename
+            >> skip<std::wstring>
+            >> skip<std::wstring>
+            >> value.about
+            >> skip<i32>
+            >> value.binary_files
+            >> value.controls;
+    }
 
     class Timer {
-        std::string _message;
+        std::string _name;
         std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
 
     public:
-        Timer(std::string_view message) noexcept :
-            _message{ message } {
+        Timer(std::string_view name) noexcept :
+            _name{ name } {
 
-            spdlog::info("Started {}.", _message);
+            spdlog::info("Started {}.", _name);
         }
 
         ~Timer() noexcept {
             using namespace std::chrono;
             double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _message, duration);
+            spdlog::info("Finished {} ({}s).", _name, duration);
         }
 
         Timer(Timer&& other) noexcept = default;
         Timer& operator=(Timer&& other) noexcept = default;
     };
 
-    export struct File {
-        Header header;
-        FontBank font_bank;
-        SoundBank sound_bank;
-        MusicBank music_bank;
-        ImageBank icon_bank;
-        ImageBank image_bank;
-        Setting setting;
-
-        void load(Stream& stream) {
-            {
-                Timer _{ "parsing header" };
-                stream >> header;
-                stream.build = header.product_build;
-            }
-            {
-                Timer _{ "parsing font bank" };
-                stream >> font_bank;
-            }
-            {
-                Timer _{ "parsing sound bank" };
-                stream >> sound_bank;
-            }
-            {
-                Timer _{ "parsing music bank" };
-                stream >> music_bank;
-            }
-            {
-                Timer _{ "parsing icon bank" };
-                stream >> icon_bank;
-            }
-            {
-                Timer _{ "parsing image bank" };
-                stream >> image_bank;
-            }
-            {
-                Timer _{ "parsing setting" };
-                stream >> setting;
-            }
+    export void load(Stream& stream, File& value) {
+        {
+            Timer _{ "parsing header" };
+            stream >> value.header;
+            stream.build = value.header.product_build;
         }
-    };
+        {
+            Timer _{ "parsing font bank" };
+            stream >> value.font_bank;
+        }
+        {
+            Timer _{ "parsing sound bank" };
+            stream >> value.sound_bank;
+        }
+        {
+            Timer _{ "parsing music bank" };
+            stream >> value.music_bank;
+        }
+        {
+            Timer _{ "parsing icon bank" };
+            stream >> value.icon_bank;
+        }
+        {
+            Timer _{ "parsing image bank" };
+            stream >> value.image_bank;
+        }
+        {
+            Timer _{ "parsing setting" };
+            stream >> value.setting;
+        }
+    }
 
 }

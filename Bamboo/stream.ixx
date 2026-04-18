@@ -9,15 +9,12 @@ namespace bamboo {
     constexpr bool is_dense_layout_v{
         std::is_arithmetic_v<T> || std::is_enum_v<T>
         || std::is_trivially_copyable_v<T> && requires { typename T::dense_layout; }
+        || std::is_array_v<T> && is_dense_layout_v<std::remove_all_extents_t<T>>
     };
 
     template <class T>
-    concept binary_readable = !std::is_const_v<T> && is_dense_layout_v<T>;
-
-    template <class S>
-    concept has_binary_read = requires(S& stream, char* ptr, usize size) {
-        stream.read(ptr, size);
-    };
+    concept binary_readable = std::is_lvalue_reference_v<T>
+        && !std::is_const_v<std::remove_reference_t<T>> && is_dense_layout_v<std::remove_reference_t<T>>;
 
     template <class S, class T, class... Args>
     concept has_member_load = requires(S& stream, T&& value, Args&&... args) {
@@ -29,63 +26,67 @@ namespace bamboo {
         load(stream, std::forward<T>(value), std::forward<Args>(args)...);
     };
 
-    enum class load_mode {
-        read,
-        read_array,
-        member_custom,
-        non_member_custom,
-        none
-    };
+    template <class S, class T, class... Args>
+    struct Loadable;
 
     template <class S, class T, class... Args>
-    static constexpr load_mode select_load_mode{
-        has_binary_read<S>
-        && std::is_lvalue_reference_v<T> && binary_readable<std::remove_reference_t<T>>
-        && sizeof...(Args) == 0
-        ? load_mode::read
+    struct IndirectlyLoadable : std::false_type {};
 
-        : has_binary_read<S>
-        && std::is_pointer_v<std::decay_t<T>> && binary_readable<std::remove_pointer_t<std::decay_t<T>>>
-        && sizeof...(Args) == 1 && (std::convertible_to<Args, usize> && ...)
-        ? load_mode::read_array
-
-        : has_member_load<S, T, Args...>
-        ? load_mode::member_custom
-
-        : has_non_member_load<S, T, Args...>
-        ? load_mode::non_member_custom
-
-        : load_mode::none
-    };
+    template <class S, class T, class Size, class... Args>
+    struct IndirectlyLoadable<S, T, Size, Args...> : std::bool_constant<
+            std::is_pointer_v<std::decay_t<T>> && std::convertible_to<Size, usize>
+            && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
+        > {};
 
     template <class S, class T, class... Args>
-    concept loadable = select_load_mode<S, T, Args...> != load_mode::none;
+    struct Loadable<S, T, Args...> : std::bool_constant<
+            has_member_load<S, T, Args...> || has_non_member_load<S, T, Args...>
+            || IndirectlyLoadable<S, T, Args...>::value || binary_readable<T> && sizeof...(Args) == 0
+        > {};
 
-    struct load_fn {
+    template <class S, class T, class... Args>
+    concept indirectly_loadable = IndirectlyLoadable<S, T, Args...>::value;
+
+    export template <class S, class T, class... Args>
+    concept loadable = Loadable<S, T, Args...>::value;
+
+    struct Load {
+    private:
+        template <class S, class T, class Size, class... Args>
+        static void _indirectly(S& stream, T&& value, Size&& size, Args&&... args) {
+            using value_type = std::remove_pointer_t<std::decay_t<T>>;
+
+            usize cast_size{ static_cast<usize>(size) };
+            if constexpr (is_dense_layout_v<value_type>) {
+                stream.read(reinterpret_cast<char*>(value), sizeof(value_type) * cast_size);
+            }
+            else {
+                for (usize i{}; i < cast_size; ++i) {
+                    Load::operator()(stream, value[i], std::forward<Args>(args)...);
+                }
+            }
+        }
+
+    public:
         template <class S, class T, class... Args>
             requires loadable<S, T, Args...>
         static void operator()(S& stream, T&& value, Args&&... args) {
-            static constexpr load_mode MODE{ select_load_mode<S, T, Args...> };
-            if constexpr (MODE == load_mode::read) {
-                stream.read(reinterpret_cast<char*>(&value), sizeof(value));
-            }
-            else if constexpr (MODE == load_mode::read_array) {
-                stream.read(reinterpret_cast<char*>(value), sizeof(*value) * args...);
-            }
-            else if constexpr (MODE == load_mode::member_custom) {
+            if constexpr (has_member_load<S, T, Args...>) {
                 std::forward<T>(value).load(stream, std::forward<Args>(args)...);
             }
-            else if constexpr (MODE == load_mode::non_member_custom) {
+            else if constexpr (has_non_member_load<S, T, Args...>) {
                 load(stream, std::forward<T>(value), std::forward<Args>(args)...);
             }
+            else if constexpr (indirectly_loadable<S, T, Args...>) {
+                Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
+            }
             else {
-                static_assert(false);
-                std::unreachable();
+                stream.read(reinterpret_cast<char*>(&value), sizeof(T));
             }
         }
     };
 
-    export constexpr load_fn load;
+    export constexpr Load load;
 
     export class Stream : public std::fstream {
     public:
@@ -99,45 +100,18 @@ namespace bamboo {
             open(std::u8string{ path.begin(), path.end() }, binary | in);
         }
 
-        template <class T, class... Args>
-        auto& load(this auto& self, T&& value, Args&&... args) {
+        template <class S, class T, class... Args>
+            requires loadable<S, T, Args...>
+        S& load(this S& self, T&& value, Args&&... args) {
             bamboo::load(self, std::forward<T>(value), std::forward<Args>(args)...);
             return self;
         }
 
-        template <class T>
-        auto& operator>>(this auto& self, T&& value) {
+        template <class S, class T>
+            requires loadable<S, T>
+        S& operator>>(this S& self, T&& value) {
             return self.load(std::forward<T>(value));
         }
     };
-
-    template <usize N>
-    struct IgnoreBytes {
-        void load(auto& stream) const {
-            stream.ignore(N);
-        }
-    };
-
-    export template <usize N>
-    constexpr IgnoreBytes<N> ignore_bytes;
-
-    template <class T>
-    struct Ignore {
-        template <class S, class... Args>
-            requires (is_dense_layout_v<T> && sizeof...(Args) == 0
-                || std::is_default_constructible_v<T> && loadable<S&, T, Args...>)
-        void load(S& stream, Args&&... args) const {
-            if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
-                stream >> ignore_bytes<sizeof(T)>;
-            }
-            else {
-                T dummy;
-                stream.load(dummy, std::forward<Args>(args)...);
-            }
-        }
-    };
-
-    export template <class T>
-    constexpr Ignore<T> ignore;
 
 }

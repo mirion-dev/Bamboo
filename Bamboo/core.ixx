@@ -26,23 +26,6 @@ namespace bamboo {
 
     }
 
-    export template <usize N>
-    struct LiteralString {
-        std::array<char, N> data;
-
-        consteval LiteralString(const char (&data)[N]) noexcept {
-            std::ranges::copy(data, this->data.data());
-        }
-
-        consteval operator std::string_view() const noexcept {
-            return { data.data(), size() };
-        }
-
-        consteval usize size() const noexcept {
-            return N - 1;
-        }
-    };
-
     export std::string to_string(std::wstring_view str) noexcept {
         std::u8string u8{ std::filesystem::path{ str.begin(), str.end() }.u8string() };
         return { reinterpret_cast<char*>(u8.data()), u8.size() };
