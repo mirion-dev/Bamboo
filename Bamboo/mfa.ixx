@@ -39,12 +39,12 @@ namespace bamboo::mfa {
         }
 
         container.resize(size);
-        stream.load(container.data(), size);
+        stream >> bamboo::args(container.data(), size);
     }
 
     template <class T, usize N>
     static void load(Stream& stream, std::array<T, N>& value) {
-        stream.load(value.data(), N);
+        stream >> bamboo::args(value.data(), N);
     }
 
     template <std::integral T>
@@ -61,8 +61,7 @@ namespace bamboo::mfa {
     template <class T, std::integral S = i32>
     static void load(Stream& stream, std::vector<T>& value, SizeType<S> = {}) {
         S size;
-        stream >> size;
-        stream.load(value, size);
+        stream >> size >> bamboo::args(value, size);
     }
 
     enum class StringTypeEnum {
@@ -137,7 +136,7 @@ namespace bamboo::mfa {
         }
         else {
             T dummy;
-            stream.load(dummy, std::forward<Args>(args)...);
+            stream >> bamboo::args(dummy, std::forward<Args>(args)...);
         }
     }
 
@@ -203,8 +202,8 @@ namespace bamboo::mfa {
             >> value.out_precision
             >> value.clip_precision
             >> value.quality
-            >> value.pitch_family;
-        stream.load(value.name, string_type_fixed_c<32>);
+            >> value.pitch_family
+            >> args(value.name, string_type_fixed_c<32>);
 
         spdlog::debug("Read font \"{}\".", to_string(value.name));
     }
@@ -220,9 +219,9 @@ namespace bamboo::mfa {
             >> value.references
             >> value.size
             >> value.flags
-            >> value.frequency;
-        stream.load(value.name, string_type_pascal_c);
-        stream.load(value.data, value.size - (value.flags & Sound::DECOMPRESSED ? 0 : (value.name.size() + 1) * 2));
+            >> value.frequency
+            >> args(value.name, string_type_pascal_c);
+        stream >> args(value.data, value.size - (value.flags & Sound::DECOMPRESSED ? 0 : (value.name.size() + 1) * 2));
 
         --value.handle;
 
@@ -240,9 +239,9 @@ namespace bamboo::mfa {
             >> value.references
             >> value.size
             >> value.flags
-            >> value.frequency;
-        stream.load(value.name, string_type_pascal_c);
-        stream.load(value.data, value.size - (value.name.size() + 1) * 2);
+            >> value.frequency
+            >> args(value.name, string_type_pascal_c);
+        stream >> args(value.data, value.size - (value.name.size() + 1) * 2);
 
         spdlog::debug("Read music \"{}\".", to_string(value.name));
     }
@@ -266,8 +265,8 @@ namespace bamboo::mfa {
             >> value.hotspot_y
             >> value.action_x
             >> value.action_y
-            >> value.transparent_color;
-        stream.load(value.data, value.size);
+            >> value.transparent_color
+            >> args(value.data, value.size);
 
         if (stream.build < 284) {
             ++value.handle;
@@ -277,9 +276,9 @@ namespace bamboo::mfa {
     static void load(Stream& stream, ImageBank& value) {
         stream >> signature<"AGMI">
             >> value.graphic_mode
-            >> value.palette_version;
-        stream.load(value.palette, size_type<i16>);
-        stream >> static_cast<std::vector<Image>&>(value);
+            >> value.palette_version
+            >> args(value.palette, size_type<i16>)
+            >> static_cast<std::vector<Image>&>(value);
 
         spdlog::info("Read {} images.", value.size());
     }

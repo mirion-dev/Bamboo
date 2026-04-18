@@ -34,8 +34,8 @@ namespace bamboo {
 
     template <class S, class T, class Size, class... Args>
     static constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
-            std::is_pointer_v<std::decay_t<T>> && std::convertible_to<Size, usize>
-            && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
+        std::is_pointer_v<std::decay_t<T>> && std::convertible_to<Size, usize>
+        && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
     };
 
     template <class S, class T, class... Args>
@@ -85,6 +85,24 @@ namespace bamboo {
 
     export constexpr Load load;
 
+    template <class T>
+    static constexpr bool is_tuple_v{};
+
+    template <class... Args>
+    static constexpr bool is_tuple_v<std::tuple<Args...>>{ true };
+
+    template <class T>
+    concept is_tuple = is_tuple_v<std::remove_cvref_t<T>>;
+
+    template <class S, class T>
+    static constexpr bool tuple_loadable_v{};
+
+    template <class S, class... Args>
+    static constexpr bool tuple_loadable_v<S, std::tuple<Args...>>{ loadable<S, Args...> };
+
+    template <class S, class T>
+    concept tuple_loadable = tuple_loadable_v<S, std::remove_cvref_t<T>>;
+
     export class Stream : public std::fstream {
     public:
         Stream() noexcept {
@@ -105,10 +123,24 @@ namespace bamboo {
         }
 
         template <class S, class T>
-            requires loadable<S, T>
-        S& operator>>(this S& self, T&& value) {
-            return self.load(std::forward<T>(value));
+            requires (!is_tuple<T> ? loadable<S, T> : tuple_loadable<S, T>)
+        S& operator>>(this S& self, T&& args) {
+            if constexpr (!is_tuple<T>) {
+                bamboo::load(self, std::forward<T>(args));
+            }
+            else {
+                std::apply(
+                    [&]<class... Args>(Args&&... args) { bamboo::load(self, std::forward<Args>(args)...); },
+                    std::forward<T>(args)
+                );
+            }
+            return self;
         }
     };
+
+    export template <class... Args>
+    auto args(Args&&... args) {
+        return std::forward_as_tuple(std::forward<Args>(args)...);
+    }
 
 }
