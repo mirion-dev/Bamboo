@@ -10,38 +10,6 @@ import bamboo.stream;
 
 namespace bamboo {
 
-    export template <usize N>
-    struct StringLiteral : std::array<char, N - 1> {
-        consteval StringLiteral(const char (&data)[N]) noexcept {
-            std::ranges::copy_n(data, N - 1, this->data());
-        }
-
-        consteval operator std::string_view() const noexcept {
-            return { this->data(), this->size() };
-        }
-    };
-
-    export class Timer {
-        std::string _name;
-        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
-
-    public:
-        Timer(std::string_view name) noexcept :
-            _name{ name } {
-
-            spdlog::info("Started {}.", _name);
-        }
-
-        ~Timer() noexcept {
-            using namespace std::chrono;
-            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _name, duration);
-        }
-
-        Timer(Timer&& other) noexcept = default;
-        Timer& operator=(Timer&& other) noexcept = default;
-    };
-
     export std::string to_string(std::wstring_view str) noexcept {
         std::u8string u8{ std::filesystem::path{ str.begin(), str.end() }.u8string() };
         return { reinterpret_cast<char*>(u8.data()), u8.size() };
@@ -70,5 +38,75 @@ namespace bamboo {
         container.resize(size);
         stream >> bamboo::args(container.data(), size);
     }
+
+    export template <class T, class... Args>
+    struct Skip {
+        template <class S>
+            requires (is_dense_layout_v<T> && sizeof...(Args) == 0
+                || std::is_default_constructible_v<T> && loadable<S, T&, Args...>)
+        void load(S& stream) const {
+            if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
+                stream.ignore(sizeof(T));
+            }
+            else {
+                T dummy;
+                stream >> bamboo::args(dummy, std::forward<Args>(args)...);
+            }
+        }
+    };
+
+    export template <class T, class... Args>
+    constexpr Skip<T, Args...> skip;
+
+    export template <usize N>
+    struct StringLiteral : std::array<char, N - 1> {
+        consteval StringLiteral(const char (&data)[N]) noexcept {
+            std::ranges::copy_n(data, N - 1, this->data());
+        }
+
+        consteval operator std::string_view() const noexcept {
+            return { this->data(), this->size() };
+        }
+    };
+
+    export template <StringLiteral Expected>
+    struct Signature {
+        void load(auto& stream) const {
+            static constexpr usize N{ Expected.size() };
+            std::array<char, N> buffer;
+            stream >> bamboo::args(buffer.data(), N);
+
+            std::string_view expected{ Expected }, actual{ buffer };
+            if (expected != actual) {
+                throw std::runtime_error{
+                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
+                };
+            }
+        }
+    };
+
+    export template <StringLiteral Expected>
+    constexpr Signature<Expected> signature;
+
+    export class Timer {
+        std::string _name;
+        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
+
+    public:
+        Timer(std::string_view name) noexcept :
+            _name{ name } {
+
+            spdlog::info("Started {}.", _name);
+        }
+
+        ~Timer() noexcept {
+            using namespace std::chrono;
+            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
+            spdlog::info("Finished {} ({}s).", _name, duration);
+        }
+
+        Timer(Timer&& other) noexcept = default;
+        Timer& operator=(Timer&& other) noexcept = default;
+    };
 
 }

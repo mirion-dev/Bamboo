@@ -53,7 +53,7 @@ namespace bamboo {
         static void _indirectly(S& stream, T&& value, Size&& size, Args&&... args) {
             using value_type = std::remove_pointer_t<std::decay_t<T>>;
 
-            usize cast_size{ static_cast<usize>(size) };
+            auto cast_size{ static_cast<usize>(size) };
             if constexpr (is_dense_layout_v<value_type>) {
                 stream.read(reinterpret_cast<char*>(value), sizeof(value_type) * cast_size);
             }

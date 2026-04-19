@@ -61,14 +61,14 @@ namespace bamboo::mfa {
     template <StringTypeEnum Type = {}, usize N = {}>
     static void load(Stream& stream, std::wstring& value, StringType<Type, N> = {}) {
         if constexpr (Type == StringTypeEnum::pascal) {
-            static constexpr u32 UNICODE_{ 1u << 31 };
+            static constexpr u32 FLAG_UNICODE{ 1u << 31 };
 
             i32 size;
             stream >> size;
-            if (!(size & UNICODE_)) {
+            if (!(size & FLAG_UNICODE)) {
                 throw std::runtime_error{ "ASCII strings are unsupported." };
             }
-            resize_load(stream, value, size & ~UNICODE_);
+            resize_load(stream, value, size & ~FLAG_UNICODE);
         }
         else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
@@ -96,44 +96,6 @@ namespace bamboo::mfa {
         }
         else {
             static_assert(false, "Unknown StringTypeEnum.");
-        }
-    }
-
-    template <class T, class... Args>
-    struct Skip {};
-
-    template <class T, class... Args>
-    static constexpr Skip<T, Args...> skip;
-
-    template <class T, class... Args>
-        requires (is_dense_layout_v<T> && sizeof...(Args) == 0
-            || std::is_default_constructible_v<T> && loadable<Stream, T&, Args...>)
-    static void load(Stream& stream, Skip<T, Args...>, Args&&... args) {
-        if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
-            stream.ignore(sizeof(T));
-        }
-        else {
-            T dummy;
-            stream >> bamboo::args(dummy, std::forward<Args>(args)...);
-        }
-    }
-
-    template <StringLiteral Expected>
-    struct Signature {};
-
-    template <StringLiteral Expected>
-    static constexpr Signature<Expected> signature;
-
-    template <StringLiteral Expected>
-    static void load(Stream& stream, Signature<Expected>) {
-        std::array<char, Expected.size()> buffer;
-        stream >> buffer;
-
-        std::string_view expected{ Expected }, actual{ buffer };
-        if (expected != actual) {
-            throw std::runtime_error{
-                std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
-            };
         }
     }
 
