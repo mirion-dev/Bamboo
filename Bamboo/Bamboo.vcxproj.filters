@@ -2,9 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="core.ixx" />
+    <ClCompile Include="types.ixx" />
     <ClCompile Include="mfa.ixx" />
     <ClCompile Include="stream.ixx" />
     <ClCompile Include="general.ixx" />
+    <ClCompile Include="utils.ixx" />
   </ItemGroup>
 </Project>

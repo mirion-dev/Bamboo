@@ -127,11 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="core.ixx" />
+    <ClCompile Include="types.ixx" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mfa.ixx" />
     <ClCompile Include="stream.ixx" />
     <ClCompile Include="general.ixx" />
+    <ClCompile Include="utils.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

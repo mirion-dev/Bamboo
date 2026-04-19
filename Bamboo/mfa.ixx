@@ -6,7 +6,8 @@ module;
 export module bamboo.mfa;
 
 import std;
-import bamboo.core;
+import bamboo.types;
+import bamboo.utils;
 import bamboo.stream;
 import bamboo.general;
 
@@ -18,29 +19,6 @@ namespace bamboo::mfa {
 
         using bamboo::Stream::Stream;
     };
-
-    static void resize_load(Stream& stream, auto& container, std::integral auto size) {
-        using T = std::remove_pointer_t<decltype(container.data())>;
-
-        static constexpr usize MAX_SIZE{ is_dense_layout_v<T> ? 100'000'000 / sizeof(T) : 100'000 };
-
-        if (size < 0) {
-            throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
-        }
-
-        if (size > MAX_SIZE) {
-            throw std::runtime_error{
-                std::format(
-                    "Container size is too large. Found {} but max allowed {} for this type.",
-                    size,
-                    MAX_SIZE
-                )
-            };
-        }
-
-        container.resize(size);
-        stream >> bamboo::args(container.data(), size);
-    }
 
     template <class T, usize N>
     static void load(Stream& stream, std::array<T, N>& value) {
@@ -55,7 +33,7 @@ namespace bamboo::mfa {
 
     template <class T>
     static void load(Stream& stream, std::vector<T>& value, std::integral auto size) {
-        mfa::resize_load(stream, value, size);
+        bamboo::resize_load(stream, value, size);
     }
 
     template <class T, std::integral S = i32>
@@ -139,17 +117,6 @@ namespace bamboo::mfa {
             stream >> bamboo::args(dummy, std::forward<Args>(args)...);
         }
     }
-
-    template <usize N>
-    struct StringLiteral : std::array<char, N - 1> {
-        consteval StringLiteral(const char (&data)[N]) noexcept {
-            std::ranges::copy_n(data, N - 1, this->data());
-        }
-
-        consteval operator std::string_view() const noexcept {
-            return { this->data(), this->size() };
-        }
-    };
 
     template <StringLiteral Expected>
     struct Signature {};
@@ -313,27 +280,6 @@ namespace bamboo::mfa {
             >> value.binary_files
             >> value.controls;
     }
-
-    class Timer {
-        std::string _name;
-        std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
-
-    public:
-        Timer(std::string_view name) noexcept :
-            _name{ name } {
-
-            spdlog::info("Started {}.", _name);
-        }
-
-        ~Timer() noexcept {
-            using namespace std::chrono;
-            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _name, duration);
-        }
-
-        Timer(Timer&& other) noexcept = default;
-        Timer& operator=(Timer&& other) noexcept = default;
-    };
 
     export void load(Stream& stream, File& value) {
         Timer _{ "parsing MFA file" };

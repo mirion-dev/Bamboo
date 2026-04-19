@@ -1,7 +1,7 @@
 export module bamboo.stream;
 
 import std;
-import bamboo.core;
+import bamboo.types;
 
 namespace bamboo {
 
