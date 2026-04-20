@@ -15,8 +15,7 @@ namespace bamboo {
         return { reinterpret_cast<char*>(u8.data()), u8.size() };
     }
 
-    export template <class S, class T, std::integral Size>
-    void resize_load(S& stream, T& container, const Size& size) {
+    export void resize_load(auto& stream, auto& container, std::integral auto size) {
         using value_type = std::remove_pointer_t<decltype(container.data())>;
 
         static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? 100'000'000 / sizeof(value_type) : 100'000 };

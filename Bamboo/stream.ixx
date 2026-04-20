@@ -103,8 +103,11 @@ namespace bamboo {
     template <class S, class T>
     concept tuple_loadable = tuple_loadable_v<S, std::remove_cvref_t<T>>;
 
-    export class Stream : public std::fstream {
+    export template <class C>
+    class Stream : public std::fstream {
     public:
+        C context;
+
         Stream() noexcept {
             exceptions(failbit | badbit);
         }
@@ -126,11 +129,11 @@ namespace bamboo {
             requires (!is_tuple<T> ? loadable<S, T> : tuple_loadable<S, T>)
         S& operator>>(this S& self, T&& args) {
             if constexpr (!is_tuple<T>) {
-                bamboo::load(self, std::forward<T>(args));
+                self.load(std::forward<T>(args));
             }
             else {
                 std::apply(
-                    [&]<class... Args>(Args&&... args) { bamboo::load(self, std::forward<Args>(args)...); },
+                    [&]<class... Args>(Args&&... args) { self.load(std::forward<Args>(args)...); },
                     std::forward<T>(args)
                 );
             }

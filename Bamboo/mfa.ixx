@@ -13,12 +13,11 @@ import bamboo.general;
 
 namespace bamboo::mfa {
 
-    export class Stream : public bamboo::Stream {
-    public:
+    struct Context {
         i32 build{};
-
-        using bamboo::Stream::Stream;
     };
+
+    export using Stream = Stream<Context>;
 
     template <class T, usize N>
     static void load(Stream& stream, std::array<T, N>& value) {
@@ -61,14 +60,14 @@ namespace bamboo::mfa {
     template <StringTypeEnum Type = {}, usize N = {}>
     static void load(Stream& stream, std::wstring& value, StringType<Type, N> = {}) {
         if constexpr (Type == StringTypeEnum::pascal) {
-            static constexpr u32 FLAG_UNICODE{ 1u << 31 };
+            static constexpr u32 MASK_UNICODE{ 1u << 31 };
 
             i32 size;
             stream >> size;
-            if (!(size & FLAG_UNICODE)) {
+            if (!(size & MASK_UNICODE)) {
                 throw std::runtime_error{ "ASCII strings are unsupported." };
             }
-            resize_load(stream, value, size & ~FLAG_UNICODE);
+            resize_load(stream, value, size & ~MASK_UNICODE);
         }
         else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
@@ -197,7 +196,7 @@ namespace bamboo::mfa {
             >> value.transparent_color
             >> args(value.data, value.size);
 
-        if (stream.build < 284) {
+        if (stream.context.build < 284) {
             ++value.handle;
         }
     }
@@ -248,7 +247,7 @@ namespace bamboo::mfa {
         {
             Timer _{ "parsing header" };
             stream >> value.header;
-            stream.build = value.header.product_build;
+            stream.context.build = value.header.product_build;
         }
         {
             Timer _{ "parsing font bank" };
