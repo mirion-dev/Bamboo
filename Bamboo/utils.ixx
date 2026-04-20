@@ -88,6 +88,51 @@ namespace bamboo {
     export template <StringLiteral Expected>
     constexpr Signature<Expected> signature;
 
+    export template <std::unsigned_integral T>
+    struct Flags {
+        T value;
+
+        class Ref {
+            friend Flags;
+
+            T* _ptr;
+            T _mask;
+
+            Ref(T* ptr, T mask) noexcept :
+                _ptr{ ptr },
+                _mask{ mask } {}
+
+        public:
+            operator bool() const noexcept {
+                return *_ptr & _mask;
+            }
+
+            const Ref& operator=(bool value) const noexcept {
+                if (value) {
+                    *_ptr |= _mask;
+                }
+                else {
+                    *_ptr &= ~_mask;
+                }
+                return *this;
+            }
+        };
+
+        Ref operator[](int index) noexcept {
+            assert(index < std::numeric_limits<T>::digits);
+            return { &value, static_cast<T>(T{ 1 } << index) };
+        }
+
+        bool operator[](int index) const noexcept {
+            assert(index < std::numeric_limits<T>::digits);
+            return value & static_cast<T>(T{ 1 } << index);
+        }
+
+        void load(auto& stream) {
+            stream >> value;
+        }
+    };
+
     export class Timer {
         std::string _name;
         std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };

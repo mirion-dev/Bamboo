@@ -150,7 +150,7 @@ namespace bamboo::mfa {
             >> value.flags
             >> value.frequency
             >> args(value.name, string_type_pascal_c);
-        stream >> args(value.data, value.size - (value.flags & Sound::DECOMPRESSED ? 0 : (value.name.size() + 1) * 2));
+        stream >> args(value.data, value.size - (value.flags[Sound::play_from_disk] ? 0 : (value.name.size() + 1) * 2));
 
         --value.handle;
 

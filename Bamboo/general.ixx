@@ -2,6 +2,7 @@ export module bamboo.general;
 
 import std;
 import bamboo.types;
+import bamboo.utils;
 
 namespace bamboo {
 
@@ -45,13 +46,19 @@ namespace bamboo {
     export struct FontBank : std::vector<Font> {};
 
     export struct Sound {
-        static constexpr u32 DECOMPRESSED{ 1 << 6 };
+        enum {
+            check,
+            load_on_call   = 4,
+            play_from_disk = 5,
+            has_name       = 8,
+            name_crop      = 14
+        };
 
         u32 handle;
         u32 checksum;
         i32 references;
         i32 size;
-        u32 flags;
+        Flags<u32> flags;
         i32 frequency;
         std::wstring name;
         std::vector<char> data;
@@ -64,7 +71,7 @@ namespace bamboo {
         u32 checksum;
         i32 references;
         i32 size;
-        u32 flags;
+        Flags<u32> flags;
         i32 frequency;
         std::wstring name;
         std::vector<char> data;
@@ -73,6 +80,17 @@ namespace bamboo {
     export struct MusicBank : std::vector<Music> {};
 
     export struct Image {
+        enum {
+            rle,
+            rlew,
+            rlet,
+            lzx,
+            alpha,
+            ace,
+            mac,
+            rgba
+        };
+
         u32 handle;
         u32 checksum;
         i32 references;
@@ -80,7 +98,7 @@ namespace bamboo {
         i16 width;
         i16 height;
         i8 graphic_mode;
-        u8 flags;
+        Flags<u8> flags;
         i16 hotspot_x;
         i16 hotspot_y;
         i16 action_x;
@@ -101,6 +119,54 @@ namespace bamboo {
     };
 
     export struct Setting {
+        enum DisplayFlag {
+            maximized_on_boot,
+            resize_display,
+            change_resolution_mode,
+            allow_fullscreen_switch,
+            heading,
+            heading_when_maximized,
+            menu_bar,
+            menu_displayed,
+            no_minimize_box,
+            no_maximize_box,
+            no_thick_frame,
+            dont_center_frame,
+            disable_close_button,
+            hidden_at_start,
+            keep_screen_ratio = 15,
+            anti_aliasing,
+            right_to_left_reading = 18,
+            right_to_left_layout,
+            fit_inside = 21
+        };
+
+        enum GraphicFlag {
+            multi_samples,
+            machine_independent_speed,
+            play_sounds_over_frames,
+            dont_mute_on_lost_focus,
+            dont_stop_screen_saver,
+            enable_visual_themes = 7,
+            v_sync,
+            run_when_minimized,
+            run_while_resizing,
+            debugger_shortcuts,
+            dont_show_debugger,
+            dont_share_sub_app_data,
+            direct3d9,
+            direct3d8,
+            dont_ignore_destroy_far = 21,
+            disable_ime,
+            reduce_cpu_usage,
+            enable_profiling = 26,
+            dont_start_profiling,
+            direct3d11,
+            premultiplied_alpha,
+            dont_optimize_events,
+            record_slowest_loops
+        };
+
         std::wstring app_name;
         std::wstring author;
         std::wstring description;
@@ -110,8 +176,8 @@ namespace bamboo {
         i32 app_width;
         i32 app_height;
         Color border_color;
-        u32 display_flags;
-        u32 graphic_flags;
+        Flags<u32> display_flags;
+        Flags<u32> graphic_flags;
         std::wstring help_file;
         i32 score;
         i32 lives;
