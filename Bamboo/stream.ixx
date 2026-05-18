@@ -103,11 +103,8 @@ namespace bamboo {
     template <class S, class T>
     concept tuple_loadable = tuple_loadable_v<S, std::remove_cvref_t<T>>;
 
-    export template <class C>
-    class Stream : public std::fstream {
+    export class Stream : public std::fstream {
     public:
-        C context;
-
         Stream() noexcept {
             exceptions(failbit | badbit);
         }

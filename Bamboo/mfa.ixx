@@ -13,11 +13,12 @@ import bamboo.general;
 
 namespace bamboo::mfa {
 
-    struct Context {
+    export class Stream : public bamboo::Stream {
+    public:
         i32 build{};
-    };
 
-    export using Stream = Stream<Context>;
+        using bamboo::Stream::Stream;
+    };
 
     template <class T, usize N>
     static void load(Stream& stream, std::array<T, N>& value) {
@@ -196,7 +197,7 @@ namespace bamboo::mfa {
             >> value.transparent_color
             >> args(value.data, value.size);
 
-        if (stream.context.build < 284) {
+        if (stream.build < 284) {
             ++value.handle;
         }
     }
@@ -247,7 +248,7 @@ namespace bamboo::mfa {
         {
             Timer _{ "parsing header" };
             stream >> value.header;
-            stream.context.build = value.header.product_build;
+            stream.build = value.header.product_build;
         }
         {
             Timer _{ "parsing font bank" };
