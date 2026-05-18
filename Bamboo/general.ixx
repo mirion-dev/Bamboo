@@ -47,12 +47,12 @@ namespace bamboo {
             }
         };
 
-        Ref operator[](int index) noexcept {
+        Ref operator[](usize index) noexcept {
             assert(index < std::numeric_limits<T>::digits);
             return { &value, static_cast<T>(T{ 1 } << index) };
         }
 
-        bool operator[](int index) const noexcept {
+        bool operator[](usize index) const noexcept {
             assert(index < std::numeric_limits<T>::digits);
             return value & static_cast<T>(T{ 1 } << index);
         }
