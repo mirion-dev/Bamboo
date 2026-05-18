@@ -7,5 +7,6 @@
     <ClCompile Include="stream.ixx" />
     <ClCompile Include="general.ixx" />
     <ClCompile Include="utils.ixx" />
+    <ClCompile Include="stream.utils.ixx" />
   </ItemGroup>
 </Project>

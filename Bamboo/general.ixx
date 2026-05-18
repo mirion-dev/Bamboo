@@ -1,8 +1,11 @@
+module;
+
+#include <cassert>
+
 export module bamboo.general;
 
 import std;
 import bamboo.types;
-import bamboo.utils;
 
 namespace bamboo {
 
@@ -10,6 +13,49 @@ namespace bamboo {
         using is_dense_layout = void;
 
         u8 r, g, b, a;
+    };
+
+    export template <std::unsigned_integral T>
+    struct Flags {
+        using is_dense_layout = void;
+
+        T value;
+
+        class Ref {
+            friend Flags;
+
+            T* _ptr;
+            T _mask;
+
+            Ref(T* ptr, T mask) noexcept :
+                _ptr{ ptr },
+                _mask{ mask } {}
+
+        public:
+            operator bool() const noexcept {
+                return *_ptr & _mask;
+            }
+
+            const Ref& operator=(bool value) const noexcept {
+                if (value) {
+                    *_ptr |= _mask;
+                }
+                else {
+                    *_ptr &= ~_mask;
+                }
+                return *this;
+            }
+        };
+
+        Ref operator[](int index) noexcept {
+            assert(index < std::numeric_limits<T>::digits);
+            return { &value, static_cast<T>(T{ 1 } << index) };
+        }
+
+        bool operator[](int index) const noexcept {
+            assert(index < std::numeric_limits<T>::digits);
+            return value & static_cast<T>(T{ 1 } << index);
+        }
     };
 
     export struct Header {

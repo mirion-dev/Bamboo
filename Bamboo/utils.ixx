@@ -5,8 +5,6 @@ module;
 export module bamboo.utils;
 
 import std;
-import bamboo.types;
-import bamboo.stream;
 
 namespace bamboo {
 
@@ -14,121 +12,6 @@ namespace bamboo {
         std::u8string u8{ std::filesystem::path{ str.begin(), str.end() }.u8string() };
         return { reinterpret_cast<char*>(u8.data()), u8.size() };
     }
-
-    export void resize_load(auto& stream, auto& container, std::integral auto size) {
-        using value_type = std::remove_pointer_t<decltype(container.data())>;
-
-        static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? 100'000'000 / sizeof(value_type) : 100'000 };
-
-        if (size < 0) {
-            throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
-        }
-
-        if (size > MAX_SIZE) {
-            throw std::runtime_error{
-                std::format(
-                    "Container size is too large. Found {} but max allowed {} for this type.",
-                    size,
-                    MAX_SIZE
-                )
-            };
-        }
-
-        container.resize(size);
-        stream >> bamboo::args(container.data(), size);
-    }
-
-    export template <class T, class... Args>
-    struct Skip {
-        template <class S>
-            requires (is_dense_layout_v<T> && sizeof...(Args) == 0
-                || std::is_default_constructible_v<T> && loadable<S, T&, Args...>)
-        void load(S& stream) const {
-            if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
-                stream.ignore(sizeof(T));
-            }
-            else {
-                T dummy;
-                stream >> bamboo::args(dummy, std::forward<Args>(args)...);
-            }
-        }
-    };
-
-    export template <class T, class... Args>
-    constexpr Skip<T, Args...> skip;
-
-    export template <usize N>
-    struct StringLiteral : std::array<char, N - 1> {
-        consteval StringLiteral(const char (&data)[N]) noexcept {
-            std::ranges::copy_n(data, N - 1, this->data());
-        }
-
-        consteval operator std::string_view() const noexcept {
-            return { this->data(), this->size() };
-        }
-    };
-
-    export template <StringLiteral Expected>
-    struct Signature {
-        void load(auto& stream) const {
-            static constexpr usize N{ Expected.size() };
-            std::array<char, N> buffer;
-            stream >> bamboo::args(buffer.data(), N);
-
-            std::string_view expected{ Expected }, actual{ buffer };
-            if (expected != actual) {
-                throw std::runtime_error{
-                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
-                };
-            }
-        }
-    };
-
-    export template <StringLiteral Expected>
-    constexpr Signature<Expected> signature;
-
-    export template <std::unsigned_integral T>
-    struct Flags {
-        using is_dense_layout = void;
-
-        T value;
-
-        class Ref {
-            friend Flags;
-
-            T* _ptr;
-            T _mask;
-
-            Ref(T* ptr, T mask) noexcept :
-                _ptr{ ptr },
-                _mask{ mask } {}
-
-        public:
-            operator bool() const noexcept {
-                return *_ptr & _mask;
-            }
-
-            const Ref& operator=(bool value) const noexcept {
-                if (value) {
-                    *_ptr |= _mask;
-                }
-                else {
-                    *_ptr &= ~_mask;
-                }
-                return *this;
-            }
-        };
-
-        Ref operator[](int index) noexcept {
-            assert(index < std::numeric_limits<T>::digits);
-            return { &value, static_cast<T>(T{ 1 } << index) };
-        }
-
-        bool operator[](int index) const noexcept {
-            assert(index < std::numeric_limits<T>::digits);
-            return value & static_cast<T>(T{ 1 } << index);
-        }
-    };
 
     export class Timer {
         std::string _name;
