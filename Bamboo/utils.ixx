@@ -89,6 +89,8 @@ namespace bamboo {
 
     export template <std::unsigned_integral T>
     struct Flags {
+        using is_dense_layout = void;
+
         T value;
 
         class Ref {
@@ -125,10 +127,6 @@ namespace bamboo {
         bool operator[](int index) const noexcept {
             assert(index < std::numeric_limits<T>::digits);
             return value & static_cast<T>(T{ 1 } << index);
-        }
-
-        void load(auto& stream) {
-            stream >> value;
         }
     };
 
