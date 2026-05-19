@@ -213,8 +213,18 @@ namespace bamboo::mfa {
         spdlog::info("Read {} images.", value.size());
     }
 
+    static void load(Stream& stream, BinaryFiles& value) {
+        stream >> static_cast<std::vector<std::wstring>&>(value);
+        spdlog::info("Read {} binary files.", value.size());
+    }
+
     static void load(Stream& stream, Control& value) {
         stream >> value.type >> value.data;
+    }
+
+    static void load(Stream& stream, Controls& value) {
+        stream >> static_cast<std::vector<Control>&>(value);
+        spdlog::info("Read {} controls.", value.size());
     }
 
     static void load(Stream& stream, MenuItem& value) {
@@ -274,6 +284,9 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(end);
+        stream >> value.window_menu >> value.images;
+
+        spdlog::info("Read menu.");
     }
 
     static void load(Stream& stream, Value& value) {
@@ -293,6 +306,18 @@ namespace bamboo::mfa {
         default:
             throw std::runtime_error{ std::format("Unknown value type {}.", type) };
         }
+
+        spdlog::debug("Read value \"{}\".", to_string(value.name));
+    }
+
+    static void load(Stream& stream, GlobalNumbers& value) {
+        stream >> static_cast<std::vector<Value>&>(value);
+        spdlog::info("Read {} global numbers.", value.size());
+    }
+
+    static void load(Stream& stream, GlobalStrings& value) {
+        stream >> static_cast<std::vector<Value>&>(value);
+        spdlog::info("Read {} global strings.", value.size());
     }
 
     static void load(Stream& stream, GlobalEvents& value) {
@@ -300,6 +325,7 @@ namespace bamboo::mfa {
         if (value.size != 0) {
             throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
         }
+        spdlog::info("Read {} global events.", value.size);
     }
 
     static void load(Stream& stream, Setting& value) {
@@ -328,8 +354,6 @@ namespace bamboo::mfa {
             >> value.binary_files
             >> value.controls
             >> value.menu
-            >> value.window_menu
-            >> value.menu_images
             >> value.global_numbers
             >> value.global_strings
             >> value.global_events;

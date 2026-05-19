@@ -159,10 +159,14 @@ namespace bamboo {
         std::vector<u32> palette;
     };
 
+    export struct BinaryFiles : std::vector<std::wstring> {};
+
     export struct Control {
         i32 type;
         std::vector<i32> data;
     };
+
+    export struct Controls : std::vector<Control> {};
 
     export struct MenuItem;
 
@@ -197,6 +201,8 @@ namespace bamboo {
         i32 accel_size;
         MenuItems items;
         std::vector<MenuAccel> accels;
+        i32 window_menu;
+        std::vector<i64> images;
     };
 
     export struct Value {
@@ -209,6 +215,10 @@ namespace bamboo {
         std::wstring name;
         std::variant<i32, f64, std::wstring> value;
     };
+
+    export struct GlobalNumbers : std::vector<Value> {};
+
+    export struct GlobalStrings : std::vector<Value> {};
 
     export struct GlobalEvents {
         i32 size;
@@ -281,13 +291,11 @@ namespace bamboo {
         i32 build_type;
         std::wstring build_filename;
         std::wstring about;
-        std::vector<std::wstring> binary_files;
-        std::vector<Control> controls;
+        BinaryFiles binary_files;
+        Controls controls;
         Menu menu;
-        i32 window_menu;
-        std::vector<i64> menu_images;
-        std::vector<Value> global_numbers;
-        std::vector<Value> global_strings;
+        GlobalNumbers global_numbers;
+        GlobalStrings global_strings;
         GlobalEvents global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
