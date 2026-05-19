@@ -19,12 +19,17 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    try {
+#ifndef _DEBUG
+    try
+#endif
+    {
         bamboo::mfa::Stream mfa_stream{ argv[1] };
         bamboo::File file;
         mfa_stream >> file;
     }
+#ifndef _DEBUG
     catch (const std::exception& error) {
         spdlog::error(error.what());
     }
+#endif
 }
