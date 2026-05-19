@@ -109,10 +109,9 @@ namespace bamboo {
             exceptions(failbit | badbit);
         }
 
-        Stream(std::string_view path) :
-            Stream{} {
-
-            open(std::u8string{ path.begin(), path.end() }, binary | in);
+        Stream(std::string_view path) {
+            exceptions(failbit | badbit); // WORKAROUND: Delegation leads to crash when open() fails.
+            open(path.data(), binary | in);
         }
 
         template <class S, class T, class... Args>
