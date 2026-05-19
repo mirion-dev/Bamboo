@@ -168,6 +168,24 @@ namespace bamboo {
 
     export struct Controls : std::vector<Control> {};
 
+    export struct Qualifier {
+        std::wstring name;
+        u32 handle;
+    };
+
+    export struct Qualifiers : std::vector<Qualifier> {};
+
+    export struct Extension {
+        u32 handle;
+        std::wstring filename;
+        std::wstring name;
+        i32 magic_num;
+        std::wstring subtype;
+        i32 is_unicode;
+    };
+
+    export struct Extensions : std::vector<Extension> {};
+
     export struct MenuItem;
 
     export struct MenuItems : std::vector<MenuItem> {};
@@ -299,8 +317,8 @@ namespace bamboo {
         GlobalEvents global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
-        //std::vector<Qualifier> qualifiers;
-        //std::vector<Extension> extensions;
+        Qualifiers qualifiers;
+        Extensions extensions;
     };
 
     export struct File {

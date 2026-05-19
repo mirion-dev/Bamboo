@@ -227,6 +227,32 @@ namespace bamboo::mfa {
         spdlog::info("Read {} controls.", value.size());
     }
 
+    static void load(Stream& stream, Qualifier& value) {
+        stream >> value.name >> value.handle;
+        spdlog::debug("Read qualifier \"{}\".", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Qualifiers& value) {
+        stream >> static_cast<std::vector<Qualifier>&>(value);
+        spdlog::info("Read {} qualifiers.", value.size());
+    }
+
+    static void load(Stream& stream, Extension& value) {
+        stream >> value.handle
+            >> value.filename
+            >> value.name
+            >> value.magic_num
+            >> value.subtype
+            >> value.is_unicode;
+
+        spdlog::debug("Read extension \"{}\".", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Extensions& value) {
+        stream >> static_cast<std::vector<Extension>&>(value);
+        spdlog::info("Read {} extensions.", value.size());
+    }
+
     static void load(Stream& stream, MenuItem& value) {
         stream >> value.flags;
         if (!value.flags[MenuItem::parent]) {
@@ -356,7 +382,11 @@ namespace bamboo::mfa {
             >> value.menu
             >> value.global_numbers
             >> value.global_strings
-            >> value.global_events;
+            >> value.global_events
+            >> value.graphic_mode
+            >> value.icons
+            >> value.qualifiers
+            >> value.extensions;
     }
 
     export void load(Stream& stream, File& value) {
