@@ -92,7 +92,7 @@ namespace bamboo {
     export struct FontBank : std::vector<Font> {};
 
     export struct Sound {
-        enum {
+        enum Flag {
             check,
             load_on_call   = 4,
             play_from_disk = 5,
@@ -126,7 +126,7 @@ namespace bamboo {
     export struct MusicBank : std::vector<Music> {};
 
     export struct Image {
-        enum {
+        enum Flag {
             rle,
             rlew,
             rlet,
@@ -169,7 +169,7 @@ namespace bamboo {
     export struct MenuItems : std::vector<MenuItem> {};
 
     struct MenuItem {
-        enum {
+        enum Flag {
             disabled,
             checked = 3,
             parent,
@@ -197,6 +197,17 @@ namespace bamboo {
         i32 accel_size;
         MenuItems items;
         std::vector<MenuAccel> accels;
+    };
+
+    export struct Value {
+        enum Type {
+            integer,
+            decimal,
+            string
+        };
+
+        std::wstring name;
+        std::variant<i32, f64, std::wstring> value;
     };
 
     export struct Setting {
@@ -271,8 +282,8 @@ namespace bamboo {
         Menu menu;
         i32 window_menu;
         std::vector<i64> menu_images;
-        //std::vector<Value> global_numbers;
-        //std::vector<Value> global_strings;
+        std::vector<Value> global_numbers;
+        std::vector<Value> global_strings;
         //Events<true> global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
