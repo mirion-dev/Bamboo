@@ -210,6 +210,10 @@ namespace bamboo {
         std::variant<i32, f64, std::wstring> value;
     };
 
+    export struct GlobalEvents {
+        i32 size;
+    };
+
     export struct Setting {
         enum DisplayFlag {
             maximized_on_boot,
@@ -284,7 +288,7 @@ namespace bamboo {
         std::vector<i64> menu_images;
         std::vector<Value> global_numbers;
         std::vector<Value> global_strings;
-        //Events<true> global_events;
+        GlobalEvents global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
         //std::vector<Qualifier> qualifiers;

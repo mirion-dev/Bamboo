@@ -295,6 +295,13 @@ namespace bamboo::mfa {
         }
     }
 
+    static void load(Stream& stream, GlobalEvents& value) {
+        stream >> value.size;
+        if (value.size != 0) {
+            throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
+        }
+    }
+
     static void load(Stream& stream, Setting& value) {
         stream >> value.app_name
             >> value.author
@@ -324,7 +331,8 @@ namespace bamboo::mfa {
             >> value.window_menu
             >> value.menu_images
             >> value.global_numbers
-            >> value.global_strings;
+            >> value.global_strings
+            >> value.global_events;
     }
 
     export void load(Stream& stream, File& value) {
