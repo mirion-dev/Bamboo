@@ -280,19 +280,19 @@ namespace bamboo::mfa {
     static void load(Stream& stream, Menu& value) {
         stream >> value.size;
 
-        auto begin{ static_cast<u32>(stream.tellg()) };
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        usize end{ begin + value.size };
         stream >> value.header_size
             >> value.item_offset
             >> value.item_size
             >> value.accel_offset
             >> value.accel_size;
 
-        u32 header_end{ begin + value.header_size };
-        u32 item_begin{ begin + value.item_offset };
-        u32 item_end{ item_begin + value.item_size };
-        u32 accel_begin{ begin + value.accel_offset };
-        u32 accel_end{ accel_begin + value.accel_size };
-        u32 end{ begin + value.size };
+        usize header_end{ begin + value.header_size };
+        usize item_begin{ begin + value.item_offset };
+        usize item_end{ item_begin + value.item_size };
+        usize accel_begin{ begin + value.accel_offset };
+        usize accel_end{ accel_begin + value.accel_size };
         if (stream.tellg() != header_end) {
             throw std::runtime_error{ "Corrupt menu header." };
         }
@@ -300,13 +300,13 @@ namespace bamboo::mfa {
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            throw std::runtime_error{ "Corrupt menu item section." };
+            throw std::runtime_error{ "Corrupt menu items." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            throw std::runtime_error{ "Corrupt menu accelerator section." };
+            throw std::runtime_error{ "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
