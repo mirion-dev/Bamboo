@@ -258,19 +258,19 @@ namespace bamboo::mfa {
         u32 accel_end{ accel_begin + value.accel_size };
         u32 end{ begin + value.size };
         if (stream.tellg() != header_end) {
-            spdlog::error("Corrupt menu header.");
+            throw std::runtime_error{ "Corrupt menu header." };
         }
 
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            spdlog::warn("Corrupt menu item section.");
+            throw std::runtime_error{ "Corrupt menu item section." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            spdlog::warn("Corrupt menu accelerator section.");
+            throw std::runtime_error{ "Corrupt menu accelerator section." };
         }
 
         stream.seekg(end);
