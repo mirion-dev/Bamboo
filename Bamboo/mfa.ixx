@@ -217,6 +217,65 @@ namespace bamboo::mfa {
         stream >> value.type >> value.data;
     }
 
+    static void load(Stream& stream, MenuItem& value) {
+        stream >> value.flags;
+        if (!value.flags[MenuItem::parent]) {
+            stream >> value.id;
+        }
+        stream >> args(value.name, string_type_c);
+        if (value.flags[MenuItem::parent]) {
+            stream >> value.items;
+        }
+    }
+
+    static void load(Stream& stream, MenuItems& value) {
+        value.clear();
+
+        MenuItem item;
+        while (stream >> item, !item.flags[MenuItem::footer]) {
+            value.emplace_back(std::move(item));
+        }
+    }
+
+    static void load(Stream& stream, MenuAccel& value) {
+        stream >> value.shift >> value.key >> value.id;
+    }
+
+    static void load(Stream& stream, Menu& value) {
+        stream >> value.size;
+
+        auto begin{ static_cast<u32>(stream.tellg()) };
+        stream >> value.header_size
+            >> value.item_offset
+            >> value.item_size
+            >> value.accel_offset
+            >> value.accel_size;
+
+        u32 header_end{ begin + value.header_size };
+        u32 item_begin{ begin + value.item_offset };
+        u32 item_end{ item_begin + value.item_size };
+        u32 accel_begin{ begin + value.accel_offset };
+        u32 accel_end{ accel_begin + value.accel_size };
+        u32 end{ begin + value.size };
+        if (stream.tellg() != header_end) {
+            spdlog::error("Corrupt menu header.");
+        }
+
+        stream.seekg(item_begin);
+        stream >> skip<i32> >> value.items;
+        if (stream.tellg() != item_end) {
+            spdlog::warn("Corrupt menu item section.");
+        }
+
+        stream.seekg(accel_begin);
+        stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
+        if (stream.tellg() != accel_end) {
+            spdlog::warn("Corrupt menu accelerator section.");
+        }
+
+        stream.seekg(end);
+    }
+
     static void load(Stream& stream, Setting& value) {
         stream >> value.app_name
             >> value.author
@@ -241,7 +300,10 @@ namespace bamboo::mfa {
             >> value.about
             >> skip<i32>
             >> value.binary_files
-            >> value.controls;
+            >> value.controls
+            >> value.menu
+            >> value.window_menu
+            >> value.menu_images;
     }
 
     export void load(Stream& stream, File& value) {

@@ -164,6 +164,41 @@ namespace bamboo {
         std::vector<i32> data;
     };
 
+    export struct MenuItem;
+
+    export struct MenuItems : std::vector<MenuItem> {};
+
+    struct MenuItem {
+        enum {
+            disabled,
+            checked = 3,
+            parent,
+            footer = 7
+        };
+
+        Flags<u16> flags;
+        i16 id;
+        std::wstring name;
+        MenuItems items;
+    };
+
+    export struct MenuAccel {
+        i16 shift;
+        i16 key;
+        i32 id;
+    };
+
+    export struct Menu {
+        i32 size;
+        i32 header_size;
+        i32 item_offset;
+        i32 item_size;
+        i32 accel_offset;
+        i32 accel_size;
+        MenuItems items;
+        std::vector<MenuAccel> accels;
+    };
+
     export struct Setting {
         enum DisplayFlag {
             maximized_on_boot,
@@ -233,7 +268,7 @@ namespace bamboo {
         std::wstring about;
         std::vector<std::wstring> binary_files;
         std::vector<Control> controls;
-        //Menu menu;
+        Menu menu;
         i32 window_menu;
         std::vector<i64> menu_images;
         //std::vector<Value> global_numbers;
