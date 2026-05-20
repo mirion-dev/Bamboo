@@ -112,7 +112,7 @@ namespace bamboo::mfa {
             >> value.editor_filename
             >> skip<std::vector<char>>;
 
-        spdlog::info("Application name: \"{}\" (Build {}).", to_string(value.app_name), value.product_build);
+        spdlog::info("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
     }
 
     static void load(Stream& stream, Font& value) {
@@ -135,7 +135,7 @@ namespace bamboo::mfa {
             >> value.pitch_family
             >> args(value.name, string_type_fixed_c<32>);
 
-        spdlog::debug("Read font \"{}\".", to_string(value.name));
+        spdlog::debug("Read font {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, FontBank& value) {
@@ -155,7 +155,7 @@ namespace bamboo::mfa {
 
         --value.handle;
 
-        spdlog::debug("Read sound \"{}\".", to_string(value.name));
+        spdlog::debug("Read sound {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, SoundBank& value) {
@@ -173,7 +173,7 @@ namespace bamboo::mfa {
             >> args(value.name, string_type_pascal_c);
         stream >> args(value.data, value.size - (value.name.size() + 1) * 2);
 
-        spdlog::debug("Read music \"{}\".", to_string(value.name));
+        spdlog::debug("Read music {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, MusicBank& value) {
@@ -229,7 +229,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Qualifier& value) {
         stream >> value.name >> value.handle;
-        spdlog::debug("Read qualifier \"{}\".", to_string(value.name));
+        spdlog::debug("Read qualifier {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Qualifiers& value) {
@@ -245,7 +245,7 @@ namespace bamboo::mfa {
             >> value.subtype
             >> value.is_unicode;
 
-        spdlog::debug("Read extension \"{}\".", to_string(value.name));
+        spdlog::debug("Read extension {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Extensions& value) {
@@ -332,10 +332,13 @@ namespace bamboo::mfa {
         default:
             throw Error{ std::format("Unknown value type {}.", type) };
         }
+
+        // no spdlog::info()
     }
 
     static void load(Stream& stream, Values& value) {
         stream >> static_cast<std::vector<Value>&>(value);
+        // no spdlog::info()
     }
 
     static void load(Stream& stream, GlobalEvents& value) {

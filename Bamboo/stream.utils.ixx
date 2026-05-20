@@ -47,7 +47,7 @@ namespace bamboo {
             std::string_view expected{ Expected }, actual{ buffer };
             if (expected != actual) {
                 throw Error{
-                    std::format("Incorrect signature. Expected \"{}\" but found \"{}\".", expected, actual)
+                    std::format("Incorrect signature. Expected {:?} but found {:?}.", expected, actual)
                 };
             }
         }
