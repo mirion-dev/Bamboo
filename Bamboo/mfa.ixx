@@ -346,22 +346,6 @@ namespace bamboo::mfa {
         spdlog::info("Read {} global events.", value.size);
     }
 
-    class AutoTimer {
-        Timer _timer;
-        std::string_view _message;
-
-    public:
-        AutoTimer(std::string_view message) :
-            _message{ message } {
-
-            spdlog::info("\033[32mStarted {}.\033[m", _message);
-        }
-
-        ~AutoTimer() {
-            spdlog::info("\033[32mFinished {} in {:.3f} seconds.\033[m", _message, _timer.duration());
-        }
-    };
-
     static void load(Stream& stream, Setting& value) {
         stream >> value.app_name
             >> value.author
@@ -396,6 +380,23 @@ namespace bamboo::mfa {
             >> value.qualifiers
             >> value.extensions;
     }
+
+
+    class AutoTimer {
+        Timer _timer;
+        std::string_view _message;
+
+    public:
+        AutoTimer(std::string_view message) :
+            _message{ message } {
+
+            spdlog::info("\033[32mStarted {}.\033[m", _message);
+        }
+
+        ~AutoTimer() {
+            spdlog::info("\033[32mFinished {} in {:.3f} seconds.\033[m", _message, _timer.duration());
+        }
+    };
 
     export void load(Stream& stream, File& value) {
         AutoTimer _{ "parsing" };
