@@ -67,7 +67,7 @@ namespace bamboo::mfa {
             i32 size;
             stream >> size;
             if (!(size & MASK_UNICODE)) {
-                throw Exception{ "ASCII strings are unsupported." };
+                throw Error{ "ASCII strings are unsupported." };
             }
             resize_load(stream, value, size & ~MASK_UNICODE);
         }
@@ -83,7 +83,7 @@ namespace bamboo::mfa {
             stream >> size;
             resize_load(stream, value, size);
             if (value.empty() || value.back() != '\0') {
-                throw Exception{ "A Pascal-C string must be null-terminated." };
+                throw Error{ "A Pascal-C string must be null-terminated." };
             }
             value.pop_back();
         }
@@ -91,7 +91,7 @@ namespace bamboo::mfa {
             resize_load(stream, value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
-                throw Exception{ "A fixed C string must be null-terminated." };
+                throw Error{ "A fixed C string must be null-terminated." };
             }
             value.resize(end);
         }
@@ -294,19 +294,19 @@ namespace bamboo::mfa {
         usize accel_begin{ begin + value.accel_offset };
         usize accel_end{ accel_begin + value.accel_size };
         if (stream.tellg() != header_end) {
-            throw Exception{ "Corrupt menu header." };
+            throw Error{ "Corrupt menu header." };
         }
 
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            throw Exception{ "Corrupt menu items." };
+            throw Error{ "Corrupt menu items." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            throw Exception{ "Corrupt menu accelerators." };
+            throw Error{ "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
@@ -330,7 +330,7 @@ namespace bamboo::mfa {
             stream >> value.value.emplace<std::wstring>();
             break;
         default:
-            throw Exception{ std::format("Unknown value type {}.", type) };
+            throw Error{ std::format("Unknown value type {}.", type) };
         }
 
         spdlog::debug("Read value \"{}\".", to_string(value.name));
@@ -344,7 +344,7 @@ namespace bamboo::mfa {
     static void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
-            throw Exception{ std::format("Global events are unsupported at the moment.") };
+            throw Error{ std::format("Global events are unsupported at the moment.") };
         }
         spdlog::info("Read {} global events.", value.size);
     }

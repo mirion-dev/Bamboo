@@ -36,9 +36,9 @@ namespace bamboo {
         );
     }
 
-    export class Exception : public std::runtime_error {
+    export class Error : public std::runtime_error {
     public:
-        Exception(
+        Error(
             std::string_view message,
             const std::source_location& loc = std::source_location::current()
         ) noexcept :
