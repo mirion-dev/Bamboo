@@ -336,14 +336,9 @@ namespace bamboo::mfa {
         spdlog::debug("Read value \"{}\".", to_string(value.name));
     }
 
-    static void load(Stream& stream, GlobalNumbers& value) {
+    static void load(Stream& stream, Values& value) {
         stream >> static_cast<std::vector<Value>&>(value);
-        spdlog::info("Read {} global numbers.", value.size());
-    }
-
-    static void load(Stream& stream, GlobalStrings& value) {
-        stream >> static_cast<std::vector<Value>&>(value);
-        spdlog::info("Read {} global strings.", value.size());
+        spdlog::info("Read {} values.", value.size());
     }
 
     static void load(Stream& stream, GlobalEvents& value) {

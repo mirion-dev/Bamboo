@@ -234,9 +234,7 @@ namespace bamboo {
         std::variant<i32, f64, std::wstring> value;
     };
 
-    export struct GlobalNumbers : std::vector<Value> {};
-
-    export struct GlobalStrings : std::vector<Value> {};
+    export struct Values : std::vector<Value> {};
 
     export struct GlobalEvents {
         i32 size;
@@ -312,8 +310,8 @@ namespace bamboo {
         BinaryFiles binary_files;
         Controls controls;
         Menu menu;
-        GlobalNumbers global_numbers;
-        GlobalStrings global_strings;
+        Values global_numbers;
+        Values global_strings;
         GlobalEvents global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
