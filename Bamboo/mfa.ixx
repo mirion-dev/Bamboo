@@ -112,7 +112,7 @@ namespace bamboo::mfa {
             >> value.editor_filename
             >> skip<std::vector<char>>;
 
-        spdlog::info("Application \"{}\" (Build {}).", to_string(value.app_name), value.product_build);
+        spdlog::info("Application name: \"{}\" (Build {}).", to_string(value.app_name), value.product_build);
     }
 
     static void load(Stream& stream, Font& value) {
@@ -139,9 +139,8 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, FontBank& value) {
-        Timer timer;
         stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
-        spdlog::info("Read {} fonts. ({:.3f}s)", value.size(), timer.duration());
+        spdlog::info("Read {} fonts.", value.size());
     }
 
     static void load(Stream& stream, Sound& value) {
@@ -160,9 +159,8 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, SoundBank& value) {
-        Timer timer;
         stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
-        spdlog::info("Read {} sounds. ({:.3f}s)", value.size(), timer.duration());
+        spdlog::info("Read {} sounds.", value.size());
     }
 
     static void load(Stream& stream, Music& value) {
@@ -179,9 +177,8 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, MusicBank& value) {
-        Timer timer;
         stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
-        spdlog::info("Read {} music. ({:.3f}s)", value.size(), timer.duration());
+        spdlog::info("Read {} music.", value.size());
     }
 
     static void load(Stream& stream, Image& value) {
@@ -207,15 +204,13 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, ImageBank& value) {
-        Timer timer;
-
         stream >> signature<"AGMI">
             >> value.graphic_mode
             >> value.palette_version
             >> args(value.palette, size_type<i16>)
             >> static_cast<std::vector<Image>&>(value);
 
-        spdlog::info("Read {} images. ({:.3f}s)", value.size(), timer.duration());
+        spdlog::info("Read {} images.", value.size());
     }
 
     static void load(Stream& stream, BinaryFiles& value) {
@@ -317,7 +312,7 @@ namespace bamboo::mfa {
         stream.seekg(end);
         stream >> value.window_menu >> value.images;
 
-        spdlog::info("Read menu.");
+        spdlog::info("Read a menu.");
     }
 
     static void load(Stream& stream, Value& value) {
@@ -359,6 +354,22 @@ namespace bamboo::mfa {
         spdlog::info("Read {} global events.", value.size);
     }
 
+    class AutoTimer {
+        Timer _timer;
+        std::string_view _message;
+
+    public:
+        AutoTimer(std::string_view message) :
+            _message{ message } {
+
+            spdlog::info("\033[32mStarted {}.\033[m", _message);
+        }
+
+        ~AutoTimer() {
+            spdlog::info("\033[32mFinished {} in {:.3f} seconds.\033[m", _message, _timer.duration());
+        }
+    };
+
     static void load(Stream& stream, Setting& value) {
         stream >> value.app_name
             >> value.author
@@ -395,18 +406,36 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, File& value) {
-        Timer timer;
-
-        stream >> value.header;
-        stream.build = value.header.product_build;
-        stream >> value.font_bank
-            >> value.sound_bank
-            >> value.music_bank
-            >> value.icon_bank
-            >> value.image_bank
-            >> value.setting;
-
-        spdlog::info("Finished parsing. ({:.3f}s)", timer.duration());
+        AutoTimer _{ "parsing" };
+        {
+            AutoTimer _{ "reading the header" };
+            stream >> value.header;
+            stream.build = value.header.product_build;
+        }
+        {
+            AutoTimer _{ "reading the font bank" };
+            stream >> value.font_bank;
+        }
+        {
+            AutoTimer _{ "reading the sound bank" };
+            stream >> value.sound_bank;
+        }
+        {
+            AutoTimer _{ "reading the music bank" };
+            stream >> value.music_bank;
+        }
+        {
+            AutoTimer _{ "reading the icon bank" };
+            stream >> value.icon_bank;
+        }
+        {
+            AutoTimer _{ "reading the image bank" };
+            stream >> value.image_bank;
+        }
+        {
+            AutoTimer _{ "reading settings" };
+            stream >> value.setting;
+        }
     }
 
 }
