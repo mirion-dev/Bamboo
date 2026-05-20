@@ -332,13 +332,10 @@ namespace bamboo::mfa {
         default:
             throw Error{ std::format("Unknown value type {}.", type) };
         }
-
-        spdlog::debug("Read value \"{}\".", to_string(value.name));
     }
 
     static void load(Stream& stream, Values& value) {
         stream >> static_cast<std::vector<Value>&>(value);
-        spdlog::info("Read {} values.", value.size());
     }
 
     static void load(Stream& stream, GlobalEvents& value) {
