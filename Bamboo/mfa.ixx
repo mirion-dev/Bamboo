@@ -139,8 +139,9 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, FontBank& value) {
+        Timer timer;
         stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
-        spdlog::info("Read {} fonts.", value.size());
+        spdlog::info("Read {} fonts. ({:.3f}s)", value.size(), timer.duration());
     }
 
     static void load(Stream& stream, Sound& value) {
@@ -159,8 +160,9 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, SoundBank& value) {
+        Timer timer;
         stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
-        spdlog::info("Read {} sounds.", value.size());
+        spdlog::info("Read {} sounds. ({:.3f}s)", value.size(), timer.duration());
     }
 
     static void load(Stream& stream, Music& value) {
@@ -177,8 +179,9 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, MusicBank& value) {
+        Timer timer;
         stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
-        spdlog::info("Read {} music.", value.size());
+        spdlog::info("Read {} music. ({:.3f}s)", value.size(), timer.duration());
     }
 
     static void load(Stream& stream, Image& value) {
@@ -204,13 +207,15 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, ImageBank& value) {
+        Timer timer;
+
         stream >> signature<"AGMI">
             >> value.graphic_mode
             >> value.palette_version
             >> args(value.palette, size_type<i16>)
             >> static_cast<std::vector<Image>&>(value);
 
-        spdlog::info("Read {} images.", value.size());
+        spdlog::info("Read {} images. ({:.3f}s)", value.size(), timer.duration());
     }
 
     static void load(Stream& stream, BinaryFiles& value) {
@@ -390,36 +395,18 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, File& value) {
-        Timer _{ "parsing MFA file" };
-        {
-            Timer _{ "parsing header" };
+        Timer timer;
+
             stream >> value.header;
             stream.build = value.header.product_build;
-        }
-        {
-            Timer _{ "parsing font bank" };
-            stream >> value.font_bank;
-        }
-        {
-            Timer _{ "parsing sound bank" };
-            stream >> value.sound_bank;
-        }
-        {
-            Timer _{ "parsing music bank" };
-            stream >> value.music_bank;
-        }
-        {
-            Timer _{ "parsing icon bank" };
-            stream >> value.icon_bank;
-        }
-        {
-            Timer _{ "parsing image bank" };
-            stream >> value.image_bank;
-        }
-        {
-            Timer _{ "parsing setting" };
-            stream >> value.setting;
-        }
+        stream >> value.font_bank
+            >> value.sound_bank
+            >> value.music_bank
+            >> value.icon_bank
+            >> value.image_bank
+            >> value.setting;
+
+        spdlog::info("Finished parsing. ({:.3f}s)", timer.duration());
     }
 
 }

@@ -1,7 +1,3 @@
-module;
-
-#include <spdlog/spdlog.h>
-
 export module bamboo.utils;
 
 import std;
@@ -14,24 +10,15 @@ namespace bamboo {
     }
 
     export class Timer {
-        std::string _name;
         std::chrono::steady_clock::time_point _start{ std::chrono::steady_clock::now() };
 
     public:
-        Timer(std::string_view name) noexcept :
-            _name{ name } {
-
-            spdlog::info("Started {}.", _name);
+        double duration() noexcept {
+            auto now{ std::chrono::steady_clock::now() };
+            double res{ std::chrono::duration<double>{ now - _start }.count() };
+            _start = now;
+            return res;
         }
-
-        ~Timer() noexcept {
-            using namespace std::chrono;
-            double duration{ duration_cast<milliseconds>(steady_clock::now() - _start).count() / 1e3 };
-            spdlog::info("Finished {} ({}s).", _name, duration);
-        }
-
-        Timer(Timer&& other) noexcept = default;
-        Timer& operator=(Timer&& other) noexcept = default;
     };
 
 }
