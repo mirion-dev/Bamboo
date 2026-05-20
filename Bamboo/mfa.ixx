@@ -100,6 +100,15 @@ namespace bamboo::mfa {
         }
     }
 
+    template <class T>
+    static void load(Stream& stream, std::optional<T>& value) {
+        u8 has_value;
+        stream >> has_value;
+        if (has_value) {
+            stream >> value.emplace();
+        }
+    }
+
     static void load(Stream& stream, Header& value) {
         stream >> signature<"MFU2">
             >> value.runtime_version
@@ -262,6 +271,8 @@ namespace bamboo::mfa {
         if (value.flags[MenuItem::parent]) {
             stream >> value.items;
         }
+
+        // no spdlog::info()
     }
 
     static void load(Stream& stream, MenuItems& value) {
@@ -384,6 +395,439 @@ namespace bamboo::mfa {
             >> value.extensions;
     }
 
+    static void load(Stream& stream, Layer& value) {
+        stream >> value.name
+            >> value.flags
+            >> value.x_coefficient
+            >> value.y_coefficient;
+
+        spdlog::debug("Read layer {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Layers& value) {
+        stream >> static_cast<std::vector<Layer>&>(value);
+        spdlog::info("Read {} layers.", value.size());
+    }
+
+    static void load(Stream& stream, Transition& value) {
+        stream >> value.name
+            >> value.module_name
+            >> value.module
+            >> value.id
+            >> value.duration
+            >> value.use_color
+            >> value.color
+            >> value.param;
+
+        spdlog::debug("Read transition {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Movement& value) {
+        stream >> value.name
+            >> value.extension
+            >> value.id
+            >> value.data;
+
+        spdlog::debug("Read movement {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Movements& value) {
+        stream >> static_cast<std::vector<Movement>&>(value);
+        spdlog::info("Read {} movements.", value.size());
+    }
+
+    static void load(Stream& stream, Behavior& value) {
+        stream >> value.name >> value.data;
+        spdlog::debug("Read behavior {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Behaviors& value) {
+        stream >> static_cast<std::vector<Behavior>&>(value);
+        spdlog::info("Read {} behaviors.", value.size());
+    }
+
+    static void load(Stream& stream, Direction& value) {
+        stream >> value.index
+            >> value.max_speed
+            >> value.min_speed
+            >> value.repeat
+            >> value.repeat_frame
+            >> value.frames;
+    }
+
+    static void load(Stream& stream, Directions& value) {
+        stream >> static_cast<std::vector<Direction>&>(value);
+        spdlog::info("Read {} directions.", value.size());
+    }
+
+    static void load(Stream& stream, Animation& value) {
+        stream >> value.name >> value.directions;
+        spdlog::debug("Read animation {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Animations& value) {
+        stream >> static_cast<std::vector<Animation>&>(value);
+        spdlog::info("Read {} animations.", value.size());
+    }
+
+    static void load(Stream& stream, Paragraph& value) {
+        stream >> value.value >> value.flags;
+    }
+
+    static void load(Stream& stream, Paragraphs& value) {
+        stream >> static_cast<std::vector<Paragraph>&>(value);
+        spdlog::info("Read {} paragraphs.", value.size());
+    }
+
+    static void load(Stream& stream, Content& value) {
+        stream >> value.font
+            >> value.color
+            >> value.flags
+            >> value.relief
+            >> value.paragraphs;
+    }
+
+    static void load(Stream& stream, QuickBackdrop& value) {
+        stream >> value.obstacle_type
+            >> value.collision_type
+            >> value.width
+            >> value.height
+            >> value.shape
+            >> value.border_size
+            >> value.border_color
+            >> value.fill_type
+            >> value.color1
+            >> value.color2
+            >> value.flags
+            >> value.image;
+    }
+
+    static void load(Stream& stream, Backdrop& value) {
+        stream >> value.obstacle_type
+            >> value.collision_type
+            >> value.image;
+    }
+
+    static void load(Stream& stream, ObjectBase& value) {
+        stream >> value.flags
+            >> value.new_flags
+            >> value.background_color
+            >> value.qualifiers
+            >> skip<i16>
+            >> value.numbers
+            >> value.strings
+            >> value.movements
+            >> value.behaviors
+            >> value.transition_in
+            >> value.transition_out;
+    }
+
+    static void load(Stream& stream, ActiveObject& value) {
+        stream >> static_cast<ObjectBase&>(value) >> value.animations;
+    }
+
+    static void load(Stream& stream, StringObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.width
+            >> value.height
+            >> value.content;
+    }
+
+    static void load(Stream& stream, QuestionAnswerObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.width
+            >> value.height
+            >> value.question
+            >> value.answer;
+    }
+
+    static void load(Stream& stream, ScoreLivesObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.player
+            >> value.images
+            >> value.use_text
+            >> value.color
+            >> value.font
+            >> value.width
+            >> value.height;
+    }
+
+    static void load(Stream& stream, CounterObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.value
+            >> value.min
+            >> value.max
+            >> value.display_type
+            >> value.fill_type
+            >> value.color1
+            >> value.color2
+            >> value.vertical_gradient
+            >> value.bar_direction
+            >> value.width
+            >> value.height
+            >> value.images
+            >> value.font;
+    }
+
+    static void load(Stream& stream, FormattedTextObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.width
+            >> value.height
+            >> value.flags
+            >> value.color
+            >> value.data;
+    }
+
+    static void load(Stream& stream, SubapplicationObject& value) {
+        stream >> static_cast<ObjectBase&>(value)
+            >> value.name
+            >> value.width
+            >> value.height
+            >> value.flags;
+
+        if (value.flags[SubapplicationObject::internal]) {
+            stream >> value.start_frame;
+        }
+
+        stream >> skip<i32>;
+
+        spdlog::debug("Read subapplication object {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, ExtensionObject& value) {
+        stream >> static_cast<ActiveObject&>(value) >> value.type;
+
+        if (value.type == -1) {
+            stream >> value.name
+                >> value.filename
+                >> value.magic_num
+                >> value.subtype;
+        }
+
+        stream >> value.real_size
+            >> value.size
+            >> skip<i32>
+            >> value.version
+            >> value.id
+            >> value.private_data;
+        stream >> args(value.data, value.real_size - 20);
+
+        if (value.type == -1) {
+            spdlog::debug("Read extension object {:?}.", to_string(value.name));
+    }
+    }
+
+    static void load(Stream& stream, Chunk& value) {
+        stream >> value.id;
+        if (value.id != 0) {
+            stream >> value.data;
+        }
+    }
+
+    static void load(Stream& stream, Chunks& value) {
+        value.clear();
+
+        Chunk chunk;
+        while (stream >> chunk, chunk.id != 0) {
+            value.emplace_back(std::move(chunk));
+        }
+
+        spdlog::info("Read {} chunks.", value.size());
+    }
+
+    static void load(Stream& stream, Object& value) {
+        stream >> value.type
+            >> value.handle
+            >> value.name
+            >> value.transparent
+            >> value.ink_effect
+            >> value.ink_effect_param
+            >> value.anti_aliasing
+            >> value.flags
+            >> value.icon_type
+            >> value.icon
+            >> value.chunks;
+
+        switch (value.type) {
+        case Object::quick_backdrop:
+            stream >> value.data.emplace<QuickBackdrop>();
+            break;
+        case Object::backdrop:
+            stream >> value.data.emplace<Backdrop>();
+            break;
+        case Object::active:
+            stream >> value.data.emplace<ActiveObject>();
+            break;
+        case Object::string:
+            stream >> value.data.emplace<StringObject>();
+            break;
+        case Object::question_answer:
+            stream >> value.data.emplace<QuestionAnswerObject>();
+            break;
+        case Object::score:
+        case Object::lives:
+            stream >> value.data.emplace<ScoreLivesObject>();
+            break;
+        case Object::counter:
+            stream >> value.data.emplace<CounterObject>();
+            break;
+        case Object::formatted_text:
+            stream >> value.data.emplace<FormattedTextObject>();
+            break;
+        case Object::subapplication:
+            stream >> value.data.emplace<SubapplicationObject>();
+            break;
+        default:
+            stream >> value.data.emplace<ExtensionObject>();
+        }
+
+        spdlog::debug("Read object {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Objects& value) {
+        stream >> static_cast<std::vector<Object>&>(value);
+        spdlog::info("Read {} objects.", value.size());
+    }
+
+    static void load(Stream& stream, Folder& value) {
+        stream >> value.header;
+        if (((value.header & 0xff) == 112 ? value.header >> 24 : value.header) == 4) {
+            stream >> value.name >> value.children;
+            spdlog::debug("Read folder {:?}.", to_string(value.name));
+        }
+        else {
+            stream >> skip<i32>;
+        }
+    }
+
+    static void load(Stream& stream, Folders& value) {
+        stream >> static_cast<std::vector<Folder>&>(value);
+        spdlog::info("Read {} folders.", value.size());
+    }
+
+    static void load(Stream& stream, Instance& value) {
+        stream >> value.pos_x
+            >> value.pos_y
+            >> value.layer
+            >> value.handle
+            >> value.flags
+            >> value.value
+            >> value.parent_type
+            >> value.object_info
+            >> value.parent;
+    }
+
+    static void load(Stream& stream, Instances& value) {
+        stream >> static_cast<std::vector<Instance>&>(value);
+        spdlog::info("Read {} instances.", value.size());
+    }
+
+    static void load(Stream& stream, Event& value) {
+        std::array<char, 4> buffer;
+        stream >> buffer;
+
+        std::string_view id{ buffer.data(), buffer.size() };
+        if (id == "Evts" || id == "STVE") {
+            value.type = Event::events;
+        }
+        else if (id == "Rems" || id == "SMER") {
+            value.type = Event::remarks;
+        }
+        else if (id == "SPRG") {
+            value.type = Event::groups;
+        }
+        else if (id == "EvOb" || id == "SJBO") {
+            value.type = Event::objects;
+        }
+        else if (id == "EvCs") {
+            value.type = Event::conditions;
+        }
+        else if (id == "EvEd") {
+            value.type = Event::editor;
+        }
+        else if (id == "EvTs") {
+            value.type = Event::tabs;
+        }
+        else if (id == "EvLs") {
+            value.type = Event::lines;
+        }
+        else if (id == "E2Ts" || id == "TYAL") {
+            value.type = Event::layout;
+        }
+        else if (id == "!DNE") {
+            value.type = Event::end;
+        }
+        else {
+            throw Error{ std::format("Unknown event block {:?}.", id) };
+        }
+
+        throw Error{ "Event::load() is unimplemented." };
+    }
+
+    static void load(Stream& stream, Events& value) {
+        value.clear();
+
+        stream >> value.data_size;
+
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        usize end{ begin + value.data_size };
+        if (value.data_size != 0) {
+            Event event;
+            while (stream >> event, event.type != Event::end) {
+                value.emplace_back(std::move(event));
+            }
+        }
+        if (stream.tellg() != end) {
+            throw Error{ "Corrupt events." };
+        }
+
+        spdlog::info("Read {} events.", value.size());
+    }
+
+    static void load(Stream& stream, Frame& value) {
+        stream >> value.handle
+            >> value.name
+            >> value.width
+            >> value.height
+            >> value.background_color
+            >> value.flags
+            >> value.max_objects
+            >> value.password
+            >> skip<std::vector<char>>
+            >> value.editor_x
+            >> value.editor_y
+            >> value.palette
+            >> value.icon
+            >> value.editor_layer
+            >> value.layers
+            >> value.transition_in
+            >> value.transition_out
+            >> value.objects
+            >> value.folders
+            >> value.instances
+            >> value.events
+            >> value.chunks;
+
+        spdlog::debug("Read frame {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Frames& value) {
+        value.clear();
+
+        stream >> value.offsets >> value.end;
+
+        for (u32 offset : value.offsets) {
+            Frame frame;
+            stream.seekg(offset);
+            stream >> frame;
+            value.emplace_back(std::move(frame));
+        }
+
+        stream.seekg(value.end);
+        stream >> value.chunks;
+
+        spdlog::info("Read {} frames.", value.size());
+    }
 
     class AutoTimer {
         Timer _timer;
@@ -431,6 +875,10 @@ namespace bamboo::mfa {
         {
             AutoTimer _{ "reading settings" };
             stream >> value.setting;
+        }
+        {
+            AutoTimer _{ "reading frames" };
+            stream >> value.frames;
         }
     }
 
