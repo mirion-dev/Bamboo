@@ -67,7 +67,7 @@ namespace bamboo::mfa {
             i32 size;
             stream >> size;
             if (!(size & MASK_UNICODE)) {
-                throw std::runtime_error{ "ASCII strings are unsupported." };
+                throw Exception{ "ASCII strings are unsupported." };
             }
             resize_load(stream, value, size & ~MASK_UNICODE);
         }
@@ -83,7 +83,7 @@ namespace bamboo::mfa {
             stream >> size;
             resize_load(stream, value, size);
             if (value.empty() || value.back() != '\0') {
-                throw std::runtime_error{ "A Pascal-C string must be null-terminated." };
+                throw Exception{ "A Pascal-C string must be null-terminated." };
             }
             value.pop_back();
         }
@@ -91,7 +91,7 @@ namespace bamboo::mfa {
             resize_load(stream, value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
-                throw std::runtime_error{ "A fixed C string must be null-terminated." };
+                throw Exception{ "A fixed C string must be null-terminated." };
             }
             value.resize(end);
         }
@@ -299,19 +299,19 @@ namespace bamboo::mfa {
         usize accel_begin{ begin + value.accel_offset };
         usize accel_end{ accel_begin + value.accel_size };
         if (stream.tellg() != header_end) {
-            throw std::runtime_error{ "Corrupt menu header." };
+            throw Exception{ "Corrupt menu header." };
         }
 
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            throw std::runtime_error{ "Corrupt menu items." };
+            throw Exception{ "Corrupt menu items." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            throw std::runtime_error{ "Corrupt menu accelerators." };
+            throw Exception{ "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
@@ -335,7 +335,7 @@ namespace bamboo::mfa {
             stream >> value.value.emplace<std::wstring>();
             break;
         default:
-            throw std::runtime_error{ std::format("Unknown value type {}.", type) };
+            throw Exception{ std::format("Unknown value type {}.", type) };
         }
 
         spdlog::debug("Read value \"{}\".", to_string(value.name));
@@ -354,7 +354,7 @@ namespace bamboo::mfa {
     static void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
-            throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
+            throw Exception{ std::format("Global events are unsupported at the moment.") };
         }
         spdlog::info("Read {} global events.", value.size);
     }
@@ -397,8 +397,8 @@ namespace bamboo::mfa {
     export void load(Stream& stream, File& value) {
         Timer timer;
 
-            stream >> value.header;
-            stream.build = value.header.product_build;
+        stream >> value.header;
+        stream.build = value.header.product_build;
         stream >> value.font_bank
             >> value.sound_bank
             >> value.music_bank

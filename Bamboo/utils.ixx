@@ -5,8 +5,13 @@ import std;
 namespace bamboo {
 
     export std::string to_string(std::wstring_view str) noexcept {
-        std::u8string u8{ std::filesystem::path{ str.begin(), str.end() }.u8string() };
+        std::u8string u8{ std::filesystem::path{ str }.u8string() };
         return { reinterpret_cast<char*>(u8.data()), u8.size() };
+    }
+
+    export std::wstring to_wstring(std::string_view str) noexcept {
+        std::u8string u8{ str.begin(), str.end() };
+        return std::filesystem::path{ str }.wstring();
     }
 
     export class Timer {
@@ -19,6 +24,25 @@ namespace bamboo {
             _start = now;
             return res;
         }
+    };
+
+    static std::string format_error(std::string_view message, const std::source_location& loc) noexcept {
+        return std::format(
+            "[{}:{}] [{}] {}",
+            to_string(std::filesystem::path{ loc.file_name() }.filename().wstring()),
+            loc.line(),
+            loc.function_name(),
+            message
+        );
+    }
+
+    export class Exception : public std::runtime_error {
+    public:
+        Exception(
+            std::string_view message,
+            const std::source_location& loc = std::source_location::current()
+        ) noexcept :
+            std::runtime_error{ format_error(message, loc) } {}
     };
 
 }

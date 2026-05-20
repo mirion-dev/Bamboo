@@ -5,6 +5,7 @@ import bamboo.general;
 import bamboo.mfa;
 
 int main(int argc, char** argv) {
+    spdlog::set_pattern("[%^%l%$] %v");
 #ifdef _DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
@@ -19,17 +20,12 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-#ifndef _DEBUG
-    try
-#endif
-    {
+    try {
         bamboo::mfa::Stream mfa_stream{ argv[1] };
         bamboo::File file;
         mfa_stream >> file;
     }
-#ifndef _DEBUG
     catch (const std::exception& error) {
         spdlog::error(error.what());
     }
-#endif
 }
