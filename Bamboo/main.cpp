@@ -33,5 +33,6 @@ int main(int argc, char** argv) {
     catch (const std::exception& error) {
         spdlog::error(error.what());
         spdlog::error("See bamboo.log for more details.");
+        return EXIT_FAILURE;
     }
 }
