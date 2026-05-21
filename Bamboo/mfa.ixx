@@ -7,7 +7,7 @@ export module bamboo.mfa;
 
 import std;
 import bamboo.types;
-import bamboo.utils;
+import bamboo.diag;
 import bamboo.stream;
 import bamboo.stream.utils;
 import bamboo.general;

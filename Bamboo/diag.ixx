@@ -1,4 +1,4 @@
-export module bamboo.utils;
+export module bamboo.diag;
 
 import std;
 import bamboo.types;
