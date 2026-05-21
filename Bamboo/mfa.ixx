@@ -121,7 +121,8 @@ namespace bamboo::mfa {
             >> value.editor_filename
             >> skip<std::vector<char>>;
 
-        spdlog::info("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
+        spdlog::info("App name: {:?}.", to_string(value.app_name));
+        spdlog::info("Build: {}.", value.product_build);
     }
 
     static void load(Stream& stream, Font& value) {
