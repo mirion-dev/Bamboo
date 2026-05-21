@@ -121,7 +121,7 @@ namespace bamboo::mfa {
             >> value.editor_filename
             >> skip<std::vector<char>>;
 
-        spdlog::debug("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
+        spdlog::info("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
     }
 
     static void load(Stream& stream, Font& value) {
@@ -1006,57 +1006,35 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} frames.", value.size());
     }
 
-    class AutoTimer {
-        Timer _timer;
-        std::string_view _message;
-
-    public:
-        AutoTimer(std::string_view message) :
-            _message{ message } {
-
-            spdlog::info("Started {}.", _message);
-        }
-
-        ~AutoTimer() {
-            spdlog::info("Finished {} in {:.3f} seconds.", _message, _timer.duration());
-        }
-    };
-
     export void load(Stream& stream, File& value) {
-        AutoTimer _{ "parsing" };
-        {
-            AutoTimer _{ "reading the header" };
-            stream >> value.header;
-            stream.build = value.header.product_build;
-        }
-        {
-            AutoTimer _{ "reading the font bank" };
-            stream >> value.font_bank;
-        }
-        {
-            AutoTimer _{ "reading the sound bank" };
-            stream >> value.sound_bank;
-        }
-        {
-            AutoTimer _{ "reading the music bank" };
-            stream >> value.music_bank;
-        }
-        {
-            AutoTimer _{ "reading the icon bank" };
-            stream >> value.icon_bank;
-        }
-        {
-            AutoTimer _{ "reading the image bank" };
-            stream >> value.image_bank;
-        }
-        {
-            AutoTimer _{ "reading settings" };
-            stream >> value.setting;
-        }
-        {
-            AutoTimer _{ "reading frames" };
-            stream >> value.frames;
-        }
+        Timer total, section{ total };
+
+        stream >> value.header;
+        stream.build = value.header.product_build;
+        spdlog::info("Read the header in {:.3f} seconds.", section.duration());
+
+        stream >> value.font_bank;
+        spdlog::info("Read the font bank in {:.3f} seconds.", section.duration());
+
+        stream >> value.sound_bank;
+        spdlog::info("Read the sound bank in {:.3f} seconds.", section.duration());
+
+        stream >> value.music_bank;
+        spdlog::info("Read the music bank in {:.3f} seconds.", section.duration());
+
+        stream >> value.icon_bank;
+        spdlog::info("Read the icon bank in {:.3f} seconds.", section.duration());
+
+        stream >> value.image_bank;
+        spdlog::info("Read the image bank in {:.3f} seconds.", section.duration());
+
+        stream >> value.setting;
+        spdlog::info("Read settings in {:.3f} seconds.", section.duration());
+
+        stream >> value.frames;
+        spdlog::info("Read frames in {:.3f} seconds.", section.duration());
+
+        spdlog::info("Finished parsing in {:.3f} seconds.", total.duration());
     }
 
 }
