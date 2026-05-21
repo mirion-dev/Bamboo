@@ -121,7 +121,7 @@ namespace bamboo::mfa {
             >> value.editor_filename
             >> skip<std::vector<char>>;
 
-        spdlog::info("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
+        spdlog::debug("Application name: {:?}, build: {}.", to_string(value.app_name), value.product_build);
     }
 
     static void load(Stream& stream, Font& value) {
@@ -149,7 +149,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, FontBank& value) {
         stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
-        spdlog::info("Read {} fonts.", value.size());
+        spdlog::debug("Read {} fonts.", value.size());
     }
 
     static void load(Stream& stream, Sound& value) {
@@ -169,7 +169,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, SoundBank& value) {
         stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
-        spdlog::info("Read {} sounds.", value.size());
+        spdlog::debug("Read {} sounds.", value.size());
     }
 
     static void load(Stream& stream, Music& value) {
@@ -187,7 +187,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, MusicBank& value) {
         stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
-        spdlog::info("Read {} music.", value.size());
+        spdlog::debug("Read {} music.", value.size());
     }
 
     static void load(Stream& stream, Image& value) {
@@ -219,12 +219,12 @@ namespace bamboo::mfa {
             >> args(value.palette, size_type<i16>)
             >> static_cast<std::vector<Image>&>(value);
 
-        spdlog::info("Read {} images.", value.size());
+        spdlog::debug("Read {} images.", value.size());
     }
 
     static void load(Stream& stream, BinaryFiles& value) {
         stream >> static_cast<std::vector<std::wstring>&>(value);
-        spdlog::info("Read {} binary files.", value.size());
+        spdlog::debug("Read {} binary files.", value.size());
     }
 
     static void load(Stream& stream, Control& value) {
@@ -233,7 +233,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Controls& value) {
         stream >> static_cast<std::vector<Control>&>(value);
-        spdlog::info("Read {} controls.", value.size());
+        spdlog::debug("Read {} controls.", value.size());
     }
 
     static void load(Stream& stream, Qualifier& value) {
@@ -243,7 +243,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Qualifiers& value) {
         stream >> static_cast<std::vector<Qualifier>&>(value);
-        spdlog::info("Read {} qualifiers.", value.size());
+        spdlog::debug("Read {} qualifiers.", value.size());
     }
 
     static void load(Stream& stream, Extension& value) {
@@ -259,7 +259,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Extensions& value) {
         stream >> static_cast<std::vector<Extension>&>(value);
-        spdlog::info("Read {} extensions.", value.size());
+        spdlog::debug("Read {} extensions.", value.size());
     }
 
     static void load(Stream& stream, MenuItem& value) {
@@ -321,7 +321,7 @@ namespace bamboo::mfa {
         stream.seekg(end);
         stream >> value.window_menu >> value.images;
 
-        spdlog::info("Read a menu.");
+        spdlog::debug("Read a menu.");
     }
 
     static void load(Stream& stream, Value& value) {
@@ -352,7 +352,7 @@ namespace bamboo::mfa {
         if (value.size != 0) {
             throw LoadError{ stream, std::format("Global events are unsupported at the moment.") };
         }
-        spdlog::info("Read {} global events.", value.size);
+        spdlog::debug("Read {} global events.", value.size);
     }
 
     static void load(Stream& stream, Setting& value) {
@@ -401,7 +401,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Layers& value) {
         stream >> static_cast<std::vector<Layer>&>(value);
-        spdlog::info("Read {} layers.", value.size());
+        spdlog::debug("Read {} layers.", value.size());
     }
 
     static void load(Stream& stream, Transition& value) {
@@ -610,7 +610,7 @@ namespace bamboo::mfa {
             value.emplace_back(std::move(chunk));
         }
 
-        spdlog::info("Read {} chunks.", value.size());
+        spdlog::debug("Read {} chunks.", value.size());
     }
 
     static void load(Stream& stream, Object& value) {
@@ -664,7 +664,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Objects& value) {
         stream >> static_cast<std::vector<Object>&>(value);
-        spdlog::info("Read {} objects.", value.size());
+        spdlog::debug("Read {} objects.", value.size());
     }
 
     static void load(Stream& stream, Folder& value) {
@@ -680,7 +680,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Folders& value) {
         stream >> static_cast<std::vector<Folder>&>(value);
-        spdlog::info("Read {} folders.", value.size());
+        spdlog::debug("Read {} folders.", value.size());
     }
 
     static void load(Stream& stream, Instance& value) {
@@ -697,7 +697,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Instances& value) {
         stream >> static_cast<std::vector<Instance>&>(value);
-        spdlog::info("Read {} instances.", value.size());
+        spdlog::debug("Read {} instances.", value.size());
     }
 
     static void load(Stream& stream, Parameter& value) {
@@ -761,7 +761,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Events& value) {
         stream >> static_cast<std::vector<Event>&>(value);
-        spdlog::info("Read {} events.", value.size());
+        spdlog::debug("Read {} events.", value.size());
     }
 
     static void load(Stream& stream, Remark& value) {
@@ -770,7 +770,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Remarks& value) {
         stream >> static_cast<std::vector<Remark>&>(value);
-        spdlog::info("Read {} remarks.", value.size());
+        spdlog::debug("Read {} remarks.", value.size());
     }
 
     static void load(Stream& stream, Group& value) {
@@ -780,7 +780,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Groups& value) {
         stream >> static_cast<std::vector<Group>&>(value);
-        spdlog::info("Read {} groups.", value.size());
+        spdlog::debug("Read {} groups.", value.size());
     }
 
     static void load(Stream& stream, EventObjectRef& value) {
@@ -828,7 +828,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, EventObjects& value) {
         stream >> static_cast<std::vector<EventObject>&>(value);
-        spdlog::info("Read {} event objects.", value.size());
+        spdlog::debug("Read {} event objects.", value.size());
     }
 
     static void load(Stream& stream, EventItem& value) {
@@ -837,7 +837,7 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, EventItems& value) {
         stream >> static_cast<std::vector<EventItem>&>(value);
-        spdlog::info("Read {} event items.", value.size());
+        spdlog::debug("Read {} event items.", value.size());
     }
 
     static void load(Stream& stream, EventsBlock& value) {
@@ -958,7 +958,7 @@ namespace bamboo::mfa {
             }
         }
 
-        spdlog::info("Read {} event blocks.", value.size());
+        spdlog::debug("Read {} event blocks.", value.size());
     }
 
     static void load(Stream& stream, Frame& value) {
@@ -1003,7 +1003,7 @@ namespace bamboo::mfa {
         stream.seekg(value.end);
         stream >> value.chunks;
 
-        spdlog::info("Read {} frames.", value.size());
+        spdlog::debug("Read {} frames.", value.size());
     }
 
     class AutoTimer {
@@ -1014,11 +1014,11 @@ namespace bamboo::mfa {
         AutoTimer(std::string_view message) :
             _message{ message } {
 
-            spdlog::info("\033[32mStarted {}.\033[m", _message);
+            spdlog::info("Started {}.", _message);
         }
 
         ~AutoTimer() {
-            spdlog::info("\033[32mFinished {} in {:.3f} seconds.\033[m", _message, _timer.duration());
+            spdlog::info("Finished {} in {:.3f} seconds.", _message, _timer.duration());
         }
     };
 
