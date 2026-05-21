@@ -67,7 +67,7 @@ namespace bamboo::mfa {
             i32 size;
             stream >> size;
             if (!(size & MASK_UNICODE)) {
-                throw Error{ "ASCII strings are unsupported." };
+                throw LoadError{ stream, "ASCII strings are unsupported." };
             }
             resize_load(stream, value, size & ~MASK_UNICODE);
         }
@@ -83,7 +83,7 @@ namespace bamboo::mfa {
             stream >> size;
             resize_load(stream, value, size);
             if (value.empty() || value.back() != '\0') {
-                throw Error{ "A Pascal-C string must be null-terminated." };
+                throw LoadError{ stream, "A Pascal-C string must be null-terminated." };
             }
             value.pop_back();
         }
@@ -91,7 +91,7 @@ namespace bamboo::mfa {
             resize_load(stream, value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
-                throw Error{ "A fixed C string must be null-terminated." };
+                throw LoadError{ stream, "A fixed C string must be null-terminated." };
             }
             value.resize(end);
         }
@@ -303,19 +303,19 @@ namespace bamboo::mfa {
         usize accel_begin{ begin + value.accel_offset };
         usize accel_end{ accel_begin + value.accel_size };
         if (stream.tellg() != header_end) {
-            throw Error{ "Corrupt menu header." };
+            throw LoadError{ stream, "Corrupt menu header." };
         }
 
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            throw Error{ "Corrupt menu items." };
+            throw LoadError{ stream, "Corrupt menu items." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            throw Error{ "Corrupt menu accelerators." };
+            throw LoadError{ stream, "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
@@ -339,7 +339,7 @@ namespace bamboo::mfa {
             stream >> value.value.emplace<std::wstring>();
             break;
         default:
-            throw Error{ std::format("Unknown value type {}.", type) };
+            throw LoadError{ stream, std::format("Unknown value type {}.", type) };
         }
     }
 
@@ -350,7 +350,7 @@ namespace bamboo::mfa {
     static void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
-            throw Error{ std::format("Global events are unsupported at the moment.") };
+            throw LoadError{ stream, std::format("Global events are unsupported at the moment.") };
         }
         spdlog::info("Read {} global events.", value.size);
     }
@@ -719,7 +719,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw Error{ "Corrupt condition." };
+            throw LoadError{ stream, "Corrupt condition." };
         }
     }
 
@@ -737,7 +737,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw Error{ "Corrupt action." };
+            throw LoadError{ stream, "Corrupt action." };
         }
     }
 
@@ -755,7 +755,7 @@ namespace bamboo::mfa {
             >> args(value.actions, value.action_num);
 
         if (stream.tellg() != begin + std::abs(value.size)) {
-            throw Error{ "Corrupt event." };
+            throw LoadError{ stream, "Corrupt event." };
         }
     }
 
@@ -820,7 +820,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace<EventObjectQualifier>();
             break;
         default:
-            throw Error{ std::format("Unknown event object type {}.", value.object_type) };
+            throw LoadError{ stream, std::format("Unknown event object type {}.", value.object_type) };
         }
 
         spdlog::debug("Read event object {:?}.", to_string(value.name));
@@ -850,7 +850,7 @@ namespace bamboo::mfa {
             value.data.emplace_back(std::move(event));
         }
         if (stream.tellg() != end) {
-            throw Error{ "Corrupt events block." };
+            throw LoadError{ stream, "Corrupt events block." };
         }
     }
 
@@ -943,7 +943,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace<EndBlock>();
         }
         else {
-            throw Error{ std::format("Unknown event block {:?}.", id) };
+            throw LoadError{ stream, std::format("Unknown event block {:?}.", id) };
         }
     }
 

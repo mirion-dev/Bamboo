@@ -1,6 +1,7 @@
 export module bamboo.utils;
 
 import std;
+import bamboo.types;
 
 namespace bamboo {
 
@@ -26,23 +27,25 @@ namespace bamboo {
         }
     };
 
-    static std::string format_error(std::string_view message, const std::source_location& loc) noexcept {
-        return std::format(
-            "[{}:{}] [{}] {}",
-            to_string(std::filesystem::path{ loc.file_name() }.filename().wstring()),
-            loc.line(),
-            loc.function_name(),
-            message
-        );
-    }
+    export template <class S>
+    class LoadError : public std::runtime_error {
+        static std::string _format(auto& stream, std::string_view message, const std::source_location& loc) noexcept {
+            return std::format(
+                "[{}:{}] [{:#018x}] {}",
+                to_string(std::filesystem::path{ loc.file_name() }.filename().wstring()),
+                loc.line(),
+                static_cast<usize>(stream.tellg()),
+                message
+            );
+        }
 
-    export class Error : public std::runtime_error {
     public:
-        Error(
+        LoadError(
+            S& stream,
             std::string_view message,
             const std::source_location& loc = std::source_location::current()
         ) noexcept :
-            std::runtime_error{ format_error(message, loc) } {}
+            std::runtime_error{ this->_format(stream, message, loc) } {}
     };
 
 }

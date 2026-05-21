@@ -46,7 +46,8 @@ namespace bamboo {
 
             std::string_view expected{ Expected }, actual{ buffer };
             if (expected != actual) {
-                throw Error{
+                throw LoadError{
+                    stream,
                     std::format("Incorrect signature. Expected {:?} but found {:?}.", expected, actual)
                 };
             }
@@ -62,11 +63,12 @@ namespace bamboo {
         static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? 100'000'000 / sizeof(value_type) : 100'000 };
 
         if (size < 0) {
-            throw Error{ std::format("Container size cannot be negative. Found {}.", size) };
+            throw LoadError{ stream, std::format("Container size cannot be negative. Found {}.", size) };
         }
 
         if (size > MAX_SIZE) {
-            throw Error{
+            throw LoadError{
+                stream,
                 std::format(
                     "Container size is too large. Found {} but max allowed {} for this type.",
                     size,
