@@ -505,6 +505,10 @@ namespace bamboo {
         i32 height;
     };
 
+    export struct ScoreObject : ScoreLivesObject {};
+
+    export struct LivesObject : ScoreLivesObject {};
+
     export struct CounterObject : ObjectBase {
         i32 value;
         i32 min;
@@ -599,7 +603,8 @@ namespace bamboo {
             ActiveObject,
             StringObject,
             QuestionAnswerObject,
-            ScoreLivesObject,
+            ScoreObject,
+            LivesObject,
             CounterObject,
             FormattedTextObject,
             SubapplicationObject,
@@ -628,7 +633,6 @@ namespace bamboo {
             no_auto_update = 7
         };
 
-        Type type;
         u32 handle;
         std::wstring name;
         i32 transparent;

@@ -615,7 +615,8 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, Object& value) {
-        stream >> value.type
+        i32 type;
+        stream >> type
             >> value.handle
             >> value.name
             >> value.transparent
@@ -627,7 +628,7 @@ namespace bamboo::mfa {
             >> value.icon
             >> value.chunks;
 
-        switch (value.type) {
+        switch (type) {
         case Object::quick_backdrop:
             stream >> value.emplace<QuickBackdrop>();
             break;
@@ -644,8 +645,10 @@ namespace bamboo::mfa {
             stream >> value.emplace<QuestionAnswerObject>();
             break;
         case Object::score:
+            stream >> value.emplace<ScoreObject>();
+            break;
         case Object::lives:
-            stream >> value.emplace<ScoreLivesObject>();
+            stream >> value.emplace<LivesObject>();
             break;
         case Object::counter:
             stream >> value.emplace<CounterObject>();
