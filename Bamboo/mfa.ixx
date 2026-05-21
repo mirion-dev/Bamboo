@@ -271,8 +271,6 @@ namespace bamboo::mfa {
         if (value.flags[MenuItem::parent]) {
             stream >> value.items;
         }
-
-        // no spdlog::info()
     }
 
     static void load(Stream& stream, MenuItems& value) {
@@ -343,13 +341,10 @@ namespace bamboo::mfa {
         default:
             throw Error{ std::format("Unknown value type {}.", type) };
         }
-
-        // no spdlog::info()
     }
 
     static void load(Stream& stream, Values& value) {
         stream >> static_cast<std::vector<Value>&>(value);
-        // no spdlog::info()
     }
 
     static void load(Stream& stream, GlobalEvents& value) {
@@ -418,8 +413,6 @@ namespace bamboo::mfa {
             >> value.use_color
             >> value.color
             >> value.param;
-
-        spdlog::debug("Read transition {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Movement& value) {
@@ -427,23 +420,18 @@ namespace bamboo::mfa {
             >> value.extension
             >> value.id
             >> value.data;
-
-        spdlog::debug("Read movement {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Movements& value) {
         stream >> static_cast<std::vector<Movement>&>(value);
-        spdlog::info("Read {} movements.", value.size());
     }
 
     static void load(Stream& stream, Behavior& value) {
         stream >> value.name >> value.data;
-        spdlog::debug("Read behavior {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Behaviors& value) {
         stream >> static_cast<std::vector<Behavior>&>(value);
-        spdlog::info("Read {} behaviors.", value.size());
     }
 
     static void load(Stream& stream, Direction& value) {
@@ -457,17 +445,14 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Directions& value) {
         stream >> static_cast<std::vector<Direction>&>(value);
-        spdlog::info("Read {} directions.", value.size());
     }
 
     static void load(Stream& stream, Animation& value) {
         stream >> value.name >> value.directions;
-        spdlog::debug("Read animation {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, Animations& value) {
         stream >> static_cast<std::vector<Animation>&>(value);
-        spdlog::info("Read {} animations.", value.size());
     }
 
     static void load(Stream& stream, Paragraph& value) {
@@ -476,7 +461,6 @@ namespace bamboo::mfa {
 
     static void load(Stream& stream, Paragraphs& value) {
         stream >> static_cast<std::vector<Paragraph>&>(value);
-        spdlog::info("Read {} paragraphs.", value.size());
     }
 
     static void load(Stream& stream, Content& value) {
@@ -590,8 +574,6 @@ namespace bamboo::mfa {
         }
 
         stream >> skip<i32>;
-
-        spdlog::debug("Read subapplication object {:?}.", to_string(value.name));
     }
 
     static void load(Stream& stream, ExtensionObject& value) {
@@ -611,10 +593,6 @@ namespace bamboo::mfa {
             >> value.id
             >> value.private_data;
         stream >> args(value.data, value.real_size - 20);
-
-        if (value.type == -1) {
-            spdlog::debug("Read extension object {:?}.", to_string(value.name));
-    }
     }
 
     static void load(Stream& stream, Chunk& value) {
