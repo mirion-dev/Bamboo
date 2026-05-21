@@ -318,15 +318,12 @@ namespace bamboo::mfa {
         }
     }
 
-    static void load(Stream& stream, Values& value) {
-        stream >> static_cast<std::vector<Value>&>(value);
-    }
-
     static void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
             throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
         }
+
         spdlog::debug("Read {} global events.", value.size);
     }
 
