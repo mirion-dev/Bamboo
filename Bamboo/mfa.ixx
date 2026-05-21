@@ -223,6 +223,14 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} images.", value.size());
     }
 
+    static void load(Stream& stream, Resources& value) {
+        stream >> value.font_bank
+            >> value.sound_bank
+            >> value.music_bank
+            >> value.icon_bank
+            >> value.image_bank;
+    }
+
     static void load(Stream& stream, BinaryFiles& value) {
         stream >> static_cast<std::vector<std::wstring>&>(value);
         spdlog::debug("Read {} binary files.", value.size());
@@ -357,7 +365,7 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} extensions.", value.size());
     }
 
-    static void load(Stream& stream, Setting& value) {
+    static void load(Stream& stream, Settings& value) {
         stream >> value.app_name
             >> value.author
             >> value.description
@@ -996,13 +1004,7 @@ namespace bamboo::mfa {
 
         stream >> value.header;
         stream.build = value.header.product_build;
-        stream >> value.font_bank
-            >> value.sound_bank
-            >> value.music_bank
-            >> value.icon_bank
-            >> value.image_bank
-            >> value.setting
-            >> value.frames;
+        stream >> value.resources >> value.settings >> value.frames;
 
         spdlog::info("Finished parsing in {:.3f} seconds.", timer.duration());
     }

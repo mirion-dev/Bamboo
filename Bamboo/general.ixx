@@ -159,6 +159,14 @@ namespace bamboo {
         std::vector<u32> palette;
     };
 
+    export struct Resources {
+        FontBank font_bank;
+        SoundBank sound_bank;
+        MusicBank music_bank;
+        ImageBank icon_bank;
+        ImageBank image_bank;
+    };
+
     export struct BinaryFiles : std::vector<std::wstring> {};
 
     export struct Control {
@@ -242,7 +250,7 @@ namespace bamboo {
 
     export struct Extensions : std::vector<Extension> {};
 
-    export struct Setting {
+    export struct Settings {
         enum DisplayFlag {
             maximized_on_boot,
             resize_display,
@@ -916,12 +924,8 @@ namespace bamboo {
 
     export struct File {
         Header header;
-        FontBank font_bank;
-        SoundBank sound_bank;
-        MusicBank music_bank;
-        ImageBank icon_bank;
-        ImageBank image_bank;
-        Setting setting;
+        Resources resources;
+        Settings settings;
         Frames frames;
     };
 
