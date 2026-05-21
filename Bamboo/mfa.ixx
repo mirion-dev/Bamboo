@@ -628,35 +628,35 @@ namespace bamboo::mfa {
 
         switch (value.type) {
         case Object::quick_backdrop:
-            stream >> value.data.emplace<QuickBackdrop>();
+            stream >> value.emplace<QuickBackdrop>();
             break;
         case Object::backdrop:
-            stream >> value.data.emplace<Backdrop>();
+            stream >> value.emplace<Backdrop>();
             break;
         case Object::active:
-            stream >> value.data.emplace<ActiveObject>();
+            stream >> value.emplace<ActiveObject>();
             break;
         case Object::string:
-            stream >> value.data.emplace<StringObject>();
+            stream >> value.emplace<StringObject>();
             break;
         case Object::question_answer:
-            stream >> value.data.emplace<QuestionAnswerObject>();
+            stream >> value.emplace<QuestionAnswerObject>();
             break;
         case Object::score:
         case Object::lives:
-            stream >> value.data.emplace<ScoreLivesObject>();
+            stream >> value.emplace<ScoreLivesObject>();
             break;
         case Object::counter:
-            stream >> value.data.emplace<CounterObject>();
+            stream >> value.emplace<CounterObject>();
             break;
         case Object::formatted_text:
-            stream >> value.data.emplace<FormattedTextObject>();
+            stream >> value.emplace<FormattedTextObject>();
             break;
         case Object::subapplication:
-            stream >> value.data.emplace<SubapplicationObject>();
+            stream >> value.emplace<SubapplicationObject>();
             break;
         default:
-            stream >> value.data.emplace<ExtensionObject>();
+            stream >> value.emplace<ExtensionObject>();
         }
 
         spdlog::debug("Read object {:?}.", to_string(value.name));
@@ -913,34 +913,34 @@ namespace bamboo::mfa {
 
         std::string_view id{ buffer.data(), buffer.size() };
         if (id == "Evts" || id == "STVE") {
-            stream >> value.data.emplace<EventsBlock>();
+            stream >> value.emplace<EventsBlock>();
         }
         else if (id == "Rems" || id == "SMER") {
-            stream >> value.data.emplace<RemarksBlock>();
+            stream >> value.emplace<RemarksBlock>();
         }
         else if (id == "SPRG") {
-            stream >> value.data.emplace<GroupsBlock>();
+            stream >> value.emplace<GroupsBlock>();
         }
         else if (id == "EvOb" || id == "SJBO") {
-            stream >> value.data.emplace<ObjectsBlock>();
+            stream >> value.emplace<ObjectsBlock>();
         }
         else if (id == "EvCs") {
-            stream >> value.data.emplace<ConditionsBlock>();
+            stream >> value.emplace<ConditionsBlock>();
         }
         else if (id == "EvEd") {
-            stream >> value.data.emplace<DataBlock>();
+            stream >> value.emplace<DataBlock>();
         }
         else if (id == "EvTs") {
-            stream >> value.data.emplace<TabsBlock>();
+            stream >> value.emplace<TabsBlock>();
         }
         else if (id == "EvLs") {
-            stream >> value.data.emplace<LinesBlock>();
+            stream >> value.emplace<LinesBlock>();
         }
         else if (id == "E2Ts" || id == "TYAL") {
-            stream >> value.data.emplace<LayoutBlock>();
+            stream >> value.emplace<LayoutBlock>();
         }
         else if (id == "!DNE") {
-            stream >> value.data.emplace<EndBlock>();
+            stream >> value.emplace<EndBlock>();
         }
         else {
             throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
@@ -953,7 +953,7 @@ namespace bamboo::mfa {
         stream >> value.data_size;
         if (value.data_size != 0) {
             EventBlock event;
-            while (stream >> event, !std::holds_alternative<EndBlock>(event.data)) {
+            while (stream >> event, !std::holds_alternative<EndBlock>(event)) {
                 value.emplace_back(std::move(event));
             }
         }

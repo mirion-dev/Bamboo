@@ -593,7 +593,19 @@ namespace bamboo {
 
     export struct Chunks : std::vector<Chunk> {};
 
-    export struct Object {
+    export struct Object : std::variant<
+            QuickBackdrop,
+            Backdrop,
+            ActiveObject,
+            StringObject,
+            QuestionAnswerObject,
+            ScoreLivesObject,
+            CounterObject,
+            FormattedTextObject,
+            SubapplicationObject,
+            ExtensionObject
+        > {
+
         enum Type {
             quick_backdrop,
             backdrop,
@@ -627,18 +639,6 @@ namespace bamboo {
         i32 icon_type;
         u32 icon;
         Chunks chunks;
-        std::variant<
-            QuickBackdrop,
-            Backdrop,
-            ActiveObject,
-            StringObject,
-            QuestionAnswerObject,
-            ScoreLivesObject,
-            CounterObject,
-            FormattedTextObject,
-            SubapplicationObject,
-            ExtensionObject
-        > data;
     };
 
     export struct Objects : std::vector<Object> {};
@@ -840,8 +840,7 @@ namespace bamboo {
 
     export struct EndBlock {};
 
-    export struct EventBlock {
-        std::variant<
+    export struct EventBlock : std::variant<
             EventsBlock,
             RemarksBlock,
             GroupsBlock,
@@ -852,8 +851,7 @@ namespace bamboo {
             LinesBlock,
             LayoutBlock,
             EndBlock
-        > data;
-    };
+        > {};
 
     export struct EventBlocks : std::vector<EventBlock> {
         i32 data_size;
