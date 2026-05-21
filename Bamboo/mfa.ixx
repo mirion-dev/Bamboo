@@ -1007,34 +1007,19 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, File& value) {
-        Timer total, section{ total };
+        Timer timer;
 
         stream >> value.header;
         stream.build = value.header.product_build;
-        spdlog::info("Read the header in {:.3f} seconds.", section.duration());
+        stream >> value.font_bank
+            >> value.sound_bank
+            >> value.music_bank
+            >> value.icon_bank
+            >> value.image_bank
+            >> value.setting
+            >> value.frames;
 
-        stream >> value.font_bank;
-        spdlog::info("Read the font bank in {:.3f} seconds.", section.duration());
-
-        stream >> value.sound_bank;
-        spdlog::info("Read the sound bank in {:.3f} seconds.", section.duration());
-
-        stream >> value.music_bank;
-        spdlog::info("Read the music bank in {:.3f} seconds.", section.duration());
-
-        stream >> value.icon_bank;
-        spdlog::info("Read the icon bank in {:.3f} seconds.", section.duration());
-
-        stream >> value.image_bank;
-        spdlog::info("Read the image bank in {:.3f} seconds.", section.duration());
-
-        stream >> value.setting;
-        spdlog::info("Read settings in {:.3f} seconds.", section.duration());
-
-        stream >> value.frames;
-        spdlog::info("Read frames in {:.3f} seconds.", section.duration());
-
-        spdlog::info("Finished parsing in {:.3f} seconds.", total.duration());
+        spdlog::info("Finished parsing in {:.3f} seconds.", timer.duration());
     }
 
 }
