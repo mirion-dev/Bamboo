@@ -700,66 +700,265 @@ namespace bamboo::mfa {
         spdlog::info("Read {} instances.", value.size());
     }
 
+    static void load(Stream& stream, Parameter& value) {
+        stream >> value.size >> args(value.data, value.size - 2);
+    }
+
+    static void load(Stream& stream, Condition& value) {
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        stream >> value.size
+            >> value.object_type
+            >> value.number
+            >> value.object
+            >> value.object_list
+            >> value.flags
+            >> value.other_flags
+            >> value.params_num
+            >> value.def_type
+            >> value.id
+            >> args(value.params, value.params_num);
+
+        if (stream.tellg() != begin + value.size) {
+            throw Error{ "Corrupt condition." };
+        }
+    }
+
+    static void load(Stream& stream, Action& value) {
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        stream >> value.size
+            >> value.object_type
+            >> value.number
+            >> value.object
+            >> value.object_list
+            >> value.flags
+            >> value.other_flags
+            >> value.params_num
+            >> value.def_type
+            >> args(value.params, value.params_num);
+
+        if (stream.tellg() != begin + value.size) {
+            throw Error{ "Corrupt action." };
+        }
+    }
+
     static void load(Stream& stream, Event& value) {
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        stream >> value.size
+            >> value.condition_num
+            >> value.action_num
+            >> value.flags
+            >> value.restricted
+            >> value.restrict_cpt
+            >> value.id
+            >> value.undo
+            >> args(value.conditions, value.condition_num)
+            >> args(value.actions, value.action_num);
+
+        if (stream.tellg() != begin + std::abs(value.size)) {
+            throw Error{ "Corrupt event." };
+        }
+    }
+
+    static void load(Stream& stream, Events& value) {
+        stream >> static_cast<std::vector<Event>&>(value);
+        spdlog::info("Read {} events.", value.size());
+    }
+
+    static void load(Stream& stream, Remark& value) {
+        stream >> value.handle >> value.value;
+    }
+
+    static void load(Stream& stream, Remarks& value) {
+        stream >> static_cast<std::vector<Remark>&>(value);
+        spdlog::info("Read {} remarks.", value.size());
+    }
+
+    static void load(Stream& stream, Group& value) {
+        stream >> value.handle >> value.name >> value.uuid;
+        spdlog::debug("Read group {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Groups& value) {
+        stream >> static_cast<std::vector<Group>&>(value);
+        spdlog::info("Read {} groups.", value.size());
+    }
+
+    static void load(Stream& stream, EventObjectRef& value) {
+        stream >> value.item_handle >> value.instance_handle;
+    }
+
+    static void load(Stream& stream, EventObjectIcon& value) {
+        std::array<char, 4> buffer;
+        stream >> buffer;
+
+        std::string_view id{ buffer.data(), buffer.size() };
+        if (id == "OIC2") {
+            stream >> value.icon_buffer;
+        }
+    }
+
+    static void load(Stream& stream, EventObjectQualifier& value) {
+        stream >> value.system_qualifier;
+    }
+
+    static void load(Stream& stream, EventObject& value) {
+        stream >> value.handle
+            >> value.object_type
+            >> value.item_type
+            >> value.name
+            >> value.type_name
+            >> value.flags;
+
+        switch (value.object_type) {
+        case 1:
+            stream >> value.data.emplace<EventObjectRef>();
+            break;
+        case 2:
+            stream >> value.data.emplace<EventObjectIcon>();
+            break;
+        case 3:
+            stream >> value.data.emplace<EventObjectQualifier>();
+            break;
+        default:
+            throw Error{ std::format("Unknown event object type {}.", value.object_type) };
+        }
+
+        spdlog::debug("Read event object {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, EventObjects& value) {
+        stream >> static_cast<std::vector<EventObject>&>(value);
+        spdlog::info("Read {} event objects.", value.size());
+    }
+
+    static void load(Stream& stream, EventItem& value) {
+        stream >> value.type >> value.handle >> value.flags;
+    }
+
+    static void load(Stream& stream, EventItems& value) {
+        stream >> static_cast<std::vector<EventItem>&>(value);
+        spdlog::info("Read {} event items.", value.size());
+    }
+
+    static void load(Stream& stream, EventsBlock& value) {
+        stream >> value.size;
+
+        auto end{ static_cast<usize>(stream.tellg()) + value.size };
+        while (static_cast<usize>(stream.tellg()) < end) {
+            Event event;
+            stream >> event;
+            value.data.emplace_back(std::move(event));
+        }
+        if (stream.tellg() != end) {
+            throw Error{ "Corrupt events block." };
+        }
+    }
+
+    static void load(Stream& stream, RemarksBlock& value) {
+        stream >> value.data;
+    }
+
+    static void load(Stream& stream, GroupsBlock& value) {
+        stream >> value.len >> value.max_handles >> args(value.data, value.len);
+    }
+
+    static void load(Stream& stream, ObjectsBlock& value) {
+        stream >> value.data;
+    }
+
+    static void load(Stream& stream, ConditionsBlock& value) {
+        stream >> value.editor_data
+            >> value.condition_width
+            >> value.object_height
+            >> skip<std::array<char, 12>>;
+    }
+
+    static void load(Stream& stream, DataBlock& value) {
+        stream >> value.header;
+        if (value.header == -1) {
+            stream >> args(value.items, size_type<i16>);
+            stream >> args(value.folders, size_type<i16>);
+        }
+        else {
+            stream >> args(value.items, value.header);
+        }
+    }
+
+    static void load(Stream& stream, TabsBlock& value) {
+        stream >> skip<i16>
+            >> value.editor_x
+            >> value.editor_y
+            >> value.editor_caret_type
+            >> value.editor_caret_x
+            >> value.editor_caret_y;
+    }
+
+    static void load(Stream& stream, LinesBlock& value) {
+        stream >> skip<i16>
+            >> value.editor_line_y
+            >> value.editor_line_type
+            >> value.event_line_y
+            >> value.event_line_type;
+    }
+
+    static void load(Stream& stream, LayoutBlock& value) {
+        stream >> value.data;
+    }
+
+    static void load(Stream& stream, EndBlock& value) {}
+
+    static void load(Stream& stream, EventBlock& value) {
         std::array<char, 4> buffer;
         stream >> buffer;
 
         std::string_view id{ buffer.data(), buffer.size() };
         if (id == "Evts" || id == "STVE") {
-            value.type = Event::events;
+            stream >> value.data.emplace<EventsBlock>();
         }
         else if (id == "Rems" || id == "SMER") {
-            value.type = Event::remarks;
+            stream >> value.data.emplace<RemarksBlock>();
         }
         else if (id == "SPRG") {
-            value.type = Event::groups;
+            stream >> value.data.emplace<GroupsBlock>();
         }
         else if (id == "EvOb" || id == "SJBO") {
-            value.type = Event::objects;
+            stream >> value.data.emplace<ObjectsBlock>();
         }
         else if (id == "EvCs") {
-            value.type = Event::conditions;
+            stream >> value.data.emplace<ConditionsBlock>();
         }
         else if (id == "EvEd") {
-            value.type = Event::editor;
+            stream >> value.data.emplace<DataBlock>();
         }
         else if (id == "EvTs") {
-            value.type = Event::tabs;
+            stream >> value.data.emplace<TabsBlock>();
         }
         else if (id == "EvLs") {
-            value.type = Event::lines;
+            stream >> value.data.emplace<LinesBlock>();
         }
         else if (id == "E2Ts" || id == "TYAL") {
-            value.type = Event::layout;
+            stream >> value.data.emplace<LayoutBlock>();
         }
         else if (id == "!DNE") {
-            value.type = Event::end;
+            stream >> value.data.emplace<EndBlock>();
         }
         else {
             throw Error{ std::format("Unknown event block {:?}.", id) };
         }
-
-        throw Error{ "Event::load() is unimplemented." };
     }
 
-    static void load(Stream& stream, Events& value) {
+    static void load(Stream& stream, EventBlocks& value) {
         value.clear();
 
         stream >> value.data_size;
-
-        auto begin{ static_cast<usize>(stream.tellg()) };
-        usize end{ begin + value.data_size };
         if (value.data_size != 0) {
-            Event event;
-            while (stream >> event, event.type != Event::end) {
+            EventBlock event;
+            while (stream >> event, !std::holds_alternative<EndBlock>(event.data)) {
                 value.emplace_back(std::move(event));
             }
         }
-        if (stream.tellg() != end) {
-            throw Error{ "Corrupt events." };
-        }
 
-        spdlog::info("Read {} events.", value.size());
+        spdlog::info("Read {} event blocks.", value.size());
     }
 
     static void load(Stream& stream, Frame& value) {
