@@ -29,7 +29,7 @@ namespace bamboo {
 
     export template <class S>
     class LoadError : public std::runtime_error {
-        static std::string _format(auto& stream, std::string_view message, const std::source_location& loc) noexcept {
+        static std::string _format(auto& stream, std::string_view message, const std::source_location& loc) {
             return std::format(
                 "[{}:{}] [{:#018x}] {}",
                 to_string(std::filesystem::path{ loc.file_name() }.filename().wstring()),
@@ -44,7 +44,7 @@ namespace bamboo {
             S& stream,
             std::string_view message,
             const std::source_location& loc = std::source_location::current()
-        ) noexcept :
+        ) :
             std::runtime_error{ this->_format(stream, message, loc) } {}
     };
 
