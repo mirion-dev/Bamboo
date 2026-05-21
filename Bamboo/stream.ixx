@@ -111,7 +111,7 @@ namespace bamboo {
 
         Stream(std::string_view path) {
             exceptions(failbit | badbit); // WORKAROUND: Delegation leads to crash when open() fails.
-            open(path.data(), binary | in);
+            open(std::string{ path }, binary | in);
         }
 
         template <class S, class T, class... Args>
