@@ -35,27 +35,6 @@ namespace bamboo {
         }
     };
 
-    export template <class S>
-    class LoadError : public std::runtime_error {
-        static std::string _format(auto& stream, std::string_view message, const std::source_location& loc) {
-            return std::format(
-                "[{}:{}] [{:#010x}] {}",
-                to_string(std::filesystem::path{ loc.file_name() }.filename().wstring()),
-                loc.line(),
-                static_cast<usize>(stream.tellg()),
-                message
-            );
-        }
-
-    public:
-        LoadError(
-            S& stream,
-            std::string_view message,
-            const std::source_location& loc = std::source_location::current()
-        ) :
-            std::runtime_error{ this->_format(stream, message, loc) } {}
-    };
-
     template <class S>
     class StreamPosFlagFormatter : public spdlog::custom_flag_formatter {
         std::weak_ptr<S> _ptr;

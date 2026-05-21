@@ -67,7 +67,7 @@ namespace bamboo::mfa {
             i32 size;
             stream >> size;
             if (!(size & MASK_UNICODE)) {
-                throw LoadError{ stream, "ASCII strings are unsupported." };
+                throw std::runtime_error{ "ASCII strings are unsupported." };
             }
             resize_load(stream, value, size & ~MASK_UNICODE);
         }
@@ -83,7 +83,7 @@ namespace bamboo::mfa {
             stream >> size;
             resize_load(stream, value, size);
             if (value.empty() || value.back() != '\0') {
-                throw LoadError{ stream, "A Pascal-C string must be null-terminated." };
+                throw std::runtime_error{ "A Pascal-C string must be null-terminated." };
             }
             value.pop_back();
         }
@@ -91,7 +91,7 @@ namespace bamboo::mfa {
             resize_load(stream, value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
-                throw LoadError{ stream, "A fixed C string must be null-terminated." };
+                throw std::runtime_error{ "A fixed C string must be null-terminated." };
             }
             value.resize(end);
         }
@@ -303,19 +303,19 @@ namespace bamboo::mfa {
         usize accel_begin{ begin + value.accel_offset };
         usize accel_end{ accel_begin + value.accel_size };
         if (stream.tellg() != header_end) {
-            throw LoadError{ stream, "Corrupt menu header." };
+            throw std::runtime_error{ "Corrupt menu header." };
         }
 
         stream.seekg(item_begin);
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
-            throw LoadError{ stream, "Corrupt menu items." };
+            throw std::runtime_error{ "Corrupt menu items." };
         }
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
         if (stream.tellg() != accel_end) {
-            throw LoadError{ stream, "Corrupt menu accelerators." };
+            throw std::runtime_error{ "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
@@ -339,7 +339,7 @@ namespace bamboo::mfa {
             stream >> value.value.emplace<std::wstring>();
             break;
         default:
-            throw LoadError{ stream, std::format("Unknown value type {}.", type) };
+            throw std::runtime_error{ std::format("Unknown value type {}.", type) };
         }
     }
 
@@ -350,7 +350,7 @@ namespace bamboo::mfa {
     static void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
-            throw LoadError{ stream, std::format("Global events are unsupported at the moment.") };
+            throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
         }
         spdlog::debug("Read {} global events.", value.size);
     }
@@ -719,7 +719,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw LoadError{ stream, "Corrupt condition." };
+            throw std::runtime_error{ "Corrupt condition." };
         }
     }
 
@@ -737,7 +737,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw LoadError{ stream, "Corrupt action." };
+            throw std::runtime_error{ "Corrupt action." };
         }
     }
 
@@ -755,7 +755,7 @@ namespace bamboo::mfa {
             >> args(value.actions, value.action_num);
 
         if (stream.tellg() != begin + std::abs(value.size)) {
-            throw LoadError{ stream, "Corrupt event." };
+            throw std::runtime_error{ "Corrupt event." };
         }
     }
 
@@ -820,7 +820,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace<EventObjectQualifier>();
             break;
         default:
-            throw LoadError{ stream, std::format("Unknown event object type {}.", value.object_type) };
+            throw std::runtime_error{ std::format("Unknown event object type {}.", value.object_type) };
         }
 
         spdlog::debug("Read event object {:?}.", to_string(value.name));
@@ -850,7 +850,7 @@ namespace bamboo::mfa {
             value.data.emplace_back(std::move(event));
         }
         if (stream.tellg() != end) {
-            throw LoadError{ stream, "Corrupt events block." };
+            throw std::runtime_error{ "Corrupt events block." };
         }
     }
 
@@ -943,7 +943,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace<EndBlock>();
         }
         else {
-            throw LoadError{ stream, std::format("Unknown event block {:?}.", id) };
+            throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
         }
     }
 
