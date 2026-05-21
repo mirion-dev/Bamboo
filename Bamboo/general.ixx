@@ -163,28 +163,10 @@ namespace bamboo {
 
     export struct Control {
         i32 type;
-        std::vector<i32> data;
+        std::vector<i32> keys;
     };
 
     export struct Controls : std::vector<Control> {};
-
-    export struct Qualifier {
-        std::wstring name;
-        u32 handle;
-    };
-
-    export struct Qualifiers : std::vector<Qualifier> {};
-
-    export struct Extension {
-        u32 handle;
-        std::wstring filename;
-        std::wstring name;
-        i32 magic_num;
-        std::wstring subtype;
-        i32 is_unicode;
-    };
-
-    export struct Extensions : std::vector<Extension> {};
 
     export struct MenuItem;
 
@@ -210,6 +192,8 @@ namespace bamboo {
         i32 id;
     };
 
+    export struct MenuAccels : std::vector<MenuAccel> {};
+
     export struct Menu {
         i32 size;
         i32 header_size;
@@ -218,7 +202,7 @@ namespace bamboo {
         i32 accel_offset;
         i32 accel_size;
         MenuItems items;
-        std::vector<MenuAccel> accels;
+        MenuAccels accels;
         i32 window_menu;
         std::vector<i64> images;
     };
@@ -239,6 +223,24 @@ namespace bamboo {
     export struct GlobalEvents {
         i32 size;
     };
+
+    export struct Qualifier {
+        std::wstring name;
+        u32 handle;
+    };
+
+    export struct Qualifiers : std::vector<Qualifier> {};
+
+    export struct Extension {
+        u32 handle;
+        std::wstring filename;
+        std::wstring name;
+        i32 magic_num;
+        std::wstring subtype;
+        i32 is_unicode;
+    };
+
+    export struct Extensions : std::vector<Extension> {};
 
     export struct Setting {
         enum DisplayFlag {

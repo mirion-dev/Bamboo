@@ -229,38 +229,12 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, Control& value) {
-        stream >> value.type >> value.data;
+        stream >> value.type >> value.keys;
     }
 
     static void load(Stream& stream, Controls& value) {
         stream >> static_cast<std::vector<Control>&>(value);
         spdlog::debug("Read {} controls.", value.size());
-    }
-
-    static void load(Stream& stream, Qualifier& value) {
-        stream >> value.name >> value.handle;
-        spdlog::debug("Read qualifier {:?}.", to_string(value.name));
-    }
-
-    static void load(Stream& stream, Qualifiers& value) {
-        stream >> static_cast<std::vector<Qualifier>&>(value);
-        spdlog::debug("Read {} qualifiers.", value.size());
-    }
-
-    static void load(Stream& stream, Extension& value) {
-        stream >> value.handle
-            >> value.filename
-            >> value.name
-            >> value.magic_num
-            >> value.subtype
-            >> value.is_unicode;
-
-        spdlog::debug("Read extension {:?}.", to_string(value.name));
-    }
-
-    static void load(Stream& stream, Extensions& value) {
-        stream >> static_cast<std::vector<Extension>&>(value);
-        spdlog::debug("Read {} extensions.", value.size());
     }
 
     static void load(Stream& stream, MenuItem& value) {
@@ -354,6 +328,32 @@ namespace bamboo::mfa {
             throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
         }
         spdlog::debug("Read {} global events.", value.size);
+    }
+
+    static void load(Stream& stream, Qualifier& value) {
+        stream >> value.name >> value.handle;
+        spdlog::debug("Read qualifier {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Qualifiers& value) {
+        stream >> static_cast<std::vector<Qualifier>&>(value);
+        spdlog::debug("Read {} qualifiers.", value.size());
+    }
+
+    static void load(Stream& stream, Extension& value) {
+        stream >> value.handle
+            >> value.filename
+            >> value.name
+            >> value.magic_num
+            >> value.subtype
+            >> value.is_unicode;
+
+        spdlog::debug("Read extension {:?}.", to_string(value.name));
+    }
+
+    static void load(Stream& stream, Extensions& value) {
+        stream >> static_cast<std::vector<Extension>&>(value);
+        spdlog::debug("Read {} extensions.", value.size());
     }
 
     static void load(Stream& stream, Setting& value) {
