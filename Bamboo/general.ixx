@@ -187,9 +187,9 @@ namespace bamboo {
     };
 
     export struct MenuAccel {
-        i16 shift;
+        i8 shift;
         i16 key;
-        i32 id;
+        i16 id;
     };
 
     export struct MenuAccels : std::vector<MenuAccel> {};

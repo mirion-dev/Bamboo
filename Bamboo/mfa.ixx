@@ -258,7 +258,11 @@ namespace bamboo::mfa {
     }
 
     static void load(Stream& stream, MenuAccel& value) {
-        stream >> value.shift >> value.key >> value.id;
+        stream >> value.shift
+            >> skip<i8>
+            >> value.key
+            >> value.id
+            >> skip<i16>;
     }
 
     static void load(Stream& stream, Menu& value) {
@@ -288,7 +292,7 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(accel_begin);
-        stream >> args(value.accels, value.accel_size / sizeof(MenuAccel));
+        stream >> args(value.accels, value.accel_size / 8);
         if (stream.tellg() != accel_end) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
