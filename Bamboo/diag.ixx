@@ -1,7 +1,13 @@
+module;
+
+#include <spdlog/spdlog.h>
+
 export module bamboo.diag;
 
 import std;
 import bamboo.types;
+
+using namespace std::literals;
 
 namespace bamboo {
 
@@ -24,6 +30,29 @@ namespace bamboo {
             double res{ std::chrono::duration<double>{ now - _start }.count() };
             _start = now;
             return res;
+        }
+    };
+
+    export template <class S>
+    class StreamPosFlagFormatter : public spdlog::custom_flag_formatter {
+        std::weak_ptr<S> _ptr;
+
+    public:
+        StreamPosFlagFormatter(std::weak_ptr<S> ptr) noexcept :
+            _ptr{ ptr } {}
+
+        void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) {
+            std::shared_ptr<S> stream{ _ptr.lock() };
+            if (stream == nullptr || stream->rdbuf() == nullptr) {
+                dest.append("invalid"sv);
+                return;
+            }
+
+            dest.append(std::format("{:#018x}", static_cast<usize>(stream->tellg())));
+        }
+
+        std::unique_ptr<custom_flag_formatter> clone() const noexcept {
+            return std::make_unique<StreamPosFlagFormatter>(_ptr);
         }
     };
 
