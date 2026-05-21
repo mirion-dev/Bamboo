@@ -71,7 +71,7 @@ namespace bamboo {
     export struct Font {
         u32 handle;
         u32 checksum;
-        i32 references;
+        u32 references;
         i32 size;
         i32 height;
         i32 width;
@@ -102,7 +102,7 @@ namespace bamboo {
 
         u32 handle;
         u32 checksum;
-        i32 references;
+        u32 references;
         i32 size;
         Flags<u32> flags;
         i32 frequency;
@@ -115,7 +115,7 @@ namespace bamboo {
     export struct Music {
         u32 handle;
         u32 checksum;
-        i32 references;
+        u32 references;
         i32 size;
         Flags<u32> flags;
         i32 frequency;
@@ -139,7 +139,7 @@ namespace bamboo {
 
         u32 handle;
         u32 checksum;
-        i32 references;
+        u32 references;
         i32 size;
         i16 width;
         i16 height;
