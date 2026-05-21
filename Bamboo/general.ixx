@@ -681,6 +681,8 @@ namespace bamboo {
         std::vector<char> data;
     };
 
+    export struct Parameters : std::vector<Parameter> {};
+
     export struct Condition {
         i16 size;
         i16 object_type;
@@ -692,8 +694,10 @@ namespace bamboo {
         i8 params_num;
         i8 def_type;
         i16 id;
-        std::vector<Parameter> params;
+        Parameters params;
     };
+
+    export struct Conditions : std::vector<Condition> {};
 
     export struct Action {
         i16 size;
@@ -705,8 +709,10 @@ namespace bamboo {
         u8 other_flags;
         i8 params_num;
         i8 def_type;
-        std::vector<Parameter> params;
+        Parameters params;
     };
+
+    export struct Actions : std::vector<Action> {};
 
     export struct Event {
         enum Flag {
@@ -736,8 +742,8 @@ namespace bamboo {
         i16 restrict_cpt;
         i16 id;
         i16 undo;
-        std::vector<Condition> conditions;
-        std::vector<Action> actions;
+        Conditions conditions;
+        Actions actions;
     };
 
     export struct Events : std::vector<Event> {};

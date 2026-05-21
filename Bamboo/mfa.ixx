@@ -420,16 +420,8 @@ namespace bamboo::mfa {
             >> value.data;
     }
 
-    static void load(Stream& stream, Movements& value) {
-        stream >> static_cast<std::vector<Movement>&>(value);
-    }
-
     static void load(Stream& stream, Behavior& value) {
         stream >> value.name >> value.data;
-    }
-
-    static void load(Stream& stream, Behaviors& value) {
-        stream >> static_cast<std::vector<Behavior>&>(value);
     }
 
     static void load(Stream& stream, Direction& value) {
@@ -441,24 +433,12 @@ namespace bamboo::mfa {
             >> value.frames;
     }
 
-    static void load(Stream& stream, Directions& value) {
-        stream >> static_cast<std::vector<Direction>&>(value);
-    }
-
     static void load(Stream& stream, Animation& value) {
         stream >> value.name >> value.directions;
     }
 
-    static void load(Stream& stream, Animations& value) {
-        stream >> static_cast<std::vector<Animation>&>(value);
-    }
-
     static void load(Stream& stream, Paragraph& value) {
         stream >> value.value >> value.flags;
-    }
-
-    static void load(Stream& stream, Paragraphs& value) {
-        stream >> static_cast<std::vector<Paragraph>&>(value);
     }
 
     static void load(Stream& stream, Content& value) {
