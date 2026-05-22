@@ -23,7 +23,7 @@ namespace bamboo::mfa {
         stream.build = value.header.product_build;
         stream >> value.resources >> value.manifest >> value.frames;
 
-        spdlog::info("Read a MFA file in {:.3f} seconds.", timer.duration());
+        spdlog::info("Read an MFA file in {:.3f} seconds.", timer.duration());
     }
 
 }
