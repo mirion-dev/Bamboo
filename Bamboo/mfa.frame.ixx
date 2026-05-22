@@ -2,15 +2,20 @@ module;
 
 #include <spdlog/spdlog.h>
 
-export module bamboo.mfa:frame;
+export module bamboo.mfa.frame;
 
-import :base;
-import :object;
-import :event;
+import std;
+import bamboo.types;
+import bamboo.diag;
+import bamboo.stream;
+import bamboo.model;
+import bamboo.mfa.base;
+import bamboo.mfa.object;
+import bamboo.mfa.event;
 
 namespace bamboo::mfa {
 
-    void load(Stream& stream, Layer& value) {
+    export void load(Stream& stream, Layer& value) {
         stream >> value.name
             >> value.flags
             >> value.x_coefficient
@@ -19,12 +24,12 @@ namespace bamboo::mfa {
         spdlog::debug("Read layer {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, Layers& value) {
+    export void load(Stream& stream, Layers& value) {
         stream >> static_cast<std::vector<Layer>&>(value);
         spdlog::debug("Read {} layers.", value.size());
     }
 
-    void load(Stream& stream, Folder& value) {
+    export void load(Stream& stream, Folder& value) {
         stream >> value.header;
         if (((value.header & 0xff) == 112 ? value.header >> 24 : value.header) == 4) {
             stream >> value.name >> value.children;
@@ -35,12 +40,12 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Folders& value) {
+    export void load(Stream& stream, Folders& value) {
         stream >> static_cast<std::vector<Folder>&>(value);
         spdlog::debug("Read {} folders.", value.size());
     }
 
-    void load(Stream& stream, Instance& value) {
+    export void load(Stream& stream, Instance& value) {
         stream >> value.pos_x
             >> value.pos_y
             >> value.layer
@@ -52,12 +57,12 @@ namespace bamboo::mfa {
             >> value.parent;
     }
 
-    void load(Stream& stream, Instances& value) {
+    export void load(Stream& stream, Instances& value) {
         stream >> static_cast<std::vector<Instance>&>(value);
         spdlog::debug("Read {} instances.", value.size());
     }
 
-    void load(Stream& stream, Frame& value) {
+    export void load(Stream& stream, Frame& value) {
         stream >> value.handle
             >> value.name
             >> value.width
@@ -84,7 +89,7 @@ namespace bamboo::mfa {
         spdlog::debug("Read frame {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, Frames& value) {
+    export void load(Stream& stream, Frames& value) {
         value.clear();
 
         stream >> value.offsets >> value.end;

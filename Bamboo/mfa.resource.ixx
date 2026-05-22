@@ -2,13 +2,18 @@ module;
 
 #include <spdlog/spdlog.h>
 
-export module bamboo.mfa:resource;
+export module bamboo.mfa.resource;
 
-import :base;
+import std;
+import bamboo.types;
+import bamboo.diag;
+import bamboo.stream;
+import bamboo.model;
+import bamboo.mfa.base;
 
 namespace bamboo::mfa {
 
-    void load(Stream& stream, Font& value) {
+    export void load(Stream& stream, Font& value) {
         stream >> value.handle
             >> value.checksum
             >> value.references
@@ -31,12 +36,12 @@ namespace bamboo::mfa {
         spdlog::debug("Read font {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, FontBank& value) {
+    export void load(Stream& stream, FontBank& value) {
         stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
         spdlog::debug("Read {} fonts.", value.size());
     }
 
-    void load(Stream& stream, Sound& value) {
+    export void load(Stream& stream, Sound& value) {
         stream >> value.handle
             >> value.checksum
             >> value.references
@@ -51,12 +56,12 @@ namespace bamboo::mfa {
         spdlog::debug("Read sound {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, SoundBank& value) {
+    export void load(Stream& stream, SoundBank& value) {
         stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
         spdlog::debug("Read {} sounds.", value.size());
     }
 
-    void load(Stream& stream, Music& value) {
+    export void load(Stream& stream, Music& value) {
         stream >> value.handle
             >> value.checksum
             >> value.references
@@ -69,12 +74,12 @@ namespace bamboo::mfa {
         spdlog::debug("Read music {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, MusicBank& value) {
+    export void load(Stream& stream, MusicBank& value) {
         stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
         spdlog::debug("Read {} music.", value.size());
     }
 
-    void load(Stream& stream, Image& value) {
+    export void load(Stream& stream, Image& value) {
         stream >> value.handle
             >> value.checksum
             >> value.references
@@ -96,7 +101,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, ImageBank& value) {
+    export void load(Stream& stream, ImageBank& value) {
         stream >> signature<"AGMI">
             >> value.graphic_mode
             >> value.palette_version
@@ -106,7 +111,7 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} images.", value.size());
     }
 
-    void load(Stream& stream, Resources& value) {
+    export void load(Stream& stream, Resources& value) {
         stream >> value.font_bank
             >> value.sound_bank
             >> value.music_bank

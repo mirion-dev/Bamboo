@@ -1,8 +1,10 @@
-export module bamboo.model:frame;
+export module bamboo.model.frame;
 
-import :base;
-import :object;
-import :event;
+import std;
+import bamboo.types;
+import bamboo.model.base;
+import bamboo.model.object;
+import bamboo.model.event;
 
 namespace bamboo {
 

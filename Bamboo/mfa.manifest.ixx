@@ -2,27 +2,32 @@ module;
 
 #include <spdlog/spdlog.h>
 
-export module bamboo.mfa:manifest;
+export module bamboo.mfa.manifest;
 
-import :base;
+import std;
+import bamboo.types;
+import bamboo.diag;
+import bamboo.stream;
+import bamboo.model;
+import bamboo.mfa.base;
 
 namespace bamboo::mfa {
 
-    void load(Stream& stream, BinaryFiles& value) {
+    export void load(Stream& stream, BinaryFiles& value) {
         stream >> static_cast<std::vector<std::wstring>&>(value);
         spdlog::debug("Read {} binary files.", value.size());
     }
 
-    void load(Stream& stream, Control& value) {
+    export void load(Stream& stream, Control& value) {
         stream >> value.type >> value.keys;
     }
 
-    void load(Stream& stream, Controls& value) {
+    export void load(Stream& stream, Controls& value) {
         stream >> static_cast<std::vector<Control>&>(value);
         spdlog::debug("Read {} controls.", value.size());
     }
 
-    void load(Stream& stream, MenuItem& value) {
+    export void load(Stream& stream, MenuItem& value) {
         stream >> value.flags;
         if (!value.flags[MenuItem::parent]) {
             stream >> value.id;
@@ -33,7 +38,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, MenuItems& value) {
+    export void load(Stream& stream, MenuItems& value) {
         value.clear();
 
         MenuItem item;
@@ -42,7 +47,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, MenuAccel& value) {
+    export void load(Stream& stream, MenuAccel& value) {
         stream >> value.shift
             >> skip<i8>
             >> value.key
@@ -50,7 +55,7 @@ namespace bamboo::mfa {
             >> skip<i16>;
     }
 
-    void load(Stream& stream, Menu& value) {
+    export void load(Stream& stream, Menu& value) {
         stream >> value.size;
 
         auto begin{ static_cast<usize>(stream.tellg()) };
@@ -88,7 +93,7 @@ namespace bamboo::mfa {
         spdlog::debug("Read a menu.");
     }
 
-    void load(Stream& stream, GlobalEvents& value) {
+    export void load(Stream& stream, GlobalEvents& value) {
         stream >> value.size;
         if (value.size != 0) {
             throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
@@ -97,17 +102,17 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} global events.", value.size);
     }
 
-    void load(Stream& stream, Qualifier& value) {
+    export void load(Stream& stream, Qualifier& value) {
         stream >> value.name >> value.handle;
         spdlog::debug("Read qualifier {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, Qualifiers& value) {
+    export void load(Stream& stream, Qualifiers& value) {
         stream >> static_cast<std::vector<Qualifier>&>(value);
         spdlog::debug("Read {} qualifiers.", value.size());
     }
 
-    void load(Stream& stream, Extension& value) {
+    export void load(Stream& stream, Extension& value) {
         stream >> value.handle
             >> value.filename
             >> value.name
@@ -118,12 +123,12 @@ namespace bamboo::mfa {
         spdlog::debug("Read extension {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, Extensions& value) {
+    export void load(Stream& stream, Extensions& value) {
         stream >> static_cast<std::vector<Extension>&>(value);
         spdlog::debug("Read {} extensions.", value.size());
     }
 
-    void load(Stream& stream, Manifest& value) {
+    export void load(Stream& stream, Manifest& value) {
         stream >> value.app_name
             >> value.author
             >> value.description

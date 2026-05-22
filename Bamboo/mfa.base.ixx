@@ -3,13 +3,12 @@ module;
 #include <spdlog/spdlog.h>
 #undef pascal
 
-export module bamboo.mfa:base;
+export module bamboo.mfa.base;
 
 import std;
 import bamboo.types;
 import bamboo.diag;
 import bamboo.stream;
-import bamboo.stream.utils;
 import bamboo.model;
 
 namespace bamboo::mfa {
@@ -21,45 +20,45 @@ namespace bamboo::mfa {
         using bamboo::Stream::Stream;
     };
 
-    template <class T, usize N>
+    export template <class T, usize N>
     void load(Stream& stream, std::array<T, N>& value) {
         stream >> bamboo::args(value.data(), N);
     }
 
-    template <std::integral T>
+    export template <std::integral T>
     struct SizeType {};
 
-    template <std::integral T>
+    export template <std::integral T>
     constexpr SizeType<T> size_type;
 
-    template <class T>
+    export template <class T>
     void load(Stream& stream, std::vector<T>& value, std::integral auto size) {
         bamboo::resize_load(stream, value, size);
     }
 
-    template <class T, std::integral S = i32>
+    export template <class T, std::integral S = i32>
     void load(Stream& stream, std::vector<T>& value, SizeType<S> = {}) {
         S size;
         stream >> size >> bamboo::args(value, size);
     }
 
-    enum class StringTypeEnum {
+    export enum class StringTypeEnum {
         pascal,
         c,
         pascal_c,
         fixed_c
     };
 
-    template <StringTypeEnum Type, usize N = {}>
+    export template <StringTypeEnum Type, usize N = {}>
     struct StringType {};
 
-    constexpr StringType<StringTypeEnum::pascal> string_type_pascal;
-    constexpr StringType<StringTypeEnum::c> string_type_c;
-    constexpr StringType<StringTypeEnum::pascal_c> string_type_pascal_c;
-    template <usize N>
+    export constexpr StringType<StringTypeEnum::pascal> string_type_pascal;
+    export constexpr StringType<StringTypeEnum::c> string_type_c;
+    export constexpr StringType<StringTypeEnum::pascal_c> string_type_pascal_c;
+    export template <usize N>
     constexpr StringType<StringTypeEnum::fixed_c, N> string_type_fixed_c;
 
-    template <StringTypeEnum Type = {}, usize N = {}>
+    export template <StringTypeEnum Type = {}, usize N = {}>
     void load(Stream& stream, std::wstring& value, StringType<Type, N> = {}) {
         if constexpr (Type == StringTypeEnum::pascal) {
             static constexpr u32 MASK_UNICODE{ 1u << 31 };
@@ -100,7 +99,7 @@ namespace bamboo::mfa {
         }
     }
 
-    template <class T>
+    export template <class T>
     void load(Stream& stream, std::optional<T>& value) {
         u8 has_value;
         stream >> has_value;
@@ -109,7 +108,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Value& value) {
+    export void load(Stream& stream, Value& value) {
         i32 type;
         stream >> value.name >> type;
 
@@ -128,7 +127,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Header& value) {
+    export void load(Stream& stream, Header& value) {
         stream >> signature<"MFU2">
             >> value.runtime_version
             >> value.runtime_subversion

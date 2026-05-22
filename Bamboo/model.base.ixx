@@ -2,7 +2,7 @@ module;
 
 #include <cassert>
 
-export module bamboo.model:base;
+export module bamboo.model.base;
 
 import std;
 import bamboo.types;

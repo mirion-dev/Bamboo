@@ -1,6 +1,8 @@
-export module bamboo.model:object;
+export module bamboo.model.object;
 
-import :base;
+import std;
+import bamboo.types;
+import bamboo.model.base;
 
 namespace bamboo {
 

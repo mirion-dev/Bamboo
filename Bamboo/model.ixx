@@ -1,11 +1,11 @@
 export module bamboo.model;
 
-export import :base;
-export import :resource;
-export import :manifest;
-export import :object;
-export import :event;
-export import :frame;
+export import bamboo.model.base;
+export import bamboo.model.resource;
+export import bamboo.model.manifest;
+export import bamboo.model.object;
+export import bamboo.model.event;
+export import bamboo.model.frame;
 
 namespace bamboo {
 

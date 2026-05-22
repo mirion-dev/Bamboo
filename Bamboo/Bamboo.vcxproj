@@ -140,6 +140,7 @@
     <ClCompile Include="model.manifest.ixx" />
     <ClCompile Include="model.object.ixx" />
     <ClCompile Include="model.resource.ixx" />
+    <ClCompile Include="stream.core.ixx" />
     <ClCompile Include="stream.utils.ixx" />
     <ClCompile Include="types.ixx" />
     <ClCompile Include="main.cpp" />

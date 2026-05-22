@@ -2,9 +2,14 @@ export module bamboo.stream.utils;
 
 import std;
 import bamboo.types;
-import bamboo.stream;
+import bamboo.stream.core;
 
 namespace bamboo {
+
+    export template <class... Args>
+    auto args(Args&&... args) {
+        return std::forward_as_tuple(std::forward<Args>(args)...);
+    }
 
     export template <class T, class... Args>
     struct Skip {

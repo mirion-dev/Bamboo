@@ -2,17 +2,22 @@ module;
 
 #include <spdlog/spdlog.h>
 
-export module bamboo.mfa:event;
+export module bamboo.mfa.event;
 
-import :base;
+import std;
+import bamboo.types;
+import bamboo.diag;
+import bamboo.stream;
+import bamboo.model;
+import bamboo.mfa.base;
 
 namespace bamboo::mfa {
 
-    void load(Stream& stream, Parameter& value) {
+    export void load(Stream& stream, Parameter& value) {
         stream >> value.size >> args(value.data, value.size - 2);
     }
 
-    void load(Stream& stream, Condition& value) {
+    export void load(Stream& stream, Condition& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> value.size
             >> value.object_type
@@ -31,7 +36,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Action& value) {
+    export void load(Stream& stream, Action& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> value.size
             >> value.object_type
@@ -49,7 +54,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Event& value) {
+    export void load(Stream& stream, Event& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> value.size
             >> value.condition_num
@@ -67,35 +72,35 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, Events& value) {
+    export void load(Stream& stream, Events& value) {
         stream >> static_cast<std::vector<Event>&>(value);
         spdlog::debug("Read {} events.", value.size());
     }
 
-    void load(Stream& stream, Remark& value) {
+    export void load(Stream& stream, Remark& value) {
         stream >> value.handle >> value.value;
     }
 
-    void load(Stream& stream, Remarks& value) {
+    export void load(Stream& stream, Remarks& value) {
         stream >> static_cast<std::vector<Remark>&>(value);
         spdlog::debug("Read {} remarks.", value.size());
     }
 
-    void load(Stream& stream, Group& value) {
+    export void load(Stream& stream, Group& value) {
         stream >> value.handle >> value.name >> value.uuid;
         spdlog::debug("Read group {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, Groups& value) {
+    export void load(Stream& stream, Groups& value) {
         stream >> static_cast<std::vector<Group>&>(value);
         spdlog::debug("Read {} groups.", value.size());
     }
 
-    void load(Stream& stream, EventObjectRef& value) {
+    export void load(Stream& stream, EventObjectRef& value) {
         stream >> value.item_handle >> value.instance_handle;
     }
 
-    void load(Stream& stream, EventObjectIcon& value) {
+    export void load(Stream& stream, EventObjectIcon& value) {
         std::array<char, 4> buffer;
         stream >> buffer;
 
@@ -105,11 +110,11 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, EventObjectQualifier& value) {
+    export void load(Stream& stream, EventObjectQualifier& value) {
         stream >> value.system_qualifier;
     }
 
-    void load(Stream& stream, EventObject& value) {
+    export void load(Stream& stream, EventObject& value) {
         stream >> value.handle
             >> value.object_type
             >> value.item_type
@@ -134,21 +139,21 @@ namespace bamboo::mfa {
         spdlog::debug("Read event object {:?}.", to_string(value.name));
     }
 
-    void load(Stream& stream, EventObjects& value) {
+    export void load(Stream& stream, EventObjects& value) {
         stream >> static_cast<std::vector<EventObject>&>(value);
         spdlog::debug("Read {} event objects.", value.size());
     }
 
-    void load(Stream& stream, EventItem& value) {
+    export void load(Stream& stream, EventItem& value) {
         stream >> value.type >> value.handle >> value.flags;
     }
 
-    void load(Stream& stream, EventItems& value) {
+    export void load(Stream& stream, EventItems& value) {
         stream >> static_cast<std::vector<EventItem>&>(value);
         spdlog::debug("Read {} event items.", value.size());
     }
 
-    void load(Stream& stream, EventsBlock& value) {
+    export void load(Stream& stream, EventsBlock& value) {
         stream >> value.size;
 
         auto end{ static_cast<usize>(stream.tellg()) + value.size };
@@ -162,26 +167,26 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, RemarksBlock& value) {
+    export void load(Stream& stream, RemarksBlock& value) {
         stream >> value.data;
     }
 
-    void load(Stream& stream, GroupsBlock& value) {
+    export void load(Stream& stream, GroupsBlock& value) {
         stream >> value.len >> value.max_handles >> args(value.data, value.len);
     }
 
-    void load(Stream& stream, ObjectsBlock& value) {
+    export void load(Stream& stream, ObjectsBlock& value) {
         stream >> value.data;
     }
 
-    void load(Stream& stream, ConditionsBlock& value) {
+    export void load(Stream& stream, ConditionsBlock& value) {
         stream >> value.editor_data
             >> value.condition_width
             >> value.object_height
             >> skip<std::array<char, 12>>;
     }
 
-    void load(Stream& stream, DataBlock& value) {
+    export void load(Stream& stream, DataBlock& value) {
         stream >> value.header;
         if (value.header == -1) {
             stream >> args(value.items, size_type<i16>);
@@ -192,7 +197,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, TabsBlock& value) {
+    export void load(Stream& stream, TabsBlock& value) {
         stream >> skip<i16>
             >> value.editor_x
             >> value.editor_y
@@ -201,7 +206,7 @@ namespace bamboo::mfa {
             >> value.editor_caret_y;
     }
 
-    void load(Stream& stream, LinesBlock& value) {
+    export void load(Stream& stream, LinesBlock& value) {
         stream >> skip<i16>
             >> value.editor_line_y
             >> value.editor_line_type
@@ -209,13 +214,13 @@ namespace bamboo::mfa {
             >> value.event_line_type;
     }
 
-    void load(Stream& stream, LayoutBlock& value) {
+    export void load(Stream& stream, LayoutBlock& value) {
         stream >> value.data;
     }
 
-    void load(Stream& stream, EndBlock& value) {}
+    export void load(Stream& stream, EndBlock& value) {}
 
-    void load(Stream& stream, EventBlock& value) {
+    export void load(Stream& stream, EventBlock& value) {
         std::array<char, 4> buffer;
         stream >> buffer;
 
@@ -255,7 +260,7 @@ namespace bamboo::mfa {
         }
     }
 
-    void load(Stream& stream, EventBlocks& value) {
+    export void load(Stream& stream, EventBlocks& value) {
         value.clear();
 
         stream >> value.data_size;

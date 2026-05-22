@@ -1,6 +1,8 @@
-export module bamboo.model:event;
+export module bamboo.model.event;
 
-import :base;
+import std;
+import bamboo.types;
+import bamboo.model.base;
 
 namespace bamboo {
 
