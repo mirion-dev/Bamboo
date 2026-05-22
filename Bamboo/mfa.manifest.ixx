@@ -1,0 +1,161 @@
+module;
+
+#include <spdlog/spdlog.h>
+
+export module bamboo.mfa:manifest;
+
+import :base;
+
+namespace bamboo::mfa {
+
+    void load(Stream& stream, BinaryFiles& value) {
+        stream >> static_cast<std::vector<std::wstring>&>(value);
+        spdlog::debug("Read {} binary files.", value.size());
+    }
+
+    void load(Stream& stream, Control& value) {
+        stream >> value.type >> value.keys;
+    }
+
+    void load(Stream& stream, Controls& value) {
+        stream >> static_cast<std::vector<Control>&>(value);
+        spdlog::debug("Read {} controls.", value.size());
+    }
+
+    void load(Stream& stream, MenuItem& value) {
+        stream >> value.flags;
+        if (!value.flags[MenuItem::parent]) {
+            stream >> value.id;
+        }
+        stream >> args(value.name, string_type_c);
+        if (value.flags[MenuItem::parent]) {
+            stream >> value.items;
+        }
+    }
+
+    void load(Stream& stream, MenuItems& value) {
+        value.clear();
+
+        MenuItem item;
+        while (stream >> item, !item.flags[MenuItem::footer]) {
+            value.emplace_back(std::move(item));
+        }
+    }
+
+    void load(Stream& stream, MenuAccel& value) {
+        stream >> value.shift
+            >> skip<i8>
+            >> value.key
+            >> value.id
+            >> skip<i16>;
+    }
+
+    void load(Stream& stream, Menu& value) {
+        stream >> value.size;
+
+        auto begin{ static_cast<usize>(stream.tellg()) };
+        usize end{ begin + value.size };
+        stream >> value.header_size
+            >> value.item_offset
+            >> value.item_size
+            >> value.accel_offset
+            >> value.accel_size;
+
+        usize header_end{ begin + value.header_size };
+        usize item_begin{ begin + value.item_offset };
+        usize item_end{ item_begin + value.item_size };
+        usize accel_begin{ begin + value.accel_offset };
+        usize accel_end{ accel_begin + value.accel_size };
+        if (stream.tellg() != header_end) {
+            throw std::runtime_error{ "Corrupt menu header." };
+        }
+
+        stream.seekg(item_begin);
+        stream >> skip<i32> >> value.items;
+        if (stream.tellg() != item_end) {
+            throw std::runtime_error{ "Corrupt menu items." };
+        }
+
+        stream.seekg(accel_begin);
+        stream >> args(value.accels, value.accel_size / 8);
+        if (stream.tellg() != accel_end) {
+            throw std::runtime_error{ "Corrupt menu accelerators." };
+        }
+
+        stream.seekg(end);
+        stream >> value.window_menu >> value.images;
+
+        spdlog::debug("Read a menu.");
+    }
+
+    void load(Stream& stream, GlobalEvents& value) {
+        stream >> value.size;
+        if (value.size != 0) {
+            throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
+        }
+
+        spdlog::debug("Read {} global events.", value.size);
+    }
+
+    void load(Stream& stream, Qualifier& value) {
+        stream >> value.name >> value.handle;
+        spdlog::debug("Read qualifier {:?}.", to_string(value.name));
+    }
+
+    void load(Stream& stream, Qualifiers& value) {
+        stream >> static_cast<std::vector<Qualifier>&>(value);
+        spdlog::debug("Read {} qualifiers.", value.size());
+    }
+
+    void load(Stream& stream, Extension& value) {
+        stream >> value.handle
+            >> value.filename
+            >> value.name
+            >> value.magic_num
+            >> value.subtype
+            >> value.is_unicode;
+
+        spdlog::debug("Read extension {:?}.", to_string(value.name));
+    }
+
+    void load(Stream& stream, Extensions& value) {
+        stream >> static_cast<std::vector<Extension>&>(value);
+        spdlog::debug("Read {} extensions.", value.size());
+    }
+
+    void load(Stream& stream, Manifest& value) {
+        stream >> value.app_name
+            >> value.author
+            >> value.description
+            >> value.copyright
+            >> value.company
+            >> value.version
+            >> value.app_width
+            >> value.app_height
+            >> value.border_color
+            >> value.display_flags
+            >> value.graphic_flags
+            >> value.help_file
+            >> skip<std::wstring>
+            >> value.score
+            >> value.lives
+            >> value.frame_rate
+            >> value.build_type
+            >> value.build_filename
+            >> skip<std::wstring>
+            >> skip<std::wstring>
+            >> value.about
+            >> skip<i32>
+            >> value.binary_files
+            >> value.controls
+            >> value.menu
+            >> value.global_numbers
+            >> value.global_strings
+            >> value.global_events
+            >> value.graphic_mode
+            >> value.icons
+            >> value.qualifiers
+            >> value.extensions;
+    }
+
+}

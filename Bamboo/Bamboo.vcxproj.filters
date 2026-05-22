@@ -14,5 +14,11 @@
     <ClCompile Include="model.ixx" />
     <ClCompile Include="model.event.ixx" />
     <ClCompile Include="model.object.ixx" />
+    <ClCompile Include="mfa.base.ixx" />
+    <ClCompile Include="mfa.resource.ixx" />
+    <ClCompile Include="mfa.manifest.ixx" />
+    <ClCompile Include="mfa.frame.ixx" />
+    <ClCompile Include="mfa.object.ixx" />
+    <ClCompile Include="mfa.event.ixx" />
   </ItemGroup>
 </Project>
