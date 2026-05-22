@@ -58,8 +58,10 @@ namespace bamboo {
         }
     };
 
-    export template <class S>
-    class Logger : public spdlog::logger {
+    export class Logger : public spdlog::logger {
+        // WORKAROUND: '_Ok' uses undefined class 'std::basic_istream<char,std::char_traits<char>>::sentry'
+        using S = std::istream;
+
         std::string _pattern;
         std::weak_ptr<S> _ptr;
 
