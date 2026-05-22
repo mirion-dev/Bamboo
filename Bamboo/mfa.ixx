@@ -365,7 +365,7 @@ namespace bamboo::mfa {
         spdlog::debug("Read {} extensions.", value.size());
     }
 
-    static void load(Stream& stream, Settings& value) {
+    static void load(Stream& stream, Manifest& value) {
         stream >> value.app_name
             >> value.author
             >> value.description
@@ -1004,9 +1004,9 @@ namespace bamboo::mfa {
 
         stream >> value.header;
         stream.build = value.header.product_build;
-        stream >> value.resources >> value.settings >> value.frames;
+        stream >> value.resources >> value.manifest >> value.frames;
 
-        spdlog::info("Finished parsing in {:.3f} seconds.", timer.duration());
+        spdlog::info("Read a MFA file in {:.3f} seconds.", timer.duration());
     }
 
 }

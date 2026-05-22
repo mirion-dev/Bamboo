@@ -250,7 +250,7 @@ namespace bamboo {
 
     export struct Extensions : std::vector<Extension> {};
 
-    export struct Settings {
+    export struct Manifest {
         enum DisplayFlag {
             maximized_on_boot,
             resize_display,
@@ -925,7 +925,7 @@ namespace bamboo {
     export struct File {
         Header header;
         Resources resources;
-        Settings settings;
+        Manifest manifest;
         Frames frames;
     };
 
