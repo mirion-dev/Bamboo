@@ -10,7 +10,7 @@ import bamboo.types;
 import bamboo.diag;
 import bamboo.stream;
 import bamboo.stream.utils;
-import bamboo.general;
+import bamboo.model;
 
 namespace bamboo::mfa {
 

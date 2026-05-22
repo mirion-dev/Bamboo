@@ -2,7 +2,7 @@
 
 import std;
 import bamboo.diag;
-import bamboo.general;
+import bamboo.model;
 import bamboo.mfa;
 
 int main(int argc, char** argv) {
