@@ -30,7 +30,7 @@ namespace bamboo::mfa {
             >> value.out_precision
             >> value.clip_precision
             >> value.quality
-            >> value.pitch_family
+            >> value.pitch_and_family
             >> args(value.name, string_type_fixed_c<32>);
 
         spdlog::debug("Read font {:?}.", to_string(value.name));
@@ -89,8 +89,8 @@ namespace bamboo::mfa {
             >> value.graphic_mode
             >> value.flags
             >> skip<i16>
-            >> value.hotspot_x
-            >> value.hotspot_y
+            >> value.origin_x
+            >> value.origin_y
             >> value.action_x
             >> value.action_y
             >> value.transparent_color

@@ -42,7 +42,7 @@ namespace bamboo {
 
     export struct MenuAccels : std::vector<MenuAccel> {};
 
-    export struct Menu {
+    export struct MenuBar {
         i32 size;
         i32 header_size;
         i32 item_offset;
@@ -51,8 +51,6 @@ namespace bamboo {
         i32 accel_size;
         MenuItems items;
         MenuAccels accels;
-        i32 window_menu;
-        std::vector<i64> images;
     };
 
     export struct Qualifier {
@@ -81,7 +79,7 @@ namespace bamboo {
             allow_fullscreen_switch,
             heading,
             heading_when_maximized,
-            menu_bar,
+            menu_bar_,
             menu_displayed,
             no_minimize_box,
             no_maximize_box,
@@ -128,21 +126,23 @@ namespace bamboo {
         std::wstring copyright;
         std::wstring company;
         std::wstring version;
-        i32 app_width;
-        i32 app_height;
+        i32 window_width;
+        i32 window_height;
         Color border_color;
         Flags<u32> display_flags;
         Flags<u32> graphic_flags;
         std::wstring help_file;
-        i32 score;
-        i32 lives;
+        i32 init_score;
+        i32 init_lives;
         i32 frame_rate;
         i32 build_type;
         std::wstring build_filename;
         std::wstring about;
         BinaryFiles binary_files;
         Controls controls;
-        Menu menu;
+        MenuBar menu_bar;
+        i32 window_menu;
+        std::vector<i64> menu_images;
         Values global_numbers;
         Values global_strings;
         GlobalEventBlocks global_events;

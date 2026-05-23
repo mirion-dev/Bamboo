@@ -23,7 +23,7 @@ namespace bamboo {
         i8 out_precision;
         i8 clip_precision;
         i8 quality;
-        i8 pitch_family;
+        i8 pitch_and_family;
         std::wstring name;
     };
 
@@ -83,8 +83,8 @@ namespace bamboo {
         i16 height;
         i8 graphic_mode;
         Flags<u8> flags;
-        i16 hotspot_x;
-        i16 hotspot_y;
+        i16 origin_x;
+        i16 origin_y;
         i16 action_x;
         i16 action_y;
         Color transparent_color;

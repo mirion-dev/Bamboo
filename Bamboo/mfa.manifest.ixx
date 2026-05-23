@@ -37,6 +37,8 @@ namespace bamboo::mfa {
         if (value.flags[MenuItem::parent]) {
             stream >> value.items;
         }
+
+        spdlog::debug("Read menu item {:?}.", value.name);
     }
 
     export void load(Stream& stream, MenuItems& value) {
@@ -56,7 +58,7 @@ namespace bamboo::mfa {
             >> skip<i16>;
     }
 
-    export void load(Stream& stream, Menu& value) {
+    export void load(Stream& stream, MenuBar& value) {
         stream >> value.size;
 
         auto begin{ static_cast<usize>(stream.tellg()) };
@@ -89,9 +91,8 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(end);
-        stream >> value.window_menu >> value.images;
 
-        spdlog::debug("Read a menu.");
+        spdlog::debug("Read a menu bar.");
     }
 
     export void load(Stream& stream, Qualifier& value) {
@@ -127,15 +128,15 @@ namespace bamboo::mfa {
             >> value.copyright
             >> value.company
             >> value.version
-            >> value.app_width
-            >> value.app_height
+            >> value.window_width
+            >> value.window_height
             >> value.border_color
             >> value.display_flags
             >> value.graphic_flags
             >> value.help_file
             >> skip<std::wstring>
-            >> value.score
-            >> value.lives
+            >> value.init_score
+            >> value.init_lives
             >> value.frame_rate
             >> value.build_type
             >> value.build_filename
@@ -145,7 +146,9 @@ namespace bamboo::mfa {
             >> skip<i32>
             >> value.binary_files
             >> value.controls
-            >> value.menu
+            >> value.menu_bar
+            >> value.window_menu
+            >> value.menu_images
             >> value.global_numbers
             >> value.global_strings
             >> value.global_events
