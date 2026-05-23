@@ -7,7 +7,7 @@ import bamboo.model.base;
 namespace bamboo {
 
     export struct Transition {
-        std::wstring name;
+        std::wstring filename;
         std::wstring module_name;
         i32 module;
         std::array<char, 4> id;

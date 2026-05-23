@@ -69,7 +69,7 @@ namespace bamboo::mfa {
             >> value.height
             >> value.background_color
             >> value.flags
-            >> value.max_objects
+            >> value.object_num
             >> value.password
             >> skip<std::vector<char>>
             >> value.editor_x
@@ -78,8 +78,8 @@ namespace bamboo::mfa {
             >> value.icon
             >> value.editor_layer
             >> value.layers
-            >> value.transition_in
-            >> value.transition_out
+            >> value.fade_in
+            >> value.fade_out
             >> value.objects
             >> value.folders
             >> value.instances

@@ -14,7 +14,7 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Transition& value) {
-        stream >> value.name
+        stream >> value.filename
             >> value.module_name
             >> value.module
             >> value.id
