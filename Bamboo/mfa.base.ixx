@@ -15,7 +15,7 @@ namespace bamboo::mfa {
 
     export class Stream : public bamboo::Stream {
     public:
-        i32 build{};
+        std::optional<i32> build;
 
         using bamboo::Stream::Stream;
     };
@@ -138,6 +138,8 @@ namespace bamboo::mfa {
             >> skip<std::wstring>
             >> value.editor_filename
             >> skip<std::vector<char>>;
+
+        stream.build.emplace(value.product_build);
 
         spdlog::info("App name: {:?}.", to_string(value.app_name));
         spdlog::info("Build: {}.", value.product_build);

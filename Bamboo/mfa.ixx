@@ -18,11 +18,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, File& value) {
         Timer timer;
-
-        stream >> value.header;
-        stream.build = value.header.product_build;
-        stream >> value.resources >> value.manifest >> value.frames;
-
+        stream >> value.header >> value.resources >> value.manifest >> value.frames;
         spdlog::info("Read an MFA file in {:.3f} seconds.", timer.duration());
     }
 
