@@ -31,7 +31,7 @@ namespace bamboo {
     export struct Folder {
         u32 header;
         std::wstring name;
-        std::vector<i32> children;
+        std::vector<u32> children;
     };
 
     export struct Folders : std::vector<Folder> {};
@@ -44,8 +44,8 @@ namespace bamboo {
             create_only
         };
 
-        i32 pos_x;
-        i32 pos_y;
+        i32 x;
+        i32 y;
         u32 layer;
         u32 handle;
         Flags<u16> flags;

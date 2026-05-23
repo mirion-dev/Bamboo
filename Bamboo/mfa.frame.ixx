@@ -36,7 +36,7 @@ namespace bamboo::mfa {
             spdlog::debug("Read folder {:?}.", to_string(value.name));
         }
         else {
-            stream >> skip<i32>;
+            stream >> value.children.emplace_back();
         }
     }
 
@@ -46,8 +46,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Instance& value) {
-        stream >> value.pos_x
-            >> value.pos_y
+        stream >> value.x
+            >> value.y
             >> value.layer
             >> value.handle
             >> value.flags
