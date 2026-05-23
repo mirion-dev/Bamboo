@@ -10,6 +10,7 @@ import bamboo.diag;
 import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa.base;
+import bamboo.mfa.event;
 
 namespace bamboo::mfa {
 
@@ -91,15 +92,6 @@ namespace bamboo::mfa {
         stream >> value.window_menu >> value.images;
 
         spdlog::debug("Read a menu.");
-    }
-
-    export void load(Stream& stream, GlobalEvents& value) {
-        stream >> value.size;
-        if (value.size != 0) {
-            throw std::runtime_error{ std::format("Global events are unsupported at the moment.") };
-        }
-
-        spdlog::debug("Read {} global events.", value.size);
     }
 
     export void load(Stream& stream, Qualifier& value) {

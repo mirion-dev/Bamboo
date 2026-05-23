@@ -199,4 +199,6 @@ namespace bamboo {
         i32 data_size;
     };
 
+    export struct GlobalEventBlocks : EventBlocks {};
+
 }

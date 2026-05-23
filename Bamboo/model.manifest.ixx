@@ -3,6 +3,7 @@ export module bamboo.model.manifest;
 import std;
 import bamboo.types;
 import bamboo.model.base;
+import bamboo.model.event;
 
 namespace bamboo {
 
@@ -52,10 +53,6 @@ namespace bamboo {
         MenuAccels accels;
         i32 window_menu;
         std::vector<i64> images;
-    };
-
-    export struct GlobalEvents {
-        i32 size;
     };
 
     export struct Qualifier {
@@ -148,7 +145,7 @@ namespace bamboo {
         Menu menu;
         Values global_numbers;
         Values global_strings;
-        GlobalEvents global_events;
+        GlobalEventBlocks global_events;
         i32 graphic_mode;
         std::vector<u32> icons;
         Qualifiers qualifiers;
