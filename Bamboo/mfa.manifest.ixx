@@ -85,9 +85,11 @@ namespace bamboo::mfa {
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / 8);
-        if (stream.tellg() != accel_end || accel_end != end) {
+        if (stream.tellg() != accel_end) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
+
+        stream.seekg(end);
 
         spdlog::debug("Read a menu bar.");
     }
