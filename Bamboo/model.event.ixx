@@ -113,11 +113,7 @@ namespace bamboo {
         std::wstring name;
         std::wstring type_name;
         Flags<u16> flags;
-        std::variant<
-            EventObjectRef,
-            EventObjectIcon,
-            EventObjectQualifier
-        > data;
+        std::variant<EventObjectRef, EventObjectIcon, EventObjectQualifier> data;
     };
 
     export struct EventObjects : std::vector<EventObject> {};
