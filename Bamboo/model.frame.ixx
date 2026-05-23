@@ -12,7 +12,8 @@ namespace bamboo {
         enum Flag {
             visible,
             locked,
-            hidden_at_start = 3,
+            _2,
+            hidden_at_start,
             dont_save_background,
             wrap_horizontally,
             wrap_vertically,
@@ -37,7 +38,9 @@ namespace bamboo {
 
     export struct Instance {
         enum Flag {
-            locked = 2,
+            _0,
+            _1,
+            locked,
             create_only
         };
 
@@ -62,12 +65,16 @@ namespace bamboo {
             display_title,
             resize_to_screen,
             force_load_on_call,
-            screen_saver_setup = 7,
+            _6,
+            screen_saver_setup,
             timer_based_movements,
-            dont_include_global_events = 10,
-            dont_include               = 12,
+            _9,
+            dont_include_global_events,
+            _11,
+            dont_include,
             dont_erase_background,
-            force_load_on_call_ignore = 15
+            _14,
+            force_load_on_call_ignore
         };
 
         u32 handle;

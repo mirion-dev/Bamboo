@@ -32,10 +32,20 @@ namespace bamboo {
     export struct Sound {
         enum Flag {
             check,
-            load_on_call   = 4,
-            play_from_disk = 5,
-            has_name       = 8,
-            name_crop      = 14
+            _1,
+            _2,
+            _3,
+            load_on_call,
+            play_from_disk,
+            _6,
+            _7,
+            has_name,
+            _9,
+            _10,
+            _11,
+            _12,
+            _13,
+            name_crop
         };
 
         u32 handle;

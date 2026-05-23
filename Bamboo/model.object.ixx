@@ -54,7 +54,14 @@ namespace bamboo {
     export struct Paragraph {
         enum Flag {
             mfa_correct,
-            correct = 8,
+            _1,
+            _2,
+            _3,
+            _4,
+            _5,
+            _6,
+            _7,
+            correct,
             relief
         };
 
@@ -119,7 +126,8 @@ namespace bamboo {
             has_text,
             create_at_start,
             ccn_check,
-            dont_reset_frame_duration = 20
+            _19,
+            dont_reset_frame_duration
         };
 
         enum NewFlag {
@@ -195,7 +203,8 @@ namespace bamboo {
 
     export struct FormattedTextObject : ObjectBase {
         enum Flag {
-            auto_scrollbar = 1
+            _0,
+            auto_scrollbar
         };
 
         i32 width;
@@ -295,10 +304,13 @@ namespace bamboo {
 
         enum Flag {
             load_on_call,
-            global_object  = 2,
-            no_editor_sync = 4,
+            _1,
+            global_object,
+            _3,
+            no_editor_sync,
             name_type_editor_sync,
-            no_auto_update = 7
+            _6,
+            no_auto_update
         };
 
         u32 handle;

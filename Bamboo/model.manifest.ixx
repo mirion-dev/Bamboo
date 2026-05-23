@@ -23,9 +23,13 @@ namespace bamboo {
     struct MenuItem {
         enum Flag {
             disabled,
-            checked = 3,
+            _1,
+            _2,
+            checked,
             parent,
-            last = 7
+            _5,
+            _6,
+            last
         };
 
         Flags<u16> flags;
@@ -72,52 +76,71 @@ namespace bamboo {
     export struct Extensions : std::vector<Extension> {};
 
     export struct Manifest {
-        enum DisplayFlag {
-            maximized_on_boot,
-            resize_display,
+        enum Flag {
+            maximized_on_boot_up,
+            resize_display_to_fill_window_size,
             change_resolution_mode,
-            allow_fullscreen_switch,
+            allow_user_to_switch_to_from_fullscreen,
             heading,
             heading_when_maximized,
-            menu_bar_,
-            menu_displayed,
+            has_menu_bar,
+            menu_displayed_on_boot_up,
             no_minimize_box,
             no_maximize_box,
             no_thick_frame,
-            dont_center_frame,
+            do_not_center_frame_area_in_window,
             disable_close_button,
             hidden_at_start,
-            keep_screen_ratio = 15,
-            anti_aliasing,
-            right_to_left_reading = 18,
+            _14,
+            keep_screen_ratio,
+            antialiasing_when_resizing,
+            _17,
+            right_to_left_reading,
             right_to_left_layout,
-            fit_inside = 21
-        };
-
-        enum GraphicFlag {
-            multi_samples,
+            _20,
+            fit_inside,
+            _22,
+            _23,
+            _24,
+            _25,
+            _26,
+            _27,
+            _28,
+            _29,
+            _30,
+            _31,
+            multisamples,
             machine_independent_speed,
             play_sounds_over_frames,
-            dont_mute_on_lost_focus,
-            dont_stop_screen_saver,
-            enable_visual_themes = 7,
-            v_sync,
+            do_not_mute_samples_when_application_lost_focus,
+            do_not_stop_screen_saver_when_input_event,
+            _37,
+            _38,
+            enable_visual_themes,
+            vsync,
             run_when_minimized,
             run_while_resizing,
-            debugger_shortcuts,
-            dont_show_debugger,
-            dont_share_sub_app_data,
+            enable_debugger_keyboard_shortcuts,
+            show_debugger,
+            do_not_share_data_if_run_as_subapplication,
             direct3d9,
             direct3d8,
-            dont_ignore_destroy_far = 21,
+            _48,
+            _49,
+            _50,
+            _51,
+            _52,
+            ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no,
             disable_ime,
             reduce_cpu_usage,
-            enable_profiling = 26,
-            dont_start_profiling,
+            _56,
+            _57,
+            enable_profiling,
+            start_profiling_at_start_of_frame,
             direct3d11,
             premultiplied_alpha,
-            dont_optimize_events,
-            record_slowest_loops
+            optimize_events,
+            record_slowest_app_loops
         };
 
         std::wstring app_name;
@@ -129,8 +152,7 @@ namespace bamboo {
         i32 window_width;
         i32 window_height;
         Color border_color;
-        Flags<u32> display_flags;
-        Flags<u32> graphic_flags;
+        Flags<u64> options;
         std::wstring help_file;
         i32 init_score;
         i32 init_lives;

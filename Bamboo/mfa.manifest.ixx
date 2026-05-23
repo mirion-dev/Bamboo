@@ -130,8 +130,7 @@ namespace bamboo::mfa {
             >> value.window_width
             >> value.window_height
             >> value.border_color
-            >> value.display_flags
-            >> value.graphic_flags
+            >> value.options
             >> value.help_file
             >> skip<std::wstring>
             >> value.init_score
