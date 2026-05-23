@@ -170,7 +170,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, GroupsBlock& value) {
-        stream >> value.len >> value.max_handles >> args(value.data, value.len);
+        stream >> value.data_size >> value.max_handles >> args(value.data, value.data_size);
     }
 
     export void load(Stream& stream, ObjectsBlock& value) {

@@ -63,13 +63,13 @@ namespace bamboo {
     export void resize_load(auto& stream, auto& container, std::integral auto size) {
         using value_type = std::remove_pointer_t<decltype(container.data())>;
 
-        static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? 100'000'000 / sizeof(value_type) : 100'000 };
+        static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };
 
         if (size < 0) {
             throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
         }
 
-        if (size > MAX_SIZE) {
+        if (size >= MAX_SIZE) {
             throw std::runtime_error{
                 std::format(
                     "Container size is too large. Found {} but max allowed {} for this type.",

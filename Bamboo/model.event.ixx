@@ -136,7 +136,7 @@ namespace bamboo {
     };
 
     export struct GroupsBlock {
-        i32 len;
+        i32 data_size;
         i32 max_handles;
         Groups data;
     };

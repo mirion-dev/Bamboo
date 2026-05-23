@@ -76,9 +76,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Backdrop& value) {
-        stream >> value.obstacle_type
-            >> value.collision_type
-            >> value.image;
+        stream >> value.obstacle_type >> value.collision_type >> value.image;
     }
 
     export void load(Stream& stream, ObjectBase& value) {
