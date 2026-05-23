@@ -278,8 +278,6 @@ namespace bamboo::mfa {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> static_cast<EventBlocks&>(value);
         stream.seekg(begin + value.data_size + 4);
-
-        spdlog::debug("Read {} global event blocks.", value.size());
     }
 
 }
