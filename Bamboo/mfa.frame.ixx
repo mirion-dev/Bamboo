@@ -92,6 +92,10 @@ namespace bamboo::mfa {
     export void load(Stream& stream, Frames& value) {
         value.clear();
 
+        i32 temp;
+        stream >> temp;
+        stream.seekg(temp > 900 ? -2 : -4, std::ios_base::cur);
+
         stream >> value.offsets >> value.end;
         for (u32 offset : value.offsets) {
             stream.seekg(offset);
