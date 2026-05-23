@@ -158,9 +158,7 @@ namespace bamboo::mfa {
 
         auto end{ static_cast<usize>(stream.tellg()) + value.size };
         while (static_cast<usize>(stream.tellg()) < end) {
-            Event event;
-            stream >> event;
-            value.data.emplace_back(std::move(event));
+            stream >> value.data.emplace_back();
         }
         if (stream.tellg() != end) {
             throw std::runtime_error{ "Corrupt events block." };
@@ -225,39 +223,52 @@ namespace bamboo::mfa {
         stream >> buffer;
 
         std::string_view id{ buffer.data(), buffer.size() };
+        std::string_view name;
         if (id == "Evts" || id == "STVE") {
             stream >> value.emplace<EventsBlock>();
+            name = "an events block";
         }
         else if (id == "Rems" || id == "SMER") {
             stream >> value.emplace<RemarksBlock>();
+            name = "a remarks block";
         }
         else if (id == "SPRG") {
             stream >> value.emplace<GroupsBlock>();
+            name = "a groups block";
         }
         else if (id == "EvOb" || id == "SJBO") {
             stream >> value.emplace<ObjectsBlock>();
+            name = "an objects block";
         }
         else if (id == "EvCs") {
             stream >> value.emplace<ConditionsBlock>();
+            name = "a conditions block";
         }
         else if (id == "EvEd") {
             stream >> value.emplace<DataBlock>();
+            name = "a data block";
         }
         else if (id == "EvTs") {
             stream >> value.emplace<TabsBlock>();
+            name = "a tabs block";
         }
         else if (id == "EvLs") {
             stream >> value.emplace<LinesBlock>();
+            name = "a lines block";
         }
         else if (id == "E2Ts" || id == "TYAL") {
             stream >> value.emplace<LayoutBlock>();
+            name = "a layout block";
         }
         else if (id == "!DNE") {
             stream >> value.emplace<EndBlock>();
+            name = "an end block";
         }
         else {
             throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
         }
+
+        spdlog::debug("Read {}.", name);
     }
 
     export void load(Stream& stream, EventBlocks& value) {

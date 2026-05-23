@@ -95,10 +95,8 @@ namespace bamboo::mfa {
         stream >> value.offsets >> value.end;
 
         for (u32 offset : value.offsets) {
-            Frame frame;
             stream.seekg(offset);
-            stream >> frame;
-            value.emplace_back(std::move(frame));
+            stream >> value.emplace_back();
         }
 
         stream.seekg(value.end);

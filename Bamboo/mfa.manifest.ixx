@@ -38,16 +38,15 @@ namespace bamboo::mfa {
             stream >> value.items;
         }
 
-        spdlog::debug("Read menu item {:?}.", value.name);
+        spdlog::debug("Read menu item {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, MenuItems& value) {
         value.clear();
 
-        MenuItem item;
-        while (stream >> item, !item.flags[MenuItem::footer]) {
-            value.emplace_back(std::move(item));
-        }
+        do {
+            stream >> value.emplace_back();
+        } while (!value.back().flags[MenuItem::footer]);
     }
 
     export void load(Stream& stream, MenuAccel& value) {
