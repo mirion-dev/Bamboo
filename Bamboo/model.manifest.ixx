@@ -121,7 +121,7 @@ namespace bamboo {
             run_when_minimized,
             run_while_resizing,
             enable_debugger_keyboard_shortcuts,
-            show_debugger,
+            do_not_show_debugger,
             do_not_share_data_if_run_as_subapplication,
             direct3d9,
             direct3d8,
@@ -130,16 +130,16 @@ namespace bamboo {
             _50,
             _51,
             _52,
-            ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no,
+            do_not_ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no,
             disable_ime,
             reduce_cpu_usage,
             _56,
             _57,
             enable_profiling,
-            start_profiling_at_start_of_frame,
+            do_not_start_profiling_at_start_of_frame,
             direct3d11,
             premultiplied_alpha,
-            optimize_events,
+            do_not_optimize_events,
             record_slowest_app_loops
         };
 
