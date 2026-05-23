@@ -25,17 +25,17 @@ namespace bamboo {
             disabled,
             checked = 3,
             parent,
-            footer = 7
+            last = 7
         };
 
         Flags<u16> flags;
         i16 id;
         std::wstring name;
-        MenuItems items;
+        MenuItems children;
     };
 
     export struct MenuAccel {
-        i8 shift;
+        i8 modifier;
         i16 key;
         i16 id;
     };
@@ -147,7 +147,7 @@ namespace bamboo {
         Values global_strings;
         GlobalEventBlocks global_events;
         i32 graphic_mode;
-        std::vector<u32> icons;
+        std::vector<u32> window_icons;
         Qualifiers qualifiers;
         Extensions extensions;
     };

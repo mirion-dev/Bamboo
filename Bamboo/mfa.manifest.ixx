@@ -35,7 +35,7 @@ namespace bamboo::mfa {
         }
         stream >> args(value.name, string_type_c);
         if (value.flags[MenuItem::parent]) {
-            stream >> value.items;
+            stream >> value.children;
         }
 
         spdlog::debug("Read menu item {:?}.", to_string(value.name));
@@ -46,11 +46,11 @@ namespace bamboo::mfa {
 
         do {
             stream >> value.emplace_back();
-        } while (!value.back().flags[MenuItem::footer]);
+        } while (!value.back().flags[MenuItem::last]);
     }
 
     export void load(Stream& stream, MenuAccel& value) {
-        stream >> value.shift
+        stream >> value.modifier
             >> skip<i8>
             >> value.key
             >> value.id
@@ -61,7 +61,6 @@ namespace bamboo::mfa {
         stream >> value.size;
 
         auto begin{ static_cast<usize>(stream.tellg()) };
-        usize end{ begin + value.size };
         stream >> value.header_size
             >> value.item_offset
             >> value.item_size
@@ -73,6 +72,7 @@ namespace bamboo::mfa {
         usize item_end{ item_begin + value.item_size };
         usize accel_begin{ begin + value.accel_offset };
         usize accel_end{ accel_begin + value.accel_size };
+        usize end{ begin + value.size };
         if (stream.tellg() != header_end) {
             throw std::runtime_error{ "Corrupt menu header." };
         }
@@ -85,11 +85,9 @@ namespace bamboo::mfa {
 
         stream.seekg(accel_begin);
         stream >> args(value.accels, value.accel_size / 8);
-        if (stream.tellg() != accel_end) {
+        if (stream.tellg() != accel_end || accel_end != end) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
-
-        stream.seekg(end);
 
         spdlog::debug("Read a menu bar.");
     }
@@ -152,7 +150,7 @@ namespace bamboo::mfa {
             >> value.global_strings
             >> value.global_events
             >> value.graphic_mode
-            >> value.icons
+            >> value.window_icons
             >> value.qualifiers
             >> value.extensions;
     }
