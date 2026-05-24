@@ -215,34 +215,34 @@ namespace bamboo::mfa {
             >> value.chunks;
 
         switch (type) {
-        case Object::quick_backdrop:
+        case 0:
             stream >> value.emplace<QuickBackdrop>();
             break;
-        case Object::backdrop:
+        case 1:
             stream >> value.emplace<Backdrop>();
             break;
-        case Object::active:
+        case 2:
             stream >> value.emplace<ActiveObject>();
             break;
-        case Object::string:
+        case 3:
             stream >> value.emplace<StringObject>();
             break;
-        case Object::question_answer:
+        case 4:
             stream >> value.emplace<QuestionAnswerObject>();
             break;
-        case Object::score:
+        case 5:
             stream >> value.emplace<ScoreObject>();
             break;
-        case Object::lives:
+        case 6:
             stream >> value.emplace<LivesObject>();
             break;
-        case Object::counter:
+        case 7:
             stream >> value.emplace<CounterObject>();
             break;
-        case Object::formatted_text:
+        case 8:
             stream >> value.emplace<FormattedTextObject>();
             break;
-        case Object::subapplication:
+        case 9:
             stream >> value.emplace<SubapplicationObject>();
             break;
         default:

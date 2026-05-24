@@ -288,20 +288,6 @@ namespace bamboo {
             ExtensionObject
         > {
 
-        enum Type {
-            quick_backdrop,
-            backdrop,
-            active,
-            string,
-            question_answer,
-            score,
-            lives,
-            counter,
-            formatted_text,
-            subapplication,
-            extension
-        };
-
         enum Flag {
             load_on_call,
             _1,

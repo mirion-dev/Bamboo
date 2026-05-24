@@ -59,12 +59,6 @@ namespace bamboo {
     };
 
     export struct Value {
-        enum Type {
-            integer,
-            decimal,
-            string
-        };
-
         std::wstring name;
         std::variant<i32, f64, std::wstring> value;
     };

@@ -113,13 +113,13 @@ namespace bamboo::mfa {
         stream >> value.name >> type;
 
         switch (type) {
-        case Value::integer:
+        case 0:
             stream >> value.value.emplace<i32>();
             break;
-        case Value::decimal:
+        case 1:
             stream >> value.value.emplace<f64>();
             break;
-        case Value::string:
+        case 2:
             stream >> value.value.emplace<std::wstring>();
             break;
         default:
