@@ -10,8 +10,8 @@ import bamboo.diag;
 import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa.base;
-import bamboo.mfa.object;
 import bamboo.mfa.event;
+import bamboo.mfa.object;
 
 namespace bamboo::mfa {
 

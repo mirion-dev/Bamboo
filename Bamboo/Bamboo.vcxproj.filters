@@ -20,5 +20,8 @@
     <ClCompile Include="mfa.frame.ixx" />
     <ClCompile Include="mfa.object.ixx" />
     <ClCompile Include="mfa.event.ixx" />
+    <ClCompile Include="stream.core.ixx" />
+    <ClCompile Include="mfa.header.ixx" />
+    <ClCompile Include="model.header.ixx" />
   </ItemGroup>
 </Project>

@@ -139,7 +139,7 @@ namespace bamboo::mfa {
             >> value.build_type
             >> value.build_filename
             >> skip<std::wstring>
-            >> skip<std::wstring>
+            >> value.command_line
             >> value.about
             >> skip<i32>
             >> value.binary_files

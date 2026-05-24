@@ -11,6 +11,8 @@ namespace bamboo {
         u32 checksum;
         u32 references;
         i32 size;
+
+        // LOGFONTW data;
         i32 height;
         i32 width;
         i32 escapement;

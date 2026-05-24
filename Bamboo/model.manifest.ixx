@@ -143,34 +143,35 @@ namespace bamboo {
             record_slowest_app_loops
         };
 
-        std::wstring app_name;
-        std::wstring author;
-        std::wstring description;
-        std::wstring copyright;
-        std::wstring company;
-        std::wstring version;
-        i32 window_width;
-        i32 window_height;
-        Color border_color;
+        std::wstring app_name;    // About - Name
+        std::wstring author;      // About - Author
+        std::wstring description; // About - Description
+        std::wstring copyright;   // About - Copyright
+        std::wstring company;     // About - Company
+        std::wstring version;     // About - Version
+        i32 window_width;         // Window - Size
+        i32 window_height;        // Window - Size
+        Color border_color;       // Window - Border color
         Flags<u64> options;
-        std::wstring help_file;
-        i32 init_score;
-        i32 init_lives;
-        i32 frame_rate;
-        i32 build_type;
-        std::wstring build_filename;
-        std::wstring about;
+        std::wstring help_file;      // About - Help file
+        i32 init_score;              // Runtime - Initial score
+        i32 init_lives;              // Runtime - Initial # of lives
+        i32 frame_rate;              // Runtime - Frame rate
+        i32 build_type;              // Settings - Build type
+        std::wstring build_filename; // Settings - Build filename
+        std::wstring command_line;   // Settings - Command line
+        std::wstring about;          // About - About box text
         BinaryFiles binary_files;
-        Controls controls;
-        MenuBar menu_bar;
-        i32 window_menu;
+        Controls controls; // Runtime - Default controls
+        MenuBar menu_bar;  // Window - Menu bar
+        i32 window_menu;   // Window - Window menu index
         std::vector<i64> menu_images;
-        Values global_numbers;
-        Values global_strings;
-        GlobalEventBlocks global_events;
-        i32 graphic_mode;
-        std::vector<u32> window_icons;
-        Qualifiers qualifiers;
+        Values global_numbers;           // Values - Global values
+        Values global_strings;           // Values - Global strings
+        GlobalEventBlocks global_events; // Events - Global events
+        i32 graphic_mode;                // Settings - Graphic mode
+        std::vector<u32> window_icons;   // About - Icon
+        Qualifiers qualifiers;           // Events - Qualifers
         Extensions extensions;
     };
 
