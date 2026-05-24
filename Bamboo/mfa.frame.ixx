@@ -30,13 +30,13 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Folder& value) {
-        stream >> value.header;
-        if (((value.header & 0xff) == 112 ? value.header >> 24 : value.header) == 4) {
-            stream >> value.name >> value.children;
+        stream >> value.flags;
+        if (value.flags.value & 0xff == 0x70 ? value.flags.value >> 24 : value.flags.value & 0xff == 4) {
+            stream >> value.name >> value.objects;
             spdlog::debug("Read folder {:?}.", to_string(value.name));
         }
         else {
-            stream >> value.children.emplace_back();
+            stream >> value.objects.emplace_back();
         }
     }
 
@@ -53,7 +53,7 @@ namespace bamboo::mfa {
             >> value.flags
             >> value.value
             >> value.parent_type
-            >> value.object_info
+            >> value.object
             >> value.parent;
     }
 

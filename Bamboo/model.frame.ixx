@@ -29,9 +29,9 @@ namespace bamboo {
     export struct Layers : std::vector<Layer> {};
 
     export struct Folder {
-        u32 header;
+        Flags<u32> flags;
         std::wstring name;
-        std::vector<u32> children;
+        std::vector<u32> objects;
     };
 
     export struct Folders : std::vector<Folder> {};
@@ -41,17 +41,17 @@ namespace bamboo {
             _0,
             _1,
             locked,
-            create_only
+            fake
         };
 
-        i32 x;
-        i32 y;
+        i32 x; // Size / Position
+        i32 y; // Size / Position
         u32 layer;
         u32 handle;
         Flags<u16> flags;
-        i16 value;
+        i16 value; // Values
         i32 parent_type;
-        i32 object_info;
+        u32 object;
         u32 parent;
     };
 
