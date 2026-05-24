@@ -77,28 +77,28 @@ namespace bamboo {
 
     export struct Manifest {
         enum Flag {
-            maximized_on_boot_up,
-            resize_display_to_fill_window_size,
-            change_resolution_mode,
-            allow_user_to_switch_to_from_fullscreen,
-            heading,
-            heading_when_maximized,
-            has_menu_bar,
-            menu_displayed_on_boot_up,
-            no_minimize_box,
-            no_maximize_box,
-            no_thick_frame,
-            do_not_center_frame_area_in_window,
-            disable_close_button,
-            hidden_at_start,
-            _14,
-            keep_screen_ratio,
-            antialiasing_when_resizing,
+            maximized_on_boot_up,                    // Window
+            resize_display_to_fill_window_size,      // Window
+            change_resolution_mode,                  // Window
+            allow_user_to_switch_to_from_fullscreen, // Window
+            heading,                                 // Window
+            heading_when_maximized,                  // Window
+            has_menu_bar,                            // Window
+            menu_displayed_on_boot_up,               // Window
+            no_minimize_box,                         // Window
+            no_maximize_box,                         // Window
+            no_thick_frame,                          // Window
+            do_not_center_frame_area_in_window,      // Window
+            disable_close_button,                    // Window
+            hidden_at_start,                         // Window
+            multiple_document_interface,             // Window
+            keep_screen_ratio,                       // Window
+            antialiasing_when_resizing,              // Window
             _17,
-            right_to_left_reading,
-            right_to_left_layout,
+            right_to_left_reading, // Window
+            right_to_left_layout,  // Window
             _20,
-            fit_inside,
+            fit_inside, // Window
             _22,
             _23,
             _24,
@@ -109,69 +109,69 @@ namespace bamboo {
             _29,
             _30,
             _31,
-            multisamples,
-            machine_independent_speed,
-            play_sounds_over_frames,
-            do_not_mute_samples_when_application_lost_focus,
-            do_not_stop_screen_saver_when_input_event,
+            multisamples,                                    // Runtime
+            machine_independent_speed,                       // Runtime
+            play_sounds_over_frames,                         // Runtime
+            do_not_mute_samples_when_application_lost_focus, // Runtime
+            do_not_stop_screen_saver_when_input_event,       // Runtime
             _37,
             _38,
-            enable_visual_themes,
-            vsync,
-            run_when_minimized,
-            run_while_resizing,
-            enable_debugger_keyboard_shortcuts,
-            do_not_show_debugger,
-            do_not_share_data_if_run_as_subapplication,
-            direct3d9,
-            direct3d8,
+            enable_visual_themes,                       // Windows
+            vsync,                                      // Runtime
+            run_when_minimized,                         // Runtime
+            run_while_resizing,                         // Runtime
+            enable_debugger_keyboard_shortcuts,         // Settings
+            do_not_show_debugger,                       // Settings
+            do_not_share_data_if_run_as_subapplication, // Runtime
+            direct3d9,                                  // Runtime
+            direct3d8,                                  // Runtime
             _48,
             _49,
             _50,
             _51,
             _52,
-            do_not_ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no,
-            disable_ime,
-            reduce_cpu_usage,
+            do_not_ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no, // Runtime
+            disable_ime,                                                                 // Windows
+            reduce_cpu_usage,                                                            // Windows
             _56,
-            _57,
-            enable_profiling,
-            do_not_start_profiling_at_start_of_frame,
-            direct3d11,
-            premultiplied_alpha,
-            do_not_optimize_events,
-            record_slowest_app_loops
+            use_high_performance_gpu,                 // Windows
+            enable_profiling,                         // Settings
+            do_not_start_profiling_at_start_of_frame, // Settings
+            direct3d11,                               // Runtime
+            premultiplied_alpha,                      // Runtime
+            do_not_optimize_events,                   // Settings
+            record_slowest_app_loops                  // Settings
         };
 
-        std::wstring app_name;    // About - Name
-        std::wstring author;      // About - Author
-        std::wstring description; // About - Description
-        std::wstring copyright;   // About - Copyright
-        std::wstring company;     // About - Company
-        std::wstring version;     // About - Version
-        i32 window_width;         // Window - Size
-        i32 window_height;        // Window - Size
-        Color border_color;       // Window - Border color
+        std::wstring app_name;    // About
+        std::wstring author;      // About
+        std::wstring description; // About
+        std::wstring copyright;   // About
+        std::wstring company;     // About
+        std::wstring version;     // About
+        i32 window_width;         // Window
+        i32 window_height;        // Window
+        Color border_color;       // Window
         Flags<u64> options;
-        std::wstring help_file;      // About - Help file
-        i32 init_score;              // Runtime - Initial score
-        i32 init_lives;              // Runtime - Initial # of lives
-        i32 frame_rate;              // Runtime - Frame rate
-        i32 build_type;              // Settings - Build type
-        std::wstring build_filename; // Settings - Build filename
-        std::wstring command_line;   // Settings - Command line
-        std::wstring about;          // About - About box text
+        std::wstring help_file;      // About
+        i32 init_score;              // Runtime
+        i32 init_lives;              // Runtime
+        i32 frame_rate;              // Runtime
+        i32 build_type;              // Settings
+        std::wstring build_filename; // Settings
+        std::wstring command_line;   // Settings
+        std::wstring about;          // About
         BinaryFiles binary_files;
-        Controls controls; // Runtime - Default controls
-        MenuBar menu_bar;  // Window - Menu bar
-        i32 window_menu;   // Window - Window menu index
+        Controls controls; // Runtime
+        MenuBar menu_bar;  // Window
+        i32 window_menu;   // Window
         std::vector<i64> menu_images;
-        Values global_numbers;           // Values - Global values
-        Values global_strings;           // Values - Global strings
-        GlobalEventBlocks global_events; // Events - Global events
-        i32 graphic_mode;                // Settings - Graphic mode
-        std::vector<u32> window_icons;   // About - Icon
-        Qualifiers qualifiers;           // Events - Qualifers
+        Values global_numbers;           // Values
+        Values global_strings;           // Values
+        GlobalEventBlocks global_events; // Events
+        i32 graphic_mode;                // Settings
+        std::vector<u32> window_icons;   // About
+        Qualifiers qualifiers;           // Events
         Extensions extensions;
     };
 
