@@ -10,7 +10,16 @@ namespace bamboo {
     export struct BinaryFiles : std::vector<std::wstring> {};
 
     export struct Control {
-        i32 type;
+        enum Type : i32 {
+            _0,
+            joystick1,
+            joystick2,
+            joystick3,
+            joystick4,
+            keyboard
+        };
+
+        Type type;
         std::vector<i32> keys;
     };
 
