@@ -11,8 +11,6 @@ namespace bamboo {
         u32 checksum;
         u32 references;
         i32 size;
-
-        // LOGFONTW data;
         i32 height;
         i32 width;
         i32 escapement;
@@ -110,9 +108,9 @@ namespace bamboo {
     };
 
     export struct Resources {
-        FontBank font_bank;
-        SoundBank sound_bank;
-        MusicBank music_bank;
+        FontBank font_bank;   // Data Elements - Fonts
+        SoundBank sound_bank; // Data Elements - Sounds
+        MusicBank music_bank; // Data Elements - Music
         ImageBank icon_bank;
         ImageBank image_bank;
     };
