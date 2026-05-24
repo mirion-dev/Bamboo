@@ -72,7 +72,7 @@ namespace bamboo {
     export struct Paragraphs : std::vector<Paragraph> {};
 
     export struct Content {
-        i32 font;
+        u32 font;
         Color color;
         Flags<u32> flags;
         i32 relief;
@@ -176,7 +176,7 @@ namespace bamboo {
         std::vector<u32> images;
         i32 use_text;
         Color color;
-        i32 font;
+        u32 font;
         i32 width;
         i32 height;
     };
