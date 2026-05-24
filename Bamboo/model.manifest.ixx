@@ -55,6 +55,8 @@ namespace bamboo {
         i32 accel_size;
         MenuItems items;
         MenuAccels accels;
+        i32 window_menu_index;
+        std::vector<i64> icons;
     };
 
     export struct Qualifier {
@@ -68,7 +70,7 @@ namespace bamboo {
         u32 handle;
         std::wstring filename;
         std::wstring name;
-        i32 magic_num;
+        u32 magic_num;
         std::wstring subtype;
         i32 is_unicode;
     };
@@ -153,19 +155,17 @@ namespace bamboo {
         i32 window_height;        // Window
         Color border_color;       // Window
         Flags<u64> options;
-        std::wstring help_file;      // About
-        i32 init_score;              // Runtime
-        i32 init_lives;              // Runtime
-        i32 frame_rate;              // Runtime
-        i32 build_type;              // Settings
-        std::wstring build_filename; // Settings
-        std::wstring command_line;   // Settings
-        std::wstring about;          // About
-        BinaryFiles binary_files;    // Data Elements - Binary Data
-        Controls controls;           // Runtime
-        MenuBar menu_bar;            // Window
-        i32 window_menu;             // Window
-        std::vector<i64> menu_images;
+        std::wstring help_file;          // About
+        i32 init_score;                  // Runtime
+        i32 init_lives;                  // Runtime
+        i32 frame_rate;                  // Runtime
+        i32 build_type;                  // Settings
+        std::wstring build_filename;     // Settings
+        std::wstring command_line;       // Settings
+        std::wstring about;              // About
+        BinaryFiles binary_files;        // Data Elements - Binary Data
+        Controls controls;               // Runtime
+        MenuBar menu_bar;                // Window
         Values global_numbers;           // Values
         Values global_strings;           // Values
         GlobalEventBlocks global_events; // Events

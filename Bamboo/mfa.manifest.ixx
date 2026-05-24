@@ -90,6 +90,7 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(end);
+        stream >> value.window_menu_index >> value.icons;
 
         spdlog::debug("Read a menu bar.");
     }
@@ -145,8 +146,6 @@ namespace bamboo::mfa {
             >> value.binary_files
             >> value.controls
             >> value.menu_bar
-            >> value.window_menu
-            >> value.menu_images
             >> value.global_numbers
             >> value.global_strings
             >> value.global_events
