@@ -50,11 +50,22 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, MenuAccel& value) {
-        stream >> value.modifier
-            >> skip<i8>
+        stream >> value.flags
             >> value.key
             >> value.id
             >> skip<i16>;
+    }
+
+    export void load(Stream& stream, MenuAccels& value) {
+        value.clear();
+
+        do {
+            stream >> value.emplace_back();
+        } while (!value.back().flags[MenuAccel::last]);
+    }
+
+    export void load(Stream& stream, MenuImage& value) {
+        stream >> value.id >> skip<i16> >> value.image;
     }
 
     export void load(Stream& stream, MenuBar& value) {
@@ -84,13 +95,13 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(accel_begin);
-        stream >> args(value.accels, value.accel_size / 8);
+        stream >> value.accels;
         if (stream.tellg() != accel_end) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
 
         stream.seekg(end);
-        stream >> value.window_menu_index >> value.icons;
+        stream >> value.window_menu_index >> value.images;
 
         spdlog::debug("Read a menu bar.");
     }

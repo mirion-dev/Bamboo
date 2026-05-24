@@ -31,10 +31,10 @@ namespace bamboo {
 
     struct MenuItem {
         enum Flag {
-            disabled,
+            grayed, // Options
             _1,
             _2,
-            checked,
+            checked, // Options
             parent,
             _5,
             _6,
@@ -42,18 +42,36 @@ namespace bamboo {
         };
 
         Flags<u16> flags;
-        i16 id;
+        u16 id;
         std::wstring name;
         MenuItems children;
     };
 
     export struct MenuAccel {
-        i8 modifier;
+        enum Flag {
+            _0,
+            _1,
+            shift, // Accelerator
+            ctrl,  // Accelerator
+            alt,   // Accelerator
+            _5,
+            _6,
+            last
+        };
+
+        Flags<u16> flags;
         i16 key;
-        i16 id;
+        u16 id;
     };
 
     export struct MenuAccels : std::vector<MenuAccel> {};
+
+    export struct MenuImage {
+        u16 id;
+        u32 image; // Bitmap
+    };
+
+    export struct MenuImages : std::vector<MenuImage> {};
 
     export struct MenuBar {
         i32 size;
@@ -65,7 +83,7 @@ namespace bamboo {
         MenuItems items;
         MenuAccels accels;
         i32 window_menu_index;
-        std::vector<i64> icons;
+        MenuImages images;
     };
 
     export struct Qualifier {
