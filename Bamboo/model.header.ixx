@@ -10,10 +10,10 @@ namespace bamboo {
         i16 runtime_subversion;
         i32 product_version;
         i32 product_build;
-        i32 language;                 // App - About
-        std::wstring app_name;        // App - About
-        std::wstring description;     // App - About
-        std::wstring editor_filename; // App - About
+        i32 language;                 // About
+        std::wstring app_name;        // About
+        std::wstring description;     // About
+        std::wstring editor_filename; // About
         std::vector<char> bitmap;
     };
 

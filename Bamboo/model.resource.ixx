@@ -35,8 +35,8 @@ namespace bamboo {
             _1,
             _2,
             _3,
-            load_on_call,
-            play_from_disk,
+            load_on_call,   // Options
+            play_from_disk, // Options
             _6,
             _7,
             has_name,

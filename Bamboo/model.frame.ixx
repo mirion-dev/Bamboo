@@ -13,17 +13,17 @@ namespace bamboo {
             visible,
             locked,
             _2,
-            not_visible_at_start,
-            do_not_save_background,
-            wrap_horizontally,
-            wrap_vertically,
-            same_effect_as_previous_layer
+            not_visible_at_start,         // Settings
+            do_not_save_background,       // Settings
+            wrap_horizontally,            // Settings
+            wrap_vertically,              // Settings
+            same_effect_as_previous_layer // Settings
         };
 
-        std::wstring name;
+        std::wstring name; // Settings
         Flags<u32> flags;
-        f32 x_coefficient;
-        f32 y_coefficient;
+        f32 x_coefficient; // Settings
+        f32 y_coefficient; // Settings
     };
 
     export struct Layers : std::vector<Layer> {};
@@ -59,40 +59,40 @@ namespace bamboo {
 
     export struct Frame {
         enum Flag {
-            grab_desktop_at_start,
-            keep_display_from_previous_frame,
-            handle_background_collisions_even_out_of_window,
-            display_frame_title_in_window_caption,
-            resize_to_screen_size_at_start,
-            force_load_on_call_option_for_all_objects_force,
+            grab_desktop_at_start,                           // Runtime
+            keep_display_from_previous_frame,                // Runtime
+            handle_background_collisions_even_out_of_window, // Runtime
+            display_frame_title_in_window_caption,           // Runtime
+            resize_to_screen_size_at_start,                  // Runtime
+            force_load_on_call_option_for_all_objects_force, // Runtime
             _6,
-            screen_saver_setup_frame,
-            timer_based_movements,
+            screen_saver_setup_frame, // Runtime
+            timer_based_movements,    // Runtime
             _9,
-            do_not_include_global_events,
+            do_not_include_global_events, // Runtime
             _11,
-            do_not_include_at_build_time,
-            direct3d_do_not_erase_background_if_the_frame_has_an_effect,
+            do_not_include_at_build_time,                                // Settings
+            direct3d_do_not_erase_background_if_the_frame_has_an_effect, // Runtime
             _14,
-            force_load_on_call_option_for_all_objects_ignore
+            force_load_on_call_option_for_all_objects_ignore // Runtime
         };
 
         u32 handle;
-        std::wstring name;
-        i32 width;
-        i32 height;
-        Color background_color;
+        std::wstring name;      // About
+        i32 width;              // Settings
+        i32 height;             // Settings
+        Color background_color; // Settings
         Flags<u32> flags;
-        i32 object_num;
-        std::wstring password;
+        i32 object_num;        // Runtime
+        std::wstring password; // Runtime
         i32 editor_x;
         i32 editor_y;
-        std::vector<Color> palette;
+        std::vector<Color> palette; // Settings
         i32 icon;
         i32 editor_layer;
         Layers layers;
-        std::optional<Transition> fade_in;
-        std::optional<Transition> fade_out;
+        std::optional<Transition> fade_in;  // Settings
+        std::optional<Transition> fade_out; // Settings
         Objects objects;
         Folders folders;
         Instances instances;

@@ -95,7 +95,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Qualifier& value) {
-        stream >> value.name >> value.handle;
+        stream >> value.name >> value.icon;
         spdlog::debug("Read qualifier {:?}.", to_string(value.name));
     }
 
