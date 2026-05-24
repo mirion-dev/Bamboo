@@ -135,9 +135,9 @@ namespace bamboo::mfa {
             >> value.product_build
             >> value.language
             >> value.app_name
-            >> skip<std::wstring>
+            >> value.description
             >> value.editor_filename
-            >> skip<std::vector<char>>;
+            >> value.bitmap;
 
         spdlog::info("App name: {:?}.", to_string(value.app_name));
         spdlog::info("Build: {}.", value.product_build);
