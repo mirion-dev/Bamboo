@@ -96,7 +96,7 @@ namespace bamboo::mfa {
             >> value.transparent_color
             >> args(value.data, value.size);
 
-        if (stream.build.value() < 284) {
+        if (stream.file->header.product_build < 284) {
             ++value.handle;
         }
     }
