@@ -30,8 +30,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Folder& value) {
-        stream >> value.flags;
-        if (value.flags.value & 0xff == 0x70 ? value.flags.value >> 24 : value.flags.value & 0xff == 4) {
+        stream >> value.header;
+        if (value.header == 0x70000004) {
             stream >> value.name >> value.objects;
             spdlog::debug("Read folder {:?}.", to_string(value.name));
         }
@@ -69,7 +69,7 @@ namespace bamboo::mfa {
             >> value.height
             >> value.background_color
             >> value.flags
-            >> value.object_num
+            >> value.max_objects
             >> value.password
             >> skip<std::vector<char>>
             >> value.editor_x

@@ -29,7 +29,7 @@ namespace bamboo {
     export struct Layers : std::vector<Layer> {};
 
     export struct Folder {
-        Flags<u32> flags;
+        u32 header;
         std::wstring name;
         std::vector<u32> objects;
     };
@@ -41,7 +41,7 @@ namespace bamboo {
             _0,
             _1,
             locked,
-            fake
+            create_only
         };
 
         i32 x; // Size / Position
@@ -65,9 +65,9 @@ namespace bamboo {
             display_frame_title_in_window_caption,           // Runtime
             resize_to_screen_size_at_start,                  // Runtime
             force_load_on_call_option_for_all_objects_force, // Runtime
-            _6,
-            screen_saver_setup_frame, // Runtime
-            timer_based_movements,    // Runtime
+            no_display_surface,                              // Runtime
+            screen_saver_setup_frame,                        // Runtime
+            timer_based_movements,                           // Runtime
             _9,
             do_not_include_global_events, // Runtime
             _11,
@@ -83,7 +83,7 @@ namespace bamboo {
         i32 height;             // Settings
         Color background_color; // Settings
         Flags<u32> flags;
-        i32 object_num;        // Runtime
+        i32 max_objects;       // Runtime
         std::wstring password; // Runtime
         i32 editor_x;
         i32 editor_y;
