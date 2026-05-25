@@ -191,7 +191,7 @@ namespace bamboo::mfa {
             >> value.binary_files
             >> value.controls
             >> value.menu_bar
-            >> value.global_numbers
+            >> value.global_values
             >> value.global_strings
             >> value.global_events
             >> value.graphic_mode

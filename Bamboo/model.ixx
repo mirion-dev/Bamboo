@@ -262,7 +262,7 @@ namespace bamboo {
         BinaryFiles binary_files;        // Data Elements - Binary Data
         Controls controls;               // Runtime
         MenuBar menu_bar;                // Window
-        Values global_numbers;           // Values
+        Values global_values;            // Values
         Values global_strings;           // Values
         GlobalEventBlocks global_events; // Events
         GraphicMode graphic_mode;        // Settings
