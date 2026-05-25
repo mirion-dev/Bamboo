@@ -10,42 +10,26 @@ namespace bamboo {
         u32 handle;
         u32 checksum;
         u32 references;
-        i32 size;
-        i32 height;
-        i32 width;
-        i32 escapement;
-        i32 orientation;
-        i32 weight;
-        u8 italic;
-        u8 underline;
-        u8 strike_out;
-        i8 charset;
-        i8 out_precision;
-        i8 clip_precision;
-        i8 quality;
-        i8 pitch_and_family;
-        std::wstring name;
+        LogicalFont data;
     };
 
     export struct FontBank : std::vector<Font> {};
 
     export struct Sound {
         enum Flag {
-            check,
-            _1,
+            wave,
+            midi,
             _2,
             _3,
             load_on_call,   // Options
             play_from_disk, // Options
-            _6,
-            _7,
-            has_name,
+            file,
+            unicode_file,
+            _8,
             _9,
             _10,
             _11,
-            _12,
-            _13,
-            name_crop
+            loaded
         };
 
         u32 handle;
@@ -80,9 +64,22 @@ namespace bamboo {
             rlet,
             lzx,
             alpha,
+            _5,
             ace,
-            mac,
             rgba
+        };
+
+        enum Format: i8 {
+            rgba8888,
+            rgba4444,
+            rgba5551,
+            palette,
+            rgb888_masked,
+            jpeg,
+            rgb555_masked,
+            rgb565_masked,
+            rgba8888_masked,
+            argb8888
         };
 
         u32 handle;
@@ -91,7 +88,7 @@ namespace bamboo {
         i32 size;
         i16 width;
         i16 height;
-        i8 graphic_mode;
+        Format format;
         Flags<u8> flags;
         i16 origin_x;
         i16 origin_y;
@@ -102,9 +99,7 @@ namespace bamboo {
     };
 
     export struct ImageBank : std::vector<Image> {
-        i32 graphic_mode;
-        i16 palette_version;
-        std::vector<u32> palette;
+        LogicalPalette palette;
     };
 
     export struct Resources {

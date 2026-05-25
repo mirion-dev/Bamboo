@@ -15,7 +15,7 @@ namespace bamboo::mfa {
 
     export class Stream : public bamboo::Stream {
     public:
-        File* file;
+        Project* project;
 
         using bamboo::Stream::Stream;
     };
@@ -31,14 +31,14 @@ namespace bamboo::mfa {
     export template <std::integral T>
     constexpr SizeType<T> size_type;
 
-    export template <class T>
-    void load(Stream& stream, std::vector<T>& value, std::integral auto size) {
+    export template <class T, std::integral Size>
+    void load(Stream& stream, std::vector<T>& value, Size size) {
         bamboo::resize_load(stream, value, size);
     }
 
-    export template <class T, std::integral S = i32>
-    void load(Stream& stream, std::vector<T>& value, SizeType<S> = {}) {
-        S size;
+    export template <class T, std::integral Size = i32>
+    void load(Stream& stream, std::vector<T>& value, SizeType<Size> = {}) {
+        Size size;
         stream >> size >> bamboo::args(value, size);
     }
 
@@ -125,6 +125,28 @@ namespace bamboo::mfa {
         default:
             throw std::runtime_error{ std::format("Unknown value type {}.", type) };
         }
+    }
+
+    export void load(Stream& stream, LogicalFont& value) {
+        stream >> value.height
+            >> value.width
+            >> value.escapement
+            >> value.orientation
+            >> value.weight
+            >> value.italic
+            >> value.underline
+            >> value.strike_out
+            >> value.charset
+            >> value.out_precision
+            >> value.clip_precision
+            >> value.quality
+            >> value.pitch_and_family
+            >> args(value.face_name, string_type_fixed_c<32>);
+    }
+
+    export void load(Stream& stream, LogicalPalette& value) {
+        stream >> value.version >> value.num_entries;
+        stream >> args(value.palette_entry, value.num_entries);
     }
 
 }

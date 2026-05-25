@@ -10,7 +10,7 @@ export import bamboo.model.frame;
 
 namespace bamboo {
 
-    export struct File {
+    export struct Project {
         Header header;
         Resources resources;
         Manifest manifest;

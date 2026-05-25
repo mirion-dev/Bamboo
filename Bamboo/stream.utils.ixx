@@ -43,7 +43,8 @@ namespace bamboo {
 
     export template <StringLiteral Expected>
     struct Signature {
-        void load(auto& stream) const {
+        template <class S>
+        void load(S& stream) const {
             static constexpr usize N{ Expected.size() };
             std::array<char, N> buffer;
             stream >> bamboo::args(buffer.data(), N);
@@ -60,7 +61,8 @@ namespace bamboo {
     export template <StringLiteral Expected>
     constexpr Signature<Expected> signature;
 
-    export void resize_load(auto& stream, auto& container, std::integral auto size) {
+    export template <class S, class C, std::integral Size>
+    void resize_load(S& stream, C& container, Size size) {
         using value_type = std::remove_pointer_t<decltype(container.data())>;
 
         static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };

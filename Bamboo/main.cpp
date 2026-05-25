@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
         auto mfa_stream{ std::make_shared<bamboo::mfa::Stream>(argv[1]) };
         logger->set_stream(mfa_stream);
 
-        bamboo::File file;
-        *mfa_stream >> file;
+        bamboo::Project project;
+        *mfa_stream >> project;
     }
     catch (const std::exception& error) {
         spdlog::error(error.what());

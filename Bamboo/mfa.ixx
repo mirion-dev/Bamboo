@@ -17,11 +17,11 @@ export import bamboo.mfa.frame;
 
 namespace bamboo::mfa {
 
-    export void load(Stream& stream, File& value) {
+    export void load(Stream& stream, Project& value) {
         Timer timer;
-        stream.file = &value;
+        stream.project = &value;
         stream >> value.header >> value.resources >> value.manifest >> value.frames;
-        spdlog::info("Read an MFA file in {:.3f} seconds.", timer.duration());
+        spdlog::info("Read an MFA project in {:.3f} seconds.", timer.duration());
     }
 
 }

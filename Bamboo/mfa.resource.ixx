@@ -17,23 +17,10 @@ namespace bamboo::mfa {
         stream >> value.handle
             >> value.checksum
             >> value.references
-            >> value.size
-            >> value.height
-            >> value.width
-            >> value.escapement
-            >> value.orientation
-            >> value.weight
-            >> value.italic
-            >> value.underline
-            >> value.strike_out
-            >> value.charset
-            >> value.out_precision
-            >> value.clip_precision
-            >> value.quality
-            >> value.pitch_and_family
-            >> args(value.name, string_type_fixed_c<32>);
+            >> skip<i32>
+            >> value.data;
 
-        spdlog::debug("Read font {:?}.", to_string(value.name));
+        spdlog::debug("Read font {:?}.", to_string(value.data.face_name));
     }
 
     export void load(Stream& stream, FontBank& value) {
@@ -86,7 +73,7 @@ namespace bamboo::mfa {
             >> value.size
             >> value.width
             >> value.height
-            >> value.graphic_mode
+            >> value.format
             >> value.flags
             >> skip<i16>
             >> value.origin_x
@@ -96,16 +83,15 @@ namespace bamboo::mfa {
             >> value.transparent_color
             >> args(value.data, value.size);
 
-        if (stream.file->header.product_build < 284) {
+        if (stream.project->header.editor_build < 284) {
             ++value.handle;
         }
     }
 
     export void load(Stream& stream, ImageBank& value) {
         stream >> signature<"AGMI">
-            >> value.graphic_mode
-            >> value.palette_version
-            >> args(value.palette, size_type<i16>)
+            >> skip<i32>
+            >> value.palette
             >> static_cast<std::vector<Image>&>(value);
 
         spdlog::debug("Read {} images.", value.size());
