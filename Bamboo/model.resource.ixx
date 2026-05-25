@@ -69,7 +69,7 @@ namespace bamboo {
             rgba
         };
 
-        enum Format: i8 {
+        enum class Format: i8 {
             rgba8888,
             rgba4444,
             rgba5551,

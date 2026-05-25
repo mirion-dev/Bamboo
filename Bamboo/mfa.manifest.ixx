@@ -133,7 +133,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Manifest& value) {
-        stream >> value.app_name
+        stream >> value.name
             >> value.author
             >> value.description
             >> value.copyright
@@ -142,18 +142,19 @@ namespace bamboo::mfa {
             >> value.window_width
             >> value.window_height
             >> value.border_color
-            >> value.options
+            >> value.window_flags
+            >> value.flags
             >> value.help_file
-            >> skip<std::wstring>
+            >> value.vitalize_preview_file
             >> value.init_score
             >> value.init_lives
             >> value.frame_rate
             >> value.build_type
             >> value.build_filename
-            >> skip<std::wstring>
+            >> value.effects_folder
             >> value.command_line
             >> value.about
-            >> skip<i32>
+            >> value.installer
             >> value.binary_files
             >> value.controls
             >> value.menu_bar

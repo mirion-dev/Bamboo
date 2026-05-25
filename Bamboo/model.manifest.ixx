@@ -10,8 +10,8 @@ namespace bamboo {
     export struct BinaryFiles : std::vector<std::wstring> {};
 
     export struct Control {
-        enum Type : i32 {
-            _0,
+        enum class Type : i32 {
+            mouse,
             joystick1,
             joystick2,
             joystick3,
@@ -49,8 +49,8 @@ namespace bamboo {
 
     export struct MenuAccel {
         enum Flag {
-            _0,
-            _1,
+            virtual_key,
+            no_invert,
             shift, // Accelerator
             ctrl,  // Accelerator
             alt,   // Accelerator
@@ -105,46 +105,39 @@ namespace bamboo {
     export struct Extensions : std::vector<Extension> {};
 
     export struct Manifest {
+        enum WindowFlag {
+            maximized_on_boot_up,
+            resize_display_to_fill_window_size,
+            change_resolution_mode,
+            allow_user_to_switch_to_from_fullscreen,
+            heading,
+            heading_when_maximized,
+            has_menu_bar,
+            menu_displayed_on_boot_up,
+            no_minimize_box,
+            no_maximize_box,
+            no_thick_frame,
+            do_not_center_frame_area_in_window,
+            disable_close_button,
+            hidden_at_start,
+            multiple_document_interface,
+            keep_screen_ratio,
+            antialiasing_when_resizing,
+            _w17,
+            right_to_left_reading,
+            right_to_left_layout,
+            _w20,
+            fit_inside
+        };
+
         enum Flag {
-            maximized_on_boot_up,                    // Window
-            resize_display_to_fill_window_size,      // Window
-            change_resolution_mode,                  // Window
-            allow_user_to_switch_to_from_fullscreen, // Window
-            heading,                                 // Window
-            heading_when_maximized,                  // Window
-            has_menu_bar,                            // Window
-            menu_displayed_on_boot_up,               // Window
-            no_minimize_box,                         // Window
-            no_maximize_box,                         // Window
-            no_thick_frame,                          // Window
-            do_not_center_frame_area_in_window,      // Window
-            disable_close_button,                    // Window
-            hidden_at_start,                         // Window
-            multiple_document_interface,             // Window
-            keep_screen_ratio,                       // Window
-            antialiasing_when_resizing,              // Window
-            _17,
-            right_to_left_reading, // Window
-            right_to_left_layout,  // Window
-            _20,
-            fit_inside, // Window
-            _22,
-            _23,
-            _24,
-            _25,
-            _26,
-            _27,
-            _28,
-            _29,
-            _30,
-            _31,
             multisamples,                                    // Runtime
             machine_independent_speed,                       // Runtime
             play_sounds_over_frames,                         // Runtime
             do_not_mute_samples_when_application_lost_focus, // Runtime
             do_not_stop_screen_saver_when_input_event,       // Runtime
-            _37,
-            _38,
+            _5,
+            _6,
             enable_visual_themes,                       // Windows
             vsync,                                      // Runtime
             run_when_minimized,                         // Runtime
@@ -152,27 +145,77 @@ namespace bamboo {
             enable_debugger_keyboard_shortcuts,         // Settings
             do_not_show_debugger,                       // Settings
             do_not_share_data_if_run_as_subapplication, // Runtime
-            direct3d9,                                  // Runtime
-            direct3d8,                                  // Runtime
-            _48,
-            _49,
-            _50,
-            _51,
-            _52,
+            display_mode_direct3d9,                     // Runtime
+            display_mode_direct3d8,                     // Runtime
+            _16,
+            _17,
+            _18,
+            _19,
+            _20,
             do_not_ignore_destroy_if_too_far_option_if_inactive_if_too_far_is_set_to_no, // Runtime
             disable_ime,                                                                 // Windows
             reduce_cpu_usage,                                                            // Windows
-            _56,
+            _24,
             use_high_performance_gpu,                 // Windows
             enable_profiling,                         // Settings
             do_not_start_profiling_at_start_of_frame, // Settings
-            direct3d11,                               // Runtime
+            display_mode_direct3d11,                  // Runtime
             premultiplied_alpha,                      // Runtime
             do_not_optimize_events,                   // Settings
             record_slowest_app_loops                  // Settings
         };
 
-        std::wstring app_name;    // About
+        enum class BuildType : i32 {
+            windows_exe_application,
+            windows_screen_saver,
+            subapplication,
+            java_subapplication,
+            java_application,
+            java_internet_applet,
+            java_web_start,
+            java_for_mobile_devices,
+            java_for_bluray,
+            java_mac_application,
+            adobe_flash,
+            java_for_blackberry,
+            android_application,
+            ios_application,
+            ios_xcode_project,
+            final_ios_xcode_project,
+            xna_windows_application,
+            mac_application,
+            xna_windows_project,
+            xna_xbox_project,
+            xna_phone_project,
+            xna_xbox_application,
+            xna_phone_application,
+            html5,
+            playstation_vita,
+            playstation_vita_development,
+            playstation_vita_final_project,
+            html5_development,
+            html5_final_project,
+            ouya,
+            mac_application_file,
+            mac_xcode_project,
+            _32,
+            uwp_project,
+            android_app_bundle,
+            android_app_bundle_with_expansion
+        };
+
+        enum class GraphicMode : i32 {
+            _0,
+            _1,
+            _2,
+            color256,
+            color16m,
+            _5,
+            color32768,
+            color65536
+        };
+
+        std::wstring name;        // About
         std::wstring author;      // About
         std::wstring description; // About
         std::wstring copyright;   // About
@@ -181,22 +224,26 @@ namespace bamboo {
         i32 window_width;         // Window
         i32 window_height;        // Window
         Color border_color;       // Window
-        Flags<u64> options;
-        std::wstring help_file;          // About
-        i32 init_score;                  // Runtime
-        i32 init_lives;                  // Runtime
-        i32 frame_rate;                  // Runtime
-        i32 build_type;                  // Settings
-        std::wstring build_filename;     // Settings
-        std::wstring command_line;       // Settings
-        std::wstring about;              // About
+        Flags<u32> window_flags;  // Window
+        Flags<u32> flags;
+        std::wstring help_file; // About
+        std::wstring vitalize_preview_file;
+        i32 init_score;              // Runtime
+        i32 init_lives;              // Runtime
+        i32 frame_rate;              // Runtime
+        BuildType build_type;        // Settings
+        std::wstring build_filename; // Settings
+        std::wstring effects_folder;
+        std::wstring command_line; // Settings
+        std::wstring about;        // About
+        std::vector<char> installer;
         BinaryFiles binary_files;        // Data Elements - Binary Data
         Controls controls;               // Runtime
         MenuBar menu_bar;                // Window
         Values global_numbers;           // Values
         Values global_strings;           // Values
         GlobalEventBlocks global_events; // Events
-        i32 graphic_mode;                // Settings
+        GraphicMode graphic_mode;        // Settings
         std::vector<u32> window_icons;   // About
         Qualifiers qualifiers;           // Events
         Extensions extensions;           // Data Elements - Extensions
