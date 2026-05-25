@@ -7,12 +7,18 @@ import bamboo.model.base;
 namespace bamboo {
 
     export struct Transition {
-        std::wstring filename;
-        std::wstring module_name;
-        i32 module;
+        enum Flag {
+            _0,
+            use_color,
+            unicode
+        };
+
+        std::wstring dll_name;
+        std::wstring name;
+        i32 dll_handle;
         std::array<char, 4> id;
         i32 duration;
-        i32 use_color;
+        Flags<u32> flags;
         Color color;
         std::vector<char> param;
     };
@@ -304,7 +310,7 @@ namespace bamboo {
         i32 transparent;
         i32 ink_effect;
         i32 ink_effect_param;
-        i32 anti_aliasing;
+        i32 antialiasing;
         Flags<u32> flags;
         i32 icon_type;
         u32 icon;

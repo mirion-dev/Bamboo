@@ -14,12 +14,12 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Transition& value) {
-        stream >> value.filename
-            >> value.module_name
-            >> value.module
+        stream >> value.dll_name
+            >> value.name
+            >> value.dll_handle
             >> value.id
             >> value.duration
-            >> value.use_color
+            >> value.flags
             >> value.color
             >> value.param;
     }
@@ -208,7 +208,7 @@ namespace bamboo::mfa {
             >> value.transparent
             >> value.ink_effect
             >> value.ink_effect_param
-            >> value.anti_aliasing
+            >> value.antialiasing
             >> value.flags
             >> value.icon_type
             >> value.icon
