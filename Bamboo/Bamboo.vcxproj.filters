@@ -6,22 +6,17 @@
     <ClCompile Include="mfa.ixx" />
     <ClCompile Include="stream.ixx" />
     <ClCompile Include="diag.ixx" />
-    <ClCompile Include="stream.utils.ixx" />
     <ClCompile Include="model.base.ixx" />
     <ClCompile Include="model.resource.ixx" />
-    <ClCompile Include="model.manifest.ixx" />
     <ClCompile Include="model.frame.ixx" />
     <ClCompile Include="model.ixx" />
     <ClCompile Include="model.event.ixx" />
     <ClCompile Include="model.object.ixx" />
     <ClCompile Include="mfa.base.ixx" />
     <ClCompile Include="mfa.resource.ixx" />
-    <ClCompile Include="mfa.manifest.ixx" />
     <ClCompile Include="mfa.frame.ixx" />
     <ClCompile Include="mfa.object.ixx" />
     <ClCompile Include="mfa.event.ixx" />
     <ClCompile Include="stream.core.ixx" />
-    <ClCompile Include="mfa.header.ixx" />
-    <ClCompile Include="model.header.ixx" />
   </ItemGroup>
 </Project>

@@ -103,7 +103,6 @@ namespace bamboo {
     export struct Frames : std::vector<Frame> {
         std::vector<u32> offsets;
         u32 end;
-        Chunks chunks;
     };
 
 }

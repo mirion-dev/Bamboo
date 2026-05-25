@@ -99,7 +99,6 @@ namespace bamboo::mfa {
         }
 
         stream.seekg(value.end);
-        stream >> value.chunks;
 
         spdlog::debug("Read {} frames.", value.size());
     }
