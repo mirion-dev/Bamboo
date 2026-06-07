@@ -4,4 +4,4 @@
 
 ## Credits
 
-- [NebulaFD](https://github.com/AITYunivers/NebulaFD/)
+- [NebulaFD](https://github.com/AITYunivers/NebulaFD/) (references their reverse engineering results, but rewrites from scratch)
