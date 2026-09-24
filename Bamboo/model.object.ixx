@@ -9,17 +9,17 @@ namespace bamboo {
     export struct Transition {
         enum Flag {
             _0,
-            use_color,
+            use_color, // From / To
             unicode
         };
 
-        std::wstring dll_name;
-        std::wstring name;
+        std::wstring filename;
+        std::wstring name; // Transition
         i32 dll_handle;
         std::array<char, 4> id;
-        i32 duration;
+        i32 duration; // Duration
         Flags<u32> flags;
-        Color color;
+        Color color; // From / To
         std::vector<char> param;
     };
 
@@ -106,58 +106,66 @@ namespace bamboo {
     };
 
     export struct Backdrop {
-        i32 obstacle_type;
-        i32 collision_type;
-        u32 image;
+        enum class ObstacleType : i32 {
+            none,
+            solid,
+            platform,
+            ladder,
+            transparent
+        };
+
+        ObstacleType obstacle_type; // Runtime
+        u32 collision_with_box;     // Runtime
+        u32 image;                  // Settings
     };
 
     export struct ObjectBase {
         enum Flag {
             display_in_front,
             background,
-            save_background,
+            save_background, // Display
             run_before_fade_in,
             has_movements,
             has_animations,
-            tab_stop,
-            window_process,
-            has_alterables,
-            has_sprites,
+            tab_stop_focus,
+            is_window_process,
+            has_alterables_values_strings_flags,
+            uses_images,
             internal_save_background,
-            dont_follow_frame,
-            display_as_background,
-            dont_destroy_if_too_far,
-            dont_inactivate_if_too_far,
-            inactivate_if_too_far,
-            has_text,
-            create_at_start,
-            ccn_check,
+            do_not_follow_the_frame,                     // Runtime
+            display_as_background,                       // Display
+            do_not_destroy_object_if_too_far_from_frame, // Runtime
+            inactivate_if_too_far_from_window_no,        // Runtime
+            inactivate_if_too_far_from_window_yes,       // Runtime
+            uses_text,
+            create_at_start, // Runtime
+            _18,
             _19,
-            dont_reset_frame_duration
+            do_not_reset_current_frame_duration_when_the_animation_is_modified // Runtime
         };
 
         enum NewFlag {
-            dont_save_background,
-            wipe_with_color,
-            dont_use_fine_detection,
-            visible_at_start,
-            solid_obstacle,
-            platform_obstacle,
-            ladder_obstacle,
-            automatic_rotations,
+            do_not_save_background,    // Display
+            wipe_with_color,           // Display
+            do_not_use_fine_detection, // Runtime
+            visible_at_start,          // Display
+            obstacle_type_obstacle,    // Runtime
+            obstacle_type_platform,    // Runtime
+            obstacle_type_ladder,      // Runtime
+            automatic_rotations,       // Runtime
             initialize_flags
         };
 
         Flags<u32> flags;
         Flags<u32> new_flags;
-        Color background_color;
-        std::array<i16, 8> qualifiers;
-        Values numbers;
-        Values strings;
-        Movements movements;
-        Behaviors behaviors;
-        std::optional<Transition> transition_in;
-        std::optional<Transition> transition_out;
+        Color background_color;             // Display
+        std::array<i16, 8> qualifiers;      // Events
+        Values values;                      // Values
+        Values strings;                     // Values
+        Movements movements;                // Movement
+        Behaviors behaviors;                // Events
+        std::optional<Transition> fade_in;  // Display
+        std::optional<Transition> fade_out; // Display
     };
 
     export struct ActiveObject : ObjectBase {
@@ -295,25 +303,25 @@ namespace bamboo {
         > {
 
         enum Flag {
-            load_on_call,
+            load_on_call, // Runtime
             _1,
-            global_object,
+            global_object, // Runtime
             _3,
-            no_editor_sync,
-            name_type_editor_sync,
+            editor_synchronization_no,                 // Runtime
+            editor_synchronization_same_name_and_type, // Runtime
             _6,
-            no_auto_update
+            do_not_auto_update // About
         };
 
+        u32 extension;
         u32 handle;
-        std::wstring name;
-        i32 transparent;
+        std::wstring name; // About
+        u32 transparent;   // Display
         i32 ink_effect;
         i32 ink_effect_param;
-        i32 antialiasing;
+        u32 antialiasing; // Display
         Flags<u32> flags;
-        i32 icon_type;
-        u32 icon;
+        u32 icon; // About
         Chunks chunks;
     };
 

@@ -14,7 +14,7 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Transition& value) {
-        stream >> value.dll_name
+        stream >> value.filename
             >> value.name
             >> value.dll_handle
             >> value.id
@@ -76,7 +76,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Backdrop& value) {
-        stream >> value.obstacle_type >> value.collision_type >> value.image;
+        stream >> value.obstacle_type >> value.collision_with_box >> value.image;
     }
 
     export void load(Stream& stream, ObjectBase& value) {
@@ -85,12 +85,12 @@ namespace bamboo::mfa {
             >> value.background_color
             >> value.qualifiers
             >> skip<i16>
-            >> value.numbers
+            >> value.values
             >> value.strings
             >> value.movements
             >> value.behaviors
-            >> value.transition_in
-            >> value.transition_out;
+            >> value.fade_in
+            >> value.fade_out;
     }
 
     export void load(Stream& stream, ActiveObject& value) {
@@ -210,7 +210,7 @@ namespace bamboo::mfa {
             >> value.ink_effect_param
             >> value.antialiasing
             >> value.flags
-            >> value.icon_type
+            >> skip<i32>
             >> value.icon
             >> value.chunks;
 
@@ -246,6 +246,7 @@ namespace bamboo::mfa {
             stream >> value.emplace<SubapplicationObject>();
             break;
         default:
+            value.extension = type - 32;
             stream >> value.emplace<ExtensionObject>();
         }
 
