@@ -1,0 +1,93 @@
+module;
+
+#include <spdlog/spdlog.h>
+
+export module bamboo.mfa.resource;
+
+import std;
+import bamboo.types;
+import bamboo.log;
+import bamboo.stream;
+import bamboo.model;
+import bamboo.mfa.base;
+
+namespace bamboo::mfa {
+
+    export void load(Stream& stream, Font& value) {
+        stream >> value.handle >> value.checksum >> value.references >> skip<i32> >> value.data;
+        spdlog::debug("Read font {:?}.", to_string(value.data.face_name));
+    }
+
+    export void load(Stream& stream, FontBank& value) {
+        stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
+        spdlog::debug("Read {} fonts.", value.size());
+    }
+
+    export void load(Stream& stream, Sound& value) {
+        stream
+            >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.flags
+            >> value.frequency
+            >> args(value.name, string_type_pascal_c);
+        stream >> args(value.data, value.size - (value.flags[Sound::play_from_disk] ? 0 : (value.name.size() + 1) * 2));
+
+        --value.handle;
+
+        spdlog::debug("Read sound {:?}.", to_string(value.name));
+    }
+
+    export void load(Stream& stream, SoundBank& value) {
+        stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
+        spdlog::debug("Read {} sounds.", value.size());
+    }
+
+    export void load(Stream& stream, Music& value) {
+        stream
+            >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.flags
+            >> value.frequency
+            >> args(value.name, string_type_pascal_c);
+        stream >> args(value.data, value.size - (value.name.size() + 1) * 2);
+
+        spdlog::debug("Read music {:?}.", to_string(value.name));
+    }
+
+    export void load(Stream& stream, MusicBank& value) {
+        stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
+        spdlog::debug("Read {} music.", value.size());
+    }
+
+    export void load(Stream& stream, Image& value) {
+        stream
+            >> value.handle
+            >> value.checksum
+            >> value.references
+            >> value.size
+            >> value.width
+            >> value.height
+            >> value.format
+            >> value.flags
+            >> skip<i16> >> value.origin_x
+            >> value.origin_y
+            >> value.action_x
+            >> value.action_y
+            >> value.transparent_color
+            >> args(value.data, value.size);
+
+        if (stream.project->editor_build < 284) {
+            ++value.handle;
+        }
+    }
+
+    export void load(Stream& stream, ImageBank& value) {
+        stream >> signature<"AGMI"> >> skip<i32> >> value.palette >> static_cast<std::vector<Image>&>(value);
+        spdlog::debug("Read {} images.", value.size());
+    }
+
+}

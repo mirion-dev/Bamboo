@@ -6,7 +6,7 @@ export module bamboo.mfa.frame;
 
 import std;
 import bamboo.types;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa.base;
@@ -16,11 +16,7 @@ import bamboo.mfa.object;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Layer& value) {
-        stream >> value.name
-            >> value.flags
-            >> value.x_coefficient
-            >> value.y_coefficient;
-
+        stream >> value.name >> value.flags >> value.x_coefficient >> value.y_coefficient;
         spdlog::debug("Read layer {:?}.", to_string(value.name));
     }
 
@@ -34,8 +30,7 @@ namespace bamboo::mfa {
         if (value.header == 0x70000004) {
             stream >> value.name >> value.objects;
             spdlog::debug("Read folder {:?}.", to_string(value.name));
-        }
-        else {
+        } else {
             stream >> value.objects.emplace_back();
         }
     }
@@ -46,7 +41,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Instance& value) {
-        stream >> value.x
+        stream
+            >> value.x
             >> value.y
             >> value.layer
             >> value.handle
@@ -63,7 +59,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Frame& value) {
-        stream >> value.handle
+        stream
+            >> value.handle
             >> value.name
             >> value.width
             >> value.height
@@ -71,8 +68,7 @@ namespace bamboo::mfa {
             >> value.flags
             >> value.max_objects
             >> value.password
-            >> skip<std::vector<char>>
-            >> value.editor_x
+            >> skip<std::vector<char>> >> value.editor_x
             >> value.editor_y
             >> value.palette
             >> value.icon

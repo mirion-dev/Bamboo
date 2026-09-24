@@ -1,10 +1,10 @@
 module;
 
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
-export module bamboo.diag;
+export module bamboo.log;
 
 import std;
 import bamboo.types;
@@ -40,10 +40,10 @@ namespace bamboo {
         std::weak_ptr<S> _ptr;
 
     public:
-        StreamPosFlagFormatter(std::weak_ptr<S> ptr) noexcept :
-            _ptr{ ptr } {}
+        StreamPosFlagFormatter(std::weak_ptr<S> ptr) noexcept
+            : _ptr{ ptr } {}
 
-        void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) {
+        void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) override {
             std::shared_ptr stream{ _ptr.lock() };
             if (stream == nullptr) {
                 dest.append("invalid"sv);
@@ -53,7 +53,7 @@ namespace bamboo {
             dest.append(std::format("{:#010x}", static_cast<usize>(stream->tellg())));
         }
 
-        std::unique_ptr<custom_flag_formatter> clone() const noexcept {
+        std::unique_ptr<custom_flag_formatter> clone() const noexcept override {
             return std::make_unique<StreamPosFlagFormatter>(_ptr);
         }
     };
@@ -73,14 +73,11 @@ namespace bamboo {
         }
 
     public:
-        Logger(std::string_view name, std::string_view path) noexcept :
-            logger{
-                std::string{ name },
-                spdlog::sinks_init_list{
-                    std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-                    std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::string{ path }, true)
-                }
-            } {}
+        Logger(std::string_view name, std::string_view path) noexcept
+            : logger{ std::string{ name },
+                      spdlog::sinks_init_list{
+                          std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
+                          std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::string{ path }, true) } } {}
 
         auto console_sink() const noexcept {
             return std::static_pointer_cast<spdlog::sinks::stdout_color_sink_mt>(sinks()[0]);

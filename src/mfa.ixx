@@ -6,7 +6,7 @@ export module bamboo.mfa;
 
 import std;
 import bamboo.types;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
 
@@ -61,10 +61,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, MenuAccel& value) {
-        stream >> value.flags
-            >> value.key
-            >> value.id
-            >> skip<i16>;
+        stream >> value.flags >> value.key >> value.id >> skip<i16>;
     }
 
     export void load(Stream& stream, MenuAccels& value) {
@@ -83,11 +80,7 @@ namespace bamboo::mfa {
         stream >> value.size;
 
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> value.header_size
-            >> value.item_offset
-            >> value.item_size
-            >> value.accel_offset
-            >> value.accel_size;
+        stream >> value.header_size >> value.item_offset >> value.item_size >> value.accel_offset >> value.accel_size;
 
         usize header_end{ begin + value.header_size };
         usize item_begin{ begin + value.item_offset };
@@ -128,13 +121,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Extension& value) {
-        stream >> value.handle
-            >> value.filename
-            >> value.name
-            >> value.magic_num
-            >> value.subtype
-            >> value.is_unicode;
-
+        stream >> value.handle >> value.filename >> value.name >> value.magic_num >> value.subtype >> value.is_unicode;
         spdlog::debug("Read extension {:?}.", to_string(value.name));
     }
 
@@ -147,8 +134,8 @@ namespace bamboo::mfa {
         Timer timer;
 
         stream.project = &value;
-        stream >> signature<"MFU2">
-            >> value.format_version
+        stream
+            >> signature<"MFU2"> >> value.format_version
             >> value.format_subversion
             >> value.editor_version
             >> value.editor_build
@@ -161,7 +148,8 @@ namespace bamboo::mfa {
         spdlog::info("Project name: {:?}.", to_string(value.name));
         spdlog::info("Editor build: {}.", value.editor_build);
 
-        stream >> value.font_bank
+        stream
+            >> value.font_bank
             >> value.sound_bank
             >> value.music_bank
             >> value.icon_bank

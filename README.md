@@ -5,3 +5,4 @@
 ## Credits
 
 - [NebulaFD](https://github.com/AITYunivers/NebulaFD/)
+- [spdlog](https://github.com/gabime/spdlog)

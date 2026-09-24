@@ -7,7 +7,7 @@ export module bamboo.mfa.base;
 
 import std;
 import bamboo.types;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
 
@@ -69,15 +69,13 @@ namespace bamboo::mfa {
                 throw std::runtime_error{ "ASCII strings are unsupported." };
             }
             resize_load(stream, value, size & ~MASK_UNICODE);
-        }
-        else if constexpr (Type == StringTypeEnum::c) {
+        } else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
             wchar_t ch;
             while (stream >> ch, ch != '\0') {
                 value.push_back(ch);
             }
-        }
-        else if constexpr (Type == StringTypeEnum::pascal_c) {
+        } else if constexpr (Type == StringTypeEnum::pascal_c) {
             i32 size;
             stream >> size;
             resize_load(stream, value, size);
@@ -85,16 +83,14 @@ namespace bamboo::mfa {
                 throw std::runtime_error{ "A Pascal-C string must be null-terminated." };
             }
             value.pop_back();
-        }
-        else if constexpr (Type == StringTypeEnum::fixed_c) {
+        } else if constexpr (Type == StringTypeEnum::fixed_c) {
             resize_load(stream, value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
                 throw std::runtime_error{ "A fixed C string must be null-terminated." };
             }
             value.resize(end);
-        }
-        else {
+        } else {
             static_assert(false, "Unknown StringTypeEnum.");
         }
     }
@@ -128,7 +124,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, LogicalFont& value) {
-        stream >> value.height
+        stream
+            >> value.height
             >> value.width
             >> value.escapement
             >> value.orientation

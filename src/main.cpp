@@ -1,7 +1,7 @@
 #include <spdlog/spdlog.h>
 
 import std;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.model;
 import bamboo.mfa;
 
@@ -29,8 +29,7 @@ int main(int argc, char** argv) {
 
         bamboo::Project project;
         *mfa_stream >> project;
-    }
-    catch (const std::exception& error) {
+    } catch (const std::exception& error) {
         spdlog::error(error.what());
         spdlog::error("See bamboo.log for more details.");
         return EXIT_FAILURE;

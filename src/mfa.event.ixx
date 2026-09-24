@@ -6,7 +6,7 @@ export module bamboo.mfa.event;
 
 import std;
 import bamboo.types;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa.base;
@@ -19,7 +19,8 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Condition& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> value.size
+        stream
+            >> value.size
             >> value.object_type
             >> value.number
             >> value.object
@@ -38,7 +39,8 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Action& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> value.size
+        stream
+            >> value.size
             >> value.object_type
             >> value.number
             >> value.object
@@ -56,7 +58,8 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Event& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> value.size
+        stream
+            >> value.size
             >> value.condition_num
             >> value.action_num
             >> value.flags
@@ -115,12 +118,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, EventObject& value) {
-        stream >> value.handle
-            >> value.object_type
-            >> value.item_type
-            >> value.name
-            >> value.type_name
-            >> value.flags;
+        stream >> value.handle >> value.object_type >> value.item_type >> value.name >> value.type_name >> value.flags;
 
         switch (value.object_type) {
         case 1:
@@ -178,10 +176,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, ConditionsBlock& value) {
-        stream >> value.editor_data
-            >> value.condition_width
-            >> value.object_height
-            >> skip<std::array<char, 12>>;
+        stream >> value.editor_data >> value.condition_width >> value.object_height >> skip<std::array<char, 12>>;
     }
 
     export void load(Stream& stream, DataBlock& value) {
@@ -189,15 +184,14 @@ namespace bamboo::mfa {
         if (value.header == -1) {
             stream >> args(value.items, size_type<i16>);
             stream >> args(value.folders, size_type<i16>);
-        }
-        else {
+        } else {
             stream >> args(value.items, value.header);
         }
     }
 
     export void load(Stream& stream, TabsBlock& value) {
-        stream >> skip<i16>
-            >> value.editor_x
+        stream
+            >> skip<i16> >> value.editor_x
             >> value.editor_y
             >> value.editor_caret_type
             >> value.editor_caret_x
@@ -205,8 +199,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, LinesBlock& value) {
-        stream >> skip<i16>
-            >> value.editor_line_y
+        stream
+            >> skip<i16> >> value.editor_line_y
             >> value.editor_line_type
             >> value.event_line_y
             >> value.event_line_type;
@@ -227,44 +221,34 @@ namespace bamboo::mfa {
         if (id == "Evts" || id == "STVE") {
             stream >> value.emplace<EventsBlock>();
             name = "an events block";
-        }
-        else if (id == "Rems" || id == "SMER") {
+        } else if (id == "Rems" || id == "SMER") {
             stream >> value.emplace<RemarksBlock>();
             name = "a remarks block";
-        }
-        else if (id == "SPRG") {
+        } else if (id == "SPRG") {
             stream >> value.emplace<GroupsBlock>();
             name = "a groups block";
-        }
-        else if (id == "EvOb" || id == "SJBO") {
+        } else if (id == "EvOb" || id == "SJBO") {
             stream >> value.emplace<ObjectsBlock>();
             name = "an objects block";
-        }
-        else if (id == "EvCs") {
+        } else if (id == "EvCs") {
             stream >> value.emplace<ConditionsBlock>();
             name = "a conditions block";
-        }
-        else if (id == "EvEd") {
+        } else if (id == "EvEd") {
             stream >> value.emplace<DataBlock>();
             name = "a data block";
-        }
-        else if (id == "EvTs") {
+        } else if (id == "EvTs") {
             stream >> value.emplace<TabsBlock>();
             name = "a tabs block";
-        }
-        else if (id == "EvLs") {
+        } else if (id == "EvLs") {
             stream >> value.emplace<LinesBlock>();
             name = "a lines block";
-        }
-        else if (id == "E2Ts" || id == "TYAL") {
+        } else if (id == "E2Ts" || id == "TYAL") {
             stream >> value.emplace<LayoutBlock>();
             name = "a layout block";
-        }
-        else if (id == "!DNE") {
+        } else if (id == "!DNE") {
             stream >> value.emplace<EndBlock>();
             name = "an end block";
-        }
-        else {
+        } else {
             throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
         }
 

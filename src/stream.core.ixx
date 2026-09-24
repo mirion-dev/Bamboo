@@ -6,15 +6,15 @@ import bamboo.types;
 namespace bamboo {
 
     export template <class T>
-    constexpr bool is_dense_layout_v{
-        std::is_arithmetic_v<T> || std::is_enum_v<T>
-        || std::is_trivially_copyable_v<T> && requires { typename T::is_dense_layout; }
-        || std::is_array_v<T> && is_dense_layout_v<std::remove_all_extents_t<T>>
-    };
+    constexpr bool is_dense_layout_v{ std::is_arithmetic_v<T>
+                                      || std::is_enum_v<T>
+                                      || std::is_trivially_copyable_v<T> && requires { typename T::is_dense_layout; }
+                                      || std::is_array_v<T> && is_dense_layout_v<std::remove_all_extents_t<T>> };
 
     template <class T>
     concept binary_readable = std::is_lvalue_reference_v<T>
-        && !std::is_const_v<std::remove_reference_t<T>> && is_dense_layout_v<std::remove_reference_t<T>>;
+                              && !std::is_const_v<std::remove_reference_t<T>>
+                              && is_dense_layout_v<std::remove_reference_t<T>>;
 
     template <class S, class T, class... Args>
     concept has_member_load = requires(S& stream, T&& value, Args&&... args) {
@@ -34,15 +34,18 @@ namespace bamboo {
 
     template <class S, class T, class Size, class... Args>
     static constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
-        std::is_pointer_v<std::decay_t<T>> && std::convertible_to<Size, usize>
+        std::is_pointer_v<std::decay_t<T>>
+        && std::convertible_to<Size, usize>
         && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
     };
 
     template <class S, class T, class... Args>
     struct Loadable<S, T, Args...> : std::bool_constant<
-            has_member_load<S, T, Args...> || has_non_member_load<S, T, Args...>
-            || binary_readable<T> && sizeof...(Args) == 0 || indirectly_loadable_v<S, T, Args...>
-        > {};
+                                         has_member_load<S, T, Args...>
+                                         || has_non_member_load<S, T, Args...>
+                                         || binary_readable<T> && sizeof...(Args) == 0
+                                         || indirectly_loadable_v<S, T, Args...>
+                                     > {};
 
     export template <class S, class T, class... Args>
     concept loadable = Loadable<S, T, Args...>::value;
@@ -56,8 +59,7 @@ namespace bamboo {
             auto cast_size{ static_cast<usize>(size) };
             if constexpr (is_dense_layout_v<value_type>) {
                 stream.read(reinterpret_cast<char*>(value), sizeof(value_type) * cast_size);
-            }
-            else {
+            } else {
                 for (usize i{}; i < cast_size; ++i) {
                     Load::operator()(stream, value[i], std::forward<Args>(args)...);
                 }
@@ -70,14 +72,11 @@ namespace bamboo {
         static void operator()(S& stream, T&& value, Args&&... args) {
             if constexpr (has_member_load<S, T, Args...>) {
                 std::forward<T>(value).load(stream, std::forward<Args>(args)...);
-            }
-            else if constexpr (has_non_member_load<S, T, Args...>) {
+            } else if constexpr (has_non_member_load<S, T, Args...>) {
                 load(stream, std::forward<T>(value), std::forward<Args>(args)...);
-            }
-            else if constexpr (binary_readable<T> && sizeof...(Args) == 0) {
+            } else if constexpr (binary_readable<T> && sizeof...(Args) == 0) {
                 stream.read(reinterpret_cast<char*>(&value), sizeof(T));
-            }
-            else {
+            } else {
                 Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
             }
         }
@@ -122,12 +121,11 @@ namespace bamboo {
         }
 
         template <class S, class T>
-            requires (!is_tuple<T> ? loadable<S, T> : tuple_loadable<S, T>)
+            requires(!is_tuple<T> ? loadable<S, T> : tuple_loadable<S, T>)
         S& operator>>(this S& self, T&& args) {
             if constexpr (!is_tuple<T>) {
                 self.load(std::forward<T>(args));
-            }
-            else {
+            } else {
                 std::apply(
                     [&]<class... Args>(Args&&... args) { self.load(std::forward<Args>(args)...); },
                     std::forward<T>(args)

@@ -6,7 +6,7 @@ export module bamboo.mfa.object;
 
 import std;
 import bamboo.types;
-import bamboo.diag;
+import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa.base;
@@ -14,7 +14,8 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Transition& value) {
-        stream >> value.filename
+        stream
+            >> value.filename
             >> value.name
             >> value.dll_handle
             >> value.id
@@ -25,10 +26,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Movement& value) {
-        stream >> value.name
-            >> value.extension
-            >> value.id
-            >> value.data;
+        stream >> value.name >> value.extension >> value.id >> value.data;
     }
 
     export void load(Stream& stream, Behavior& value) {
@@ -36,7 +34,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Direction& value) {
-        stream >> value.index
+        stream
+            >> value.index
             >> value.max_speed
             >> value.min_speed
             >> value.repeat
@@ -53,15 +52,12 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Content& value) {
-        stream >> value.font
-            >> value.color
-            >> value.flags
-            >> value.relief
-            >> value.paragraphs;
+        stream >> value.font >> value.color >> value.flags >> value.relief >> value.paragraphs;
     }
 
     export void load(Stream& stream, QuickBackdrop& value) {
-        stream >> value.obstacle_type
+        stream
+            >> value.obstacle_type
             >> value.collision_type
             >> value.width
             >> value.height
@@ -80,12 +76,12 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, ObjectBase& value) {
-        stream >> value.flags
+        stream
+            >> value.flags
             >> value.new_flags
             >> value.background_color
             >> value.qualifiers
-            >> skip<i16>
-            >> value.values
+            >> skip<i16> >> value.values
             >> value.strings
             >> value.movements
             >> value.behaviors
@@ -98,22 +94,16 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, StringObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
-            >> value.width
-            >> value.height
-            >> value.content;
+        stream >> static_cast<ObjectBase&>(value) >> value.width >> value.height >> value.content;
     }
 
     export void load(Stream& stream, QuestionAnswerObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
-            >> value.width
-            >> value.height
-            >> value.question
-            >> value.answer;
+        stream >> static_cast<ObjectBase&>(value) >> value.width >> value.height >> value.question >> value.answer;
     }
 
     export void load(Stream& stream, ScoreLivesObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
+        stream
+            >> static_cast<ObjectBase&>(value)
             >> value.player
             >> value.images
             >> value.use_text
@@ -124,7 +114,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, CounterObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
+        stream
+            >> static_cast<ObjectBase&>(value)
             >> value.value
             >> value.min
             >> value.max
@@ -141,7 +132,8 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, FormattedTextObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
+        stream
+            >> static_cast<ObjectBase&>(value)
             >> value.width
             >> value.height
             >> value.flags
@@ -150,11 +142,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, SubapplicationObject& value) {
-        stream >> static_cast<ObjectBase&>(value)
-            >> value.name
-            >> value.width
-            >> value.height
-            >> value.flags;
+        stream >> static_cast<ObjectBase&>(value) >> value.name >> value.width >> value.height >> value.flags;
 
         if (value.flags[SubapplicationObject::internal]) {
             stream >> value.start_frame;
@@ -167,18 +155,10 @@ namespace bamboo::mfa {
         stream >> static_cast<ActiveObject&>(value) >> value.type;
 
         if (value.type == -1) {
-            stream >> value.name
-                >> value.filename
-                >> value.magic_num
-                >> value.subtype;
+            stream >> value.name >> value.filename >> value.magic_num >> value.subtype;
         }
 
-        stream >> value.real_size
-            >> value.size
-            >> skip<i32>
-            >> value.version
-            >> value.id
-            >> value.private_data;
+        stream >> value.real_size >> value.size >> skip<i32> >> value.version >> value.id >> value.private_data;
         stream >> args(value.data, value.real_size - 20);
     }
 
@@ -202,7 +182,8 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Object& value) {
         i32 type;
-        stream >> type
+        stream
+            >> type
             >> value.handle
             >> value.name
             >> value.transparent
@@ -210,8 +191,7 @@ namespace bamboo::mfa {
             >> value.ink_effect_param
             >> value.antialiasing
             >> value.flags
-            >> skip<i32>
-            >> value.icon
+            >> skip<i32> >> value.icon
             >> value.chunks;
 
         switch (type) {
