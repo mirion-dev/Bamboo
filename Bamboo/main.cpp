@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     auto logger{ std::make_shared<bamboo::Logger>("default", "bamboo.log") };
     logger->console_sink()->set_level(spdlog::level::info);
-    logger->set_level(spdlog::level::trace);
+    // logger->set_level(spdlog::level::trace);
     logger->set_pattern("[%^%l%$] [%&] %v");
     spdlog::register_logger(logger);
     spdlog::set_default_logger(logger);
