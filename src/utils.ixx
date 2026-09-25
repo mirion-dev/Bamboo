@@ -4,13 +4,13 @@ import std;
 
 namespace bamboo {
 
-    export std::string to_string(std::wstring_view str) noexcept {
-        std::u8string u8{ std::filesystem::path{ str }.u8string() };
-        return { reinterpret_cast<char*>(u8.data()), u8.size() };
+    export std::string to_string(std::wstring_view str) {
+        std::u8string str_u8{ std::filesystem::path{ str }.u8string() };
+        return { reinterpret_cast<char*>(str_u8.data()), str_u8.size() };
     }
 
-    export std::wstring to_wstring(std::string_view str) noexcept {
-        std::u8string u8{ str.begin(), str.end() };
+    export std::wstring to_wstring(std::string_view str) {
+        std::u8string str_u8{ str.begin(), str.end() };
         return std::filesystem::path{ str }.wstring();
     }
 
