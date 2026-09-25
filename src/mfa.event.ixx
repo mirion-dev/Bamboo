@@ -6,6 +6,7 @@ export module bamboo.mfa.event;
 
 import std;
 import bamboo.types;
+import bamboo.utils;
 import bamboo.log;
 import bamboo.stream;
 import bamboo.model;
