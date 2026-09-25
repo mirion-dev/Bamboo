@@ -7,7 +7,7 @@ add_requires("vcpkg::spdlog", {debug = is_mode("debug")})
 
 target("Bamboo")
     set_kind("binary")
-    add_files("src/*.cpp", "src/*.ixx")
+    add_files("src/**.cpp", "src/**.ixx")
     add_packages("vcpkg::spdlog")
 
     add_defines("NOMINMAX", "UNICODE", "_UNICODE", "_CONSOLE")
