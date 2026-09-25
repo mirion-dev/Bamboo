@@ -78,7 +78,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Events& value) {
         stream >> static_cast<std::vector<Event>&>(value);
-        spdlog::debug("Read {} events.", value.size());
+        logger()->debug("Read {} events.", value.size());
     }
 
     export void load(Stream& stream, Remark& value) {
@@ -87,17 +87,17 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Remarks& value) {
         stream >> static_cast<std::vector<Remark>&>(value);
-        spdlog::debug("Read {} remarks.", value.size());
+        logger()->debug("Read {} remarks.", value.size());
     }
 
     export void load(Stream& stream, Group& value) {
         stream >> value.handle >> value.name >> value.uuid;
-        spdlog::debug("Read group {:?}.", to_string(value.name));
+        logger()->debug("Read group {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Groups& value) {
         stream >> static_cast<std::vector<Group>&>(value);
-        spdlog::debug("Read {} groups.", value.size());
+        logger()->debug("Read {} groups.", value.size());
     }
 
     export void load(Stream& stream, EventObjectRef& value) {
@@ -135,12 +135,12 @@ namespace bamboo::mfa {
             throw std::runtime_error{ std::format("Unknown event object type {}.", value.object_type) };
         }
 
-        spdlog::debug("Read event object {:?}.", to_string(value.name));
+        logger()->debug("Read event object {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, EventObjects& value) {
         stream >> static_cast<std::vector<EventObject>&>(value);
-        spdlog::debug("Read {} event objects.", value.size());
+        logger()->debug("Read {} event objects.", value.size());
     }
 
     export void load(Stream& stream, EventItem& value) {
@@ -149,7 +149,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, EventItems& value) {
         stream >> static_cast<std::vector<EventItem>&>(value);
-        spdlog::debug("Read {} event items.", value.size());
+        logger()->debug("Read {} event items.", value.size());
     }
 
     export void load(Stream& stream, EventsBlock& value) {
@@ -253,7 +253,7 @@ namespace bamboo::mfa {
             throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
         }
 
-        spdlog::debug("Read {}.", name);
+        logger()->debug("Read {}.", name);
     }
 
     export void load(Stream& stream, EventBlocks& value) {
@@ -267,7 +267,7 @@ namespace bamboo::mfa {
             }
         }
 
-        spdlog::debug("Read {} event blocks.", value.size());
+        logger()->debug("Read {} event blocks.", value.size());
     }
 
     export void load(Stream& stream, GlobalEventBlocks& value) {

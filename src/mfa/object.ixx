@@ -178,7 +178,7 @@ namespace bamboo::mfa {
             value.emplace_back(std::move(chunk));
         }
 
-        spdlog::debug("Read {} chunks.", value.size());
+        logger()->debug("Read {} chunks.", value.size());
     }
 
     export void load(Stream& stream, Object& value) {
@@ -231,12 +231,12 @@ namespace bamboo::mfa {
             stream >> value.emplace<ExtensionObject>();
         }
 
-        spdlog::debug("Read object {:?}.", to_string(value.name));
+        logger()->debug("Read object {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Objects& value) {
         stream >> static_cast<std::vector<Object>&>(value);
-        spdlog::debug("Read {} objects.", value.size());
+        logger()->debug("Read {} objects.", value.size());
     }
 
 }

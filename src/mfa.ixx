@@ -28,7 +28,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, BinaryFiles& value) {
         stream >> static_cast<std::vector<std::wstring>&>(value);
-        spdlog::debug("Read {} binary files.", value.size());
+        logger()->debug("Read {} binary files.", value.size());
     }
 
     export void load(Stream& stream, Control& value) {
@@ -37,7 +37,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Controls& value) {
         stream >> static_cast<std::vector<Control>&>(value);
-        spdlog::debug("Read {} controls.", value.size());
+        logger()->debug("Read {} controls.", value.size());
     }
 
     export void load(Stream& stream, MenuItem& value) {
@@ -50,7 +50,7 @@ namespace bamboo::mfa {
             stream >> value.children;
         }
 
-        spdlog::debug("Read menu item {:?}.", to_string(value.name));
+        logger()->debug("Read menu item {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, MenuItems& value) {
@@ -108,27 +108,27 @@ namespace bamboo::mfa {
         stream.seekg(end);
         stream >> value.window_menu_index >> value.images;
 
-        spdlog::debug("Read a menu bar.");
+        logger()->debug("Read a menu bar.");
     }
 
     export void load(Stream& stream, Qualifier& value) {
         stream >> value.name >> value.icon;
-        spdlog::debug("Read qualifier {:?}.", to_string(value.name));
+        logger()->debug("Read qualifier {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Qualifiers& value) {
         stream >> static_cast<std::vector<Qualifier>&>(value);
-        spdlog::debug("Read {} qualifiers.", value.size());
+        logger()->debug("Read {} qualifiers.", value.size());
     }
 
     export void load(Stream& stream, Extension& value) {
         stream >> value.handle >> value.filename >> value.name >> value.magic_num >> value.subtype >> value.is_unicode;
-        spdlog::debug("Read extension {:?}.", to_string(value.name));
+        logger()->debug("Read extension {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Extensions& value) {
         stream >> static_cast<std::vector<Extension>&>(value);
-        spdlog::debug("Read {} extensions.", value.size());
+        logger()->debug("Read {} extensions.", value.size());
     }
 
     export void load(Stream& stream, Project& value) {
@@ -146,8 +146,8 @@ namespace bamboo::mfa {
             >> value.path
             >> value.preview_image;
 
-        spdlog::info("Project name: {:?}.", to_string(value.name));
-        spdlog::info("Editor build: {}.", value.editor_build);
+        logger()->info("Project name: {:?}.", to_string(value.name));
+        logger()->info("Editor build: {}.", value.editor_build);
 
         stream
             >> value.font_bank
@@ -190,7 +190,7 @@ namespace bamboo::mfa {
             >> value.frames
             >> value.chunks;
 
-        spdlog::info("Read an MFA project in {:.3f} seconds.", timer.duration());
+        logger()->info("Read an MFA project in {:.3f} seconds.", timer.duration());
     }
 
 }

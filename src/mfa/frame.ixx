@@ -18,19 +18,19 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Layer& value) {
         stream >> value.name >> value.flags >> value.x_coefficient >> value.y_coefficient;
-        spdlog::debug("Read layer {:?}.", to_string(value.name));
+        logger()->debug("Read layer {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Layers& value) {
         stream >> static_cast<std::vector<Layer>&>(value);
-        spdlog::debug("Read {} layers.", value.size());
+        logger()->debug("Read {} layers.", value.size());
     }
 
     export void load(Stream& stream, Folder& value) {
         stream >> value.header;
         if (value.header == 0x70000004) {
             stream >> value.name >> value.objects;
-            spdlog::debug("Read folder {:?}.", to_string(value.name));
+            logger()->debug("Read folder {:?}.", to_string(value.name));
         } else {
             stream >> value.objects.emplace_back();
         }
@@ -38,7 +38,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Folders& value) {
         stream >> static_cast<std::vector<Folder>&>(value);
-        spdlog::debug("Read {} folders.", value.size());
+        logger()->debug("Read {} folders.", value.size());
     }
 
     export void load(Stream& stream, Instance& value) {
@@ -56,7 +56,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Instances& value) {
         stream >> static_cast<std::vector<Instance>&>(value);
-        spdlog::debug("Read {} instances.", value.size());
+        logger()->debug("Read {} instances.", value.size());
     }
 
     export void load(Stream& stream, Frame& value) {
@@ -83,7 +83,7 @@ namespace bamboo::mfa {
             >> value.events
             >> value.chunks;
 
-        spdlog::debug("Read frame {:?}.", to_string(value.name));
+        logger()->debug("Read frame {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, Frames& value) {
@@ -97,7 +97,7 @@ namespace bamboo::mfa {
 
         stream.seekg(value.end);
 
-        spdlog::debug("Read {} frames.", value.size());
+        logger()->debug("Read {} frames.", value.size());
     }
 
 }

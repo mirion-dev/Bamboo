@@ -1,6 +1,7 @@
 module;
 
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/null_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -10,9 +11,10 @@ import std;
 import bamboo.types;
 import bamboo.utils;
 
-using namespace std::literals;
-
 namespace bamboo {
+
+    static constexpr auto LOG_PATH{ "bamboo.log" };
+    static constexpr auto LOGGER_NAME{ "bamboo" };
 
     template <class S>
     class StreamPosFlagFormatter : public spdlog::custom_flag_formatter {
@@ -25,7 +27,7 @@ namespace bamboo {
         void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) override {
             std::shared_ptr stream{ _ptr.lock() };
             if (stream == nullptr) {
-                dest.append("invalid"sv);
+                dest.append(std::string_view{ "invalid" });
                 return;
             }
 
@@ -37,44 +39,35 @@ namespace bamboo {
         }
     };
 
-    export class Logger : public spdlog::logger {
-        // WORKAROUND: '_Ok' uses undefined class 'std::basic_istream<char,std::char_traits<char>>::sentry'
-        using S = std::istream;
-
-        std::string _pattern;
-        std::weak_ptr<S> _ptr;
-
-        void _set_pattern() noexcept {
-            auto formatter{ std::make_unique<spdlog::pattern_formatter>() };
-            formatter->add_flag<StreamPosFlagFormatter<S>>('&', _ptr);
-            formatter->set_pattern(_pattern);
-            set_formatter(std::move(formatter));
-        }
+    class Logger : public spdlog::logger {
+        using logger::set_formatter;
+        using logger::set_pattern;
 
     public:
-        Logger(std::string_view name, std::string_view path) noexcept
-            : logger{ std::string{ name },
-                      spdlog::sinks_init_list{
-                          std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
-                          std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::string{ path }, true) } } {}
+        using logger::logger;
 
-        auto console_sink() const noexcept {
-            return std::static_pointer_cast<spdlog::sinks::stdout_color_sink_mt>(sinks()[0]);
-        }
-
-        auto file_sink() const noexcept {
-            return std::static_pointer_cast<spdlog::sinks::basic_file_sink_mt>(sinks()[1]);
-        }
-
-        void set_pattern(std::string_view pattern) noexcept {
-            _pattern = pattern;
-            _set_pattern();
-        }
-
+        // WORKAROUND: ICE.
+        using S = std::istream;
         void set_stream(const std::weak_ptr<S>& ptr) noexcept {
-            _ptr = ptr;
-            _set_pattern();
+            auto formatter{ std::make_unique<spdlog::pattern_formatter>() };
+            formatter->add_flag<StreamPosFlagFormatter<S>>('&', ptr);
+            formatter->set_pattern("[%^%l%$] [%&] %v");
+            set_formatter(std::move(formatter));
         }
     };
+
+    export Logger* logger() noexcept {
+        static auto value{ [] noexcept -> Logger {
+            try {
+                auto console_sink{ std::make_shared<spdlog::sinks::stdout_color_sink_mt>() };
+                auto file_sink{ std::make_shared<spdlog::sinks::basic_file_sink_mt>(LOG_PATH, true) };
+                // file_sink->set_level(spdlog::level::trace);
+                return { LOGGER_NAME, { console_sink, file_sink } };
+            } catch (const std::exception&) {
+                return { LOGGER_NAME, std::make_shared<spdlog::sinks::null_sink_st>() };
+            }
+        }() };
+        return &value;
+    }
 
 }

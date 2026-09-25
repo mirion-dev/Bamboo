@@ -16,12 +16,12 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, Font& value) {
         stream >> value.handle >> value.checksum >> value.references >> skip<i32> >> value.data;
-        spdlog::debug("Read font {:?}.", to_string(value.data.face_name));
+        logger()->debug("Read font {:?}.", to_string(value.data.face_name));
     }
 
     export void load(Stream& stream, FontBank& value) {
         stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
-        spdlog::debug("Read {} fonts.", value.size());
+        logger()->debug("Read {} fonts.", value.size());
     }
 
     export void load(Stream& stream, Sound& value) {
@@ -37,12 +37,12 @@ namespace bamboo::mfa {
 
         --value.handle;
 
-        spdlog::debug("Read sound {:?}.", to_string(value.name));
+        logger()->debug("Read sound {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, SoundBank& value) {
         stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
-        spdlog::debug("Read {} sounds.", value.size());
+        logger()->debug("Read {} sounds.", value.size());
     }
 
     export void load(Stream& stream, Music& value) {
@@ -56,12 +56,12 @@ namespace bamboo::mfa {
             >> args(value.name, string_type_pascal_c);
         stream >> args(value.data, value.size - (value.name.size() + 1) * 2);
 
-        spdlog::debug("Read music {:?}.", to_string(value.name));
+        logger()->debug("Read music {:?}.", to_string(value.name));
     }
 
     export void load(Stream& stream, MusicBank& value) {
         stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
-        spdlog::debug("Read {} music.", value.size());
+        logger()->debug("Read {} music.", value.size());
     }
 
     export void load(Stream& stream, Image& value) {
@@ -88,7 +88,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, ImageBank& value) {
         stream >> signature<"AGMI"> >> skip<i32> >> value.palette >> static_cast<std::vector<Image>&>(value);
-        spdlog::debug("Read {} images.", value.size());
+        logger()->debug("Read {} images.", value.size());
     }
 
 }
