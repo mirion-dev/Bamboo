@@ -2,6 +2,7 @@ export module bamboo.stream;
 
 import std;
 import bamboo.types;
+import bamboo.meta;
 
 export import bamboo.stream.core;
 
@@ -31,17 +32,6 @@ namespace bamboo {
 
     export template <class T, class... Args>
     constexpr Skip<T, Args...> skip;
-
-    template <usize N>
-    struct StringLiteral : std::array<char, N - 1> {
-        consteval StringLiteral(const char (&data)[N]) noexcept {
-            std::ranges::copy_n(data, N - 1, this->data());
-        }
-
-        consteval operator std::string_view() const noexcept {
-            return { this->data(), this->size() };
-        }
-    };
 
     export template <StringLiteral Expected>
     struct Signature {
