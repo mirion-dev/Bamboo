@@ -1,3 +1,7 @@
+> [!note]
+>
+> Development is frozen until C++ reflection has been implemented.
+
 # Bamboo
 
 **Work in progress.** A converter between MFA and a VCS-friendly format.

@@ -3,7 +3,7 @@ add_rules("mode.debug", "mode.release")
 set_languages("c++latest")
 set_warnings("all", "error")
 
-add_requires("vcpkg::spdlog", {debug = is_mode("debug")})
+add_requires("vcpkg::spdlog", {debug = is_mode("debug"), configs = {shared = true}})
 
 target("Bamboo")
     set_kind("binary")
