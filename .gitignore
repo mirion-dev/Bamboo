@@ -4,5 +4,3 @@
 .vscode
 .xmake
 build
-tests
-tools
