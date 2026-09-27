@@ -5,7 +5,7 @@ import bamboo.types;
 
 namespace bamboo {
 
-    static constexpr usize MAX_AGGREGATE_FIELD_COUNT{ 64 };
+    constexpr usize MAX_AGGREGATE_FIELD_COUNT{ 64 };
 
     export template <usize N>
     struct StringLiteral : std::array<char, N - 1> {

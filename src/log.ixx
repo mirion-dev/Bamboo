@@ -13,8 +13,8 @@ import bamboo.utils;
 
 namespace bamboo {
 
-    static constexpr auto LOG_PATH{ "bamboo.log" };
-    static constexpr auto LOGGER_NAME{ "bamboo" };
+    constexpr auto LOG_PATH{ "bamboo.log" };
+    constexpr auto LOGGER_NAME{ "bamboo" };
 
     template <class S>
     class StreamPosFlagFormatter : public spdlog::custom_flag_formatter {

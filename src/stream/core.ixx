@@ -30,10 +30,10 @@ namespace bamboo {
     struct Loadable;
 
     template <class S, class T, class... Args>
-    static constexpr bool indirectly_loadable_v{};
+    constexpr bool indirectly_loadable_v{};
 
     template <class S, class T, class Size, class... Args>
-    static constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
+    constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
         std::is_pointer_v<std::decay_t<T>>
         && std::convertible_to<Size, usize>
         && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
@@ -85,19 +85,19 @@ namespace bamboo {
     export constexpr Load load;
 
     template <class T>
-    static constexpr bool is_tuple_v{};
+    constexpr bool is_tuple_v{};
 
     template <class... Args>
-    static constexpr bool is_tuple_v<std::tuple<Args...>>{ true };
+    constexpr bool is_tuple_v<std::tuple<Args...>>{ true };
 
     template <class T>
     concept is_tuple = is_tuple_v<std::remove_cvref_t<T>>;
 
     template <class S, class T>
-    static constexpr bool tuple_loadable_v{};
+    constexpr bool tuple_loadable_v{};
 
     template <class S, class... Args>
-    static constexpr bool tuple_loadable_v<S, std::tuple<Args...>>{ loadable<S, Args...> };
+    constexpr bool tuple_loadable_v<S, std::tuple<Args...>>{ loadable<S, Args...> };
 
     template <class S, class T>
     concept tuple_loadable = tuple_loadable_v<S, std::remove_cvref_t<T>>;
