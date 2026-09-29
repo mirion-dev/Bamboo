@@ -12,25 +12,22 @@ namespace bamboo {
         return std::forward_as_tuple(std::forward<Args>(args)...);
     }
 
-    export template <class T, class... Args>
+    export template <class T>
     struct Skip {
         template <class S>
-            requires(
-                loadable_type<S, T&> == LoadableType::directly
-                || std::is_default_constructible_v<T> && loadable<S, T&, Args...>
-            )
+            requires(binary_copyable<T> || std::is_default_constructible_v<T> && loadable<S, T&>)
         void load(S& stream) const {
-            if constexpr (loadable_type<S, T&> == LoadableType::directly) {
+            if constexpr (binary_copyable<T>) {
                 stream.ignore(sizeof(T));
             } else {
                 T dummy;
-                stream >> bamboo::args(dummy, std::forward<Args>(args)...);
+                stream >> dummy;
             }
         }
     };
 
-    export template <class T, class... Args>
-    constexpr Skip<T, Args...> skip;
+    export template <class T>
+    constexpr Skip<T> skip;
 
     export template <StringLiteral Expected>
     struct Signature {
@@ -54,9 +51,9 @@ namespace bamboo {
 
     export template <class S, class C, std::integral Size>
     void resize_load(S& stream, C& container, Size size) {
-        using value_type = std::remove_pointer_t<decltype(container.data())>;
+        using T = std::remove_pointer_t<decltype(container.data())>;
 
-        static constexpr usize MAX_SIZE{ binary_copyable<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };
+        static constexpr usize MAX_SIZE{ binary_copyable<T> ? (1 << 26) / sizeof(T) : 1 << 16 };
 
         if (size < 0) {
             throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
