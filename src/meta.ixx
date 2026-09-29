@@ -98,4 +98,22 @@ namespace bamboo {
     template <class S, class T, class... Args>
     struct Loadable : std::bool_constant<loadable_type<S, T, Args...> != LoadableType::none> {};
 
+    template <class T>
+    struct IsTuple : std::false_type {};
+
+    template <class... Args>
+    struct IsTuple<std::tuple<Args...>> : std::true_type {};
+
+    export template <class T>
+    concept is_tuple = IsTuple<std::remove_cvref_t<T>>::value;
+
+    template <class S, class T>
+    struct TupleLoadable : std::false_type {};
+
+    template <class S, class... Args>
+    struct TupleLoadable<S, std::tuple<Args...>> : std::bool_constant<loadable<S, Args...>> {};
+
+    export template <class S, class T>
+    concept tuple_loadable = TupleLoadable<S, std::remove_cvref_t<T>>::value;
+
 }

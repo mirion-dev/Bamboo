@@ -9,6 +9,7 @@ import std;
 import bamboo.types;
 import bamboo.log;
 import bamboo.stream;
+import bamboo.stream_utils;
 import bamboo.model;
 
 namespace bamboo::mfa {

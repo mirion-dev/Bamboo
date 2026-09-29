@@ -4,73 +4,75 @@ import std;
 import bamboo.types;
 import bamboo.meta;
 
-export import bamboo.stream.core;
-
 namespace bamboo {
 
-    export template <class... Args>
-    auto args(Args&&... args) {
-        return std::forward_as_tuple(std::forward<Args>(args)...);
-    }
+    struct Load {
+    private:
+        template <class S, class TPtr, class Size, class... Args>
+        static void _indirectly(S& stream, TPtr&& ptr, Size&& raw_size, Args&&... args) {
+            using T = std::remove_pointer_t<std::decay_t<TPtr>>;
 
-    export template <class T, class... Args>
-    struct Skip {
-        template <class S>
-            requires(
-                loadable_type<S, T&> == LoadableType::directly
-                || std::is_default_constructible_v<T> && loadable<S, T&, Args...>
-            )
-        void load(S& stream) const {
-            if constexpr (loadable_type<S, T&> == LoadableType::directly) {
-                stream.ignore(sizeof(T));
+            auto size{ static_cast<usize>(raw_size) };
+            if constexpr (binary_copyable<T>) {
+                stream.read(reinterpret_cast<char*>(ptr), sizeof(T) * size);
             } else {
-                T dummy;
-                stream >> bamboo::args(dummy, std::forward<Args>(args)...);
+                for (usize i{}; i < size; ++i) {
+                    Load::operator()(stream, ptr[i], std::forward<Args>(args)...);
+                }
+            }
+        }
+
+    public:
+        template <class S, class T, class... Args>
+            requires loadable<S, T, Args...>
+        static void operator()(S& stream, T&& value, Args&&... args) {
+            if constexpr (loadable_type<S, T, Args...> == LoadableType::member_load) {
+                std::forward<T>(value).load(stream, std::forward<Args>(args)...);
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::non_member_load) {
+                load(stream, std::forward<T>(value), std::forward<Args>(args)...);
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::directly) {
+                stream.read(reinterpret_cast<char*>(&value), sizeof(T));
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::indirectly) {
+                Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
+            } else {
+                std::unreachable();
             }
         }
     };
 
-    export template <class T, class... Args>
-    constexpr Skip<T, Args...> skip;
+    export constexpr Load load;
 
-    export template <StringLiteral Expected>
-    struct Signature {
-        template <class S>
-        void load(S& stream) const {
-            static constexpr usize N{ Expected.size() };
-            std::array<char, N> buffer;
-            stream >> bamboo::args(buffer.data(), N);
+    export class Stream : public std::fstream {
+    public:
+        Stream() noexcept {
+            exceptions(failbit | badbit);
+        }
 
-            std::string_view expected{ Expected }, actual{ buffer };
-            if (expected != actual) {
-                throw std::runtime_error{
-                    std::format("Incorrect signature. Expected {:?} but found {:?}.", expected, actual)
-                };
+        Stream(std::string_view path) {
+            exceptions(failbit | badbit); // WORKAROUND: Delegation leads to crash when open() fails.
+            open(std::string{ path }, binary | in);
+        }
+
+        template <class S, class T, class... Args>
+            requires loadable<S, T, Args...>
+        S& load(this S& self, T&& value, Args&&... args) {
+            bamboo::load(self, std::forward<T>(value), std::forward<Args>(args)...);
+            return self;
+        }
+
+        template <class S, class T>
+            requires(!is_tuple<T> ? loadable<S, T> : tuple_loadable<S, T>)
+        S& operator>>(this S& self, T&& args) {
+            if constexpr (!is_tuple<T>) {
+                self.load(std::forward<T>(args));
+            } else {
+                std::apply(
+                    [&]<class... Args>(Args&&... args) { self.load(std::forward<Args>(args)...); },
+                    std::forward<T>(args)
+                );
             }
+            return self;
         }
     };
-
-    export template <StringLiteral Expected>
-    constexpr Signature<Expected> signature;
-
-    export template <class S, class C, std::integral Size>
-    void resize_load(S& stream, C& container, Size size) {
-        using value_type = std::remove_pointer_t<decltype(container.data())>;
-
-        static constexpr usize MAX_SIZE{ binary_copyable<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };
-
-        if (size < 0) {
-            throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
-        }
-
-        if (size >= MAX_SIZE) {
-            throw std::runtime_error{
-                std::format("Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE)
-            };
-        }
-
-        container.resize(size);
-        stream >> bamboo::args(container.data(), size);
-    }
 
 }

@@ -9,6 +9,7 @@ import bamboo.types;
 import bamboo.utils;
 import bamboo.log;
 import bamboo.stream;
+import bamboo.stream_utils;
 import bamboo.model;
 import bamboo.mfa.base;
 
