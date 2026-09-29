@@ -17,11 +17,11 @@ namespace bamboo {
     struct Skip {
         template <class S>
             requires(
-                is_dense_layout_v<T> && sizeof...(Args) == 0
+                loadable_type<S, T&> == LoadableType::directly
                 || std::is_default_constructible_v<T> && loadable<S, T&, Args...>
             )
         void load(S& stream) const {
-            if constexpr (is_dense_layout_v<T> && sizeof...(Args) == 0) {
+            if constexpr (loadable_type<S, T&> == LoadableType::directly) {
                 stream.ignore(sizeof(T));
             } else {
                 T dummy;
@@ -57,7 +57,7 @@ namespace bamboo {
     void resize_load(S& stream, C& container, Size size) {
         using value_type = std::remove_pointer_t<decltype(container.data())>;
 
-        static constexpr usize MAX_SIZE{ is_dense_layout_v<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };
+        static constexpr usize MAX_SIZE{ binary_copyable<value_type> ? (1 << 26) / sizeof(value_type) : 1 << 16 };
 
         if (size < 0) {
             throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };

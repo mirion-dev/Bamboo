@@ -2,53 +2,9 @@ export module bamboo.stream.core;
 
 import std;
 import bamboo.types;
+import bamboo.meta;
 
 namespace bamboo {
-
-    export template <class T>
-    constexpr bool is_dense_layout_v{ std::is_arithmetic_v<T>
-                                      || std::is_enum_v<T>
-                                      || std::is_trivially_copyable_v<T> && requires { typename T::is_dense_layout; }
-                                      || std::is_array_v<T> && is_dense_layout_v<std::remove_all_extents_t<T>> };
-
-    template <class T>
-    concept binary_readable = std::is_lvalue_reference_v<T>
-                              && !std::is_const_v<std::remove_reference_t<T>>
-                              && is_dense_layout_v<std::remove_reference_t<T>>;
-
-    template <class S, class T, class... Args>
-    concept has_member_load = requires(S& stream, T&& value, Args&&... args) {
-        std::forward<T>(value).load(stream, std::forward<Args>(args)...);
-    };
-
-    template <class S, class T, class... Args>
-    concept has_non_member_load = requires(S& stream, T&& value, Args&&... args) {
-        load(stream, std::forward<T>(value), std::forward<Args>(args)...);
-    };
-
-    template <class S, class T, class... Args>
-    struct Loadable;
-
-    template <class S, class T, class... Args>
-    constexpr bool indirectly_loadable_v{};
-
-    template <class S, class T, class Size, class... Args>
-    constexpr bool indirectly_loadable_v<S, T, Size, Args...>{
-        std::is_pointer_v<std::decay_t<T>>
-        && std::convertible_to<Size, usize>
-        && Loadable<S, std::remove_pointer_t<std::decay_t<T>>&, Args...>::value
-    };
-
-    template <class S, class T, class... Args>
-    struct Loadable<S, T, Args...> : std::bool_constant<
-                                         has_member_load<S, T, Args...>
-                                         || has_non_member_load<S, T, Args...>
-                                         || binary_readable<T> && sizeof...(Args) == 0
-                                         || indirectly_loadable_v<S, T, Args...>
-                                     > {};
-
-    export template <class S, class T, class... Args>
-    concept loadable = Loadable<S, T, Args...>::value;
 
     struct Load {
     private:
@@ -57,7 +13,7 @@ namespace bamboo {
             using value_type = std::remove_pointer_t<std::decay_t<T>>;
 
             auto cast_size{ static_cast<usize>(size) };
-            if constexpr (is_dense_layout_v<value_type>) {
+            if constexpr (binary_copyable<value_type>) {
                 stream.read(reinterpret_cast<char*>(value), sizeof(value_type) * cast_size);
             } else {
                 for (usize i{}; i < cast_size; ++i) {
@@ -70,14 +26,16 @@ namespace bamboo {
         template <class S, class T, class... Args>
             requires loadable<S, T, Args...>
         static void operator()(S& stream, T&& value, Args&&... args) {
-            if constexpr (has_member_load<S, T, Args...>) {
+            if constexpr (loadable_type<S, T, Args...> == LoadableType::member_load) {
                 std::forward<T>(value).load(stream, std::forward<Args>(args)...);
-            } else if constexpr (has_non_member_load<S, T, Args...>) {
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::non_member_load) {
                 load(stream, std::forward<T>(value), std::forward<Args>(args)...);
-            } else if constexpr (binary_readable<T> && sizeof...(Args) == 0) {
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::directly) {
                 stream.read(reinterpret_cast<char*>(&value), sizeof(T));
-            } else {
+            } else if constexpr (loadable_type<S, T, Args...> == LoadableType::indirectly) {
                 Load::_indirectly(stream, std::forward<T>(value), std::forward<Args>(args)...);
+            } else {
+                std::unreachable();
             }
         }
     };

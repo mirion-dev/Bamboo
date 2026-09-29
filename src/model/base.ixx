@@ -11,7 +11,7 @@ namespace bamboo {
 
     export template <std::unsigned_integral T>
     struct Flags {
-        using is_dense_layout = void;
+        using unpadded = void;
 
         T value;
 
@@ -51,7 +51,7 @@ namespace bamboo {
     };
 
     export struct Color {
-        using is_dense_layout = void;
+        using unpadded = void;
 
         u8 red;
         u8 green;
@@ -71,7 +71,7 @@ namespace bamboo {
 
     // BITMAPINFOHEADER
     export struct BitmapInfoHeader {
-        using is_dense_layout = void;
+        using unpadded = void;
 
         u32 size;
         i32 width;
@@ -106,7 +106,7 @@ namespace bamboo {
 
     // PALETTEENTRY
     export struct PaletteEntry {
-        using is_dense_layout = void;
+        using unpadded = void;
 
         u8 red;
         u8 green;
