@@ -9,7 +9,6 @@ export module bamboo.log;
 
 import std;
 import bamboo.types;
-import bamboo.utils;
 
 namespace bamboo {
 
