@@ -29,7 +29,7 @@ namespace bamboo {
                 return *_ptr & _mask;
             }
 
-            const Ref& operator=(bool value) const noexcept {
+            Ref& operator=(bool value) const noexcept {
                 if (value) {
                     *_ptr |= _mask;
                 } else {

@@ -93,19 +93,19 @@ namespace bamboo::mfa {
             throw std::runtime_error{ "Corrupt menu header." };
         }
 
-        stream.seekg(item_begin);
+        stream.seekg(static_cast<isize>(item_begin));
         stream >> skip<i32> >> value.items;
         if (stream.tellg() != item_end) {
             throw std::runtime_error{ "Corrupt menu items." };
         }
 
-        stream.seekg(accel_begin);
+        stream.seekg(static_cast<isize>(accel_begin));
         stream >> value.accels;
         if (stream.tellg() != accel_end) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
 
-        stream.seekg(end);
+        stream.seekg(static_cast<isize>(end));
         stream >> value.window_menu_index >> value.images;
 
         logger()->debug("Read a menu bar.");
