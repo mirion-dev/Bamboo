@@ -9,4 +9,5 @@
 ## Credits
 
 - [NebulaFD](https://github.com/AITYunivers/NebulaFD/) (references their reverse engineering results, but rewrites from scratch)
+- [cxxopts](https://github.com/jarro2783/cxxopts)
 - [spdlog](https://github.com/gabime/spdlog)
