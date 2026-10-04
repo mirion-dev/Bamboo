@@ -135,7 +135,7 @@ namespace bamboo::mfa {
             >> value.path
             >> value.preview_image;
 
-        logger()->info("Project name: {:?}.", to_string(value.name));
+        logger()->info("Project name: {}.", to_string(value.name));
         logger()->info("Editor build: {}.", value.editor_build);
 
         stream
