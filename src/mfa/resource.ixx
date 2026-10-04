@@ -85,6 +85,10 @@ namespace bamboo::mfa {
         if (stream.project->editor_build < 284) {
             ++value.handle;
         }
+
+        if (value.flags[Image::lzx]) {
+            // TODO
+        }
     }
 
     export void load(Stream& stream, ImageBank& value) {

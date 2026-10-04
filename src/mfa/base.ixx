@@ -97,12 +97,16 @@ namespace bamboo::mfa {
     }
 
     export template <class T>
-    void load(Stream& stream, std::optional<T>& value) {
-        u8 has_value;
-        stream >> has_value;
+    void load(Stream& stream, std::optional<T>& value, bool has_value) {
         if (has_value) {
             stream >> value.emplace();
         }
+    }
+
+    export template <class T>
+    void load(Stream& stream, std::optional<T>& value) {
+        u8 has_value;
+        stream >> has_value >> bamboo::args(value, has_value);
     }
 
     export void load(Stream& stream, Value& value) {
@@ -143,8 +147,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, LogicalPalette& value) {
-        stream >> value.version >> value.num_entries;
-        stream >> args(value.palette_entry, value.num_entries);
+        stream >> value.version >> value.num_entries >> args(value.palette_entry, value.num_entries);
     }
 
 }
