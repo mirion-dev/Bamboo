@@ -20,21 +20,21 @@ namespace bamboo {
         i32 duration; // Duration
         Flags<u32> flags;
         Color color; // From / To
-        std::vector<char> param;
+        std::vector<unsigned char> param;
     };
 
     export struct Movement {
         std::wstring name;
         std::wstring extension;
         i32 id;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct Movements : std::vector<Movement> {};
 
     export struct Behavior {
         std::wstring name;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct Behaviors : std::vector<Behavior> {};
@@ -225,7 +225,7 @@ namespace bamboo {
         i32 height;
         Flags<u32> flags;
         Color color;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct SubapplicationObject : ObjectBase {
@@ -278,12 +278,12 @@ namespace bamboo {
         i32 version;
         i32 id;
         i32 private_data;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct Chunk {
         i8 id;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct Chunks : std::vector<Chunk> {};

@@ -14,7 +14,7 @@ namespace bamboo {
     export struct PreviewImage {
         i32 size;
         BitmapInfoHeader header;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct BinaryFiles : std::vector<std::wstring> {};
@@ -258,7 +258,7 @@ namespace bamboo {
         std::wstring effects_folder;
         std::wstring command_line; // Settings
         std::wstring about;        // About
-        std::vector<char> installer;
+        std::vector<unsigned char> installer;
         BinaryFiles binary_files;        // Data Elements - Binary Data
         Controls controls;               // Runtime
         MenuBar menu_bar;                // Window

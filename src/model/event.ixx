@@ -8,7 +8,7 @@ namespace bamboo {
 
     export struct Parameter {
         i16 size;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct Parameters : std::vector<Parameter> {};
@@ -99,7 +99,7 @@ namespace bamboo {
     };
 
     export struct EventObjectIcon {
-        std::vector<char> icon_buffer;
+        std::vector<unsigned char> icon_buffer;
     };
 
     export struct EventObjectQualifier {
@@ -173,7 +173,7 @@ namespace bamboo {
     };
 
     export struct LayoutBlock {
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct EndBlock {};

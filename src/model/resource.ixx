@@ -39,7 +39,7 @@ namespace bamboo {
         Flags<u32> flags;
         i32 frequency;
         std::wstring name;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct SoundBank : std::vector<Sound> {};
@@ -52,7 +52,7 @@ namespace bamboo {
         Flags<u32> flags;
         i32 frequency;
         std::wstring name;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct MusicBank : std::vector<Music> {};
@@ -95,7 +95,7 @@ namespace bamboo {
         i16 action_x;
         i16 action_y;
         Color transparent_color;
-        std::vector<char> data;
+        std::vector<unsigned char> data;
     };
 
     export struct ImageBank : std::vector<Image> {
