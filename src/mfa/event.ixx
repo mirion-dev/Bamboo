@@ -273,8 +273,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, GlobalEventBlocks& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> static_cast<EventBlocks&>(value);
-        stream.seekg(static_cast<isize>(begin + value.data_size + 4));
+        stream >> static_cast<EventBlocks&>(value) >> move(begin + value.data_size + 4);
     }
 
 }

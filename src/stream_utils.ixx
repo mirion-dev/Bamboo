@@ -12,6 +12,17 @@ namespace bamboo {
         return std::forward_as_tuple(std::forward<Args>(args)...);
     }
 
+    export struct Move {
+        usize pos;
+
+        template <class S>
+        void load(S& stream) const {
+            stream.seekg(pos);
+        }
+    };
+
+    export auto move{ [](usize pos) { return Move{ pos }; } };
+
     export template <class T>
     struct Skip {
         template <class S>

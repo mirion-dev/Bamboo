@@ -82,32 +82,21 @@ namespace bamboo::mfa {
 
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> value.header_size >> value.item_offset >> value.item_size >> value.accel_offset >> value.accel_size;
-
-        usize header_end{ begin + value.header_size };
-        usize item_begin{ begin + value.item_offset };
-        usize item_end{ item_begin + value.item_size };
-        usize accel_begin{ begin + value.accel_offset };
-        usize accel_end{ accel_begin + value.accel_size };
-        usize end{ begin + value.size };
-        if (stream.tellg() != header_end) {
+        if (stream.tellg() != begin + value.header_size) {
             throw std::runtime_error{ "Corrupt menu header." };
         }
 
-        stream.seekg(static_cast<isize>(item_begin));
-        stream >> skip<i32> >> value.items;
-        if (stream.tellg() != item_end) {
+        stream >> move(begin + value.item_offset) >> skip<i32> >> value.items;
+        if (stream.tellg() != begin + value.item_offset + value.item_size) {
             throw std::runtime_error{ "Corrupt menu items." };
         }
 
-        stream.seekg(static_cast<isize>(accel_begin));
-        stream >> value.accels;
-        if (stream.tellg() != accel_end) {
+        stream >> move(begin + value.accel_offset) >> value.accels;
+        if (stream.tellg() != begin + value.accel_offset + value.accel_size) {
             throw std::runtime_error{ "Corrupt menu accelerators." };
         }
 
-        stream.seekg(static_cast<isize>(end));
-        stream >> value.window_menu_index >> value.images;
-
+        stream >> move(begin + value.size) >> value.window_menu_index >> value.images;
         logger()->debug("Read a menu bar.");
     }
 
