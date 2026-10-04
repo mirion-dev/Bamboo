@@ -245,7 +245,7 @@ namespace bamboo {
         std::wstring version;    // About
         i32 window_width;        // Window
         i32 window_height;       // Window
-        Color border_color;      // Window
+        ColorRef border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
         std::wstring help_file; // About

@@ -94,7 +94,7 @@ namespace bamboo {
         i16 origin_y;
         i16 action_x;
         i16 action_y;
-        Color transparent_color;
+        ColorRef transparent_color;
         std::vector<unsigned char> data;
     };
 

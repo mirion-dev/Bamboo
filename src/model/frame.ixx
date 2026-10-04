@@ -81,13 +81,13 @@ namespace bamboo {
         std::wstring name;      // About
         i32 width;              // Settings
         i32 height;             // Settings
-        Color background_color; // Settings
+        ColorRef background_color; // Settings
         Flags<u32> flags;
         i32 max_objects;       // Runtime
         std::wstring password; // Runtime
         i32 editor_x;
         i32 editor_y;
-        std::vector<Color> palette; // Settings
+        std::vector<ColorRef> palette; // Settings
         i32 icon;
         i32 editor_layer;
         Layers layers;

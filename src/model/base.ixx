@@ -50,21 +50,15 @@ namespace bamboo {
         }
     };
 
-    export struct Color {
-        using unpadded = void;
-
-        u8 red;
-        u8 green;
-        u8 blue;
-        u8 alpha;
-    };
-
     export struct Value {
         std::wstring name;
         std::variant<i32, f64, std::wstring> value;
     };
 
     export struct Values : std::vector<Value> {};
+
+    // COLORREF
+    export using ColorRef = u32;
 
     // LCID
     export using LangCodeId = u32;
