@@ -1,5 +1,6 @@
 module;
 
+#include <miniz/miniz.h>
 #include <spdlog/spdlog.h>
 
 export module bamboo.mfa.resource;
@@ -79,15 +80,25 @@ namespace bamboo::mfa {
             >> value.origin_y
             >> value.action_x
             >> value.action_y
-            >> value.transparent_color
-            >> args(value.data, value.size);
+            >> value.transparent_color;
+
+        if (!value.flags[Image::lzx]) {
+            stream >> args(value.data, value.size);
+        } else {
+            u32 decomp_size;
+            std::vector<unsigned char> raw_data;
+            stream >> decomp_size >> args(raw_data, value.size - sizeof(decomp_size));
+
+            value.data.resize(decomp_size);
+            auto actual_size{ static_cast<mz_ulong>(decomp_size) };
+            if (mz_uncompress(value.data.data(), &actual_size, raw_data.data(), static_cast<mz_ulong>(raw_data.size())) != MZ_OK
+                || decomp_size != actual_size) {
+                throw std::runtime_error{ "Failed to decompress image data." };
+            }
+        }
 
         if (stream.project->editor_build < 284) {
             ++value.handle;
-        }
-
-        if (value.flags[Image::lzx]) {
-            // TODO
         }
     }
 

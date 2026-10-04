@@ -3,7 +3,7 @@ add_rules("mode.debug", "mode.release")
 set_languages("c++latest")
 set_warnings("all", "error")
 
-add_requires("vcpkg::cxxopts", "vcpkg::spdlog", {debug = is_mode("debug"), configs = {shared = true}})
+add_requires("vcpkg::cxxopts", "vcpkg::miniz", "vcpkg::spdlog", {debug = is_mode("debug"), configs = {shared = true}})
 
 add_defines("NOMINMAX", "UNICODE", "_UNICODE", "_CONSOLE")
 
@@ -18,7 +18,7 @@ end
 target("bamboo")
     set_kind("binary")
     add_files("src/**.cpp", "src/**.ixx")
-    add_packages("vcpkg::cxxopts", "vcpkg::spdlog")
+    add_packages("vcpkg::cxxopts", "vcpkg::miniz", "vcpkg::spdlog")
 
     set_targetdir(is_mode("debug") and "build/debug" or "build/release")
     set_rundir("tests")
