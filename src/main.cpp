@@ -15,16 +15,17 @@ int main(int argc, char** argv) {
           { "l,level", "Log level", cxxopts::value<std::string>()->default_value("info") } }
     );
     options.parse_positional("path");
+    options.show_positional_help();
 
     cxxopts::ParseResult result;
     try {
         result = options.parse(argc, argv);
     } catch (const std::exception& error) {
-        std::println(std::cerr, "{}", error.what());
+        std::println(std::cerr, "{}.", error.what());
         return EXIT_FAILURE;
     }
 
-    if (!result.contains("path")) {
+    if (!result.unmatched().empty() || result.count("path") != 1) {
         std::println(std::cerr, "{}", options.help());
         return EXIT_FAILURE;
     }
@@ -75,7 +76,7 @@ int main(int argc, char** argv) {
         bamboo::Project project;
         *mfa_stream >> project;
     } catch (const std::exception& error) {
-        bamboo::logger()->error(error.what());
+        bamboo::logger()->error(std::string{ error.what() } + '.');
         std::println(std::cerr, "See log for more details.");
         return EXIT_FAILURE;
     }
