@@ -17,7 +17,13 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Font& value) {
-        stream >> value.handle >> value.checksum >> value.references >> skip<i32> >> value.data;
+        stream
+            >> value.handle
+            >> value.checksum
+            >> value.references
+            >> skip<i32> // unused
+            >> value.data;
+
         logger()->debug("Read font {:?}.", to_string(value.data.face_name));
     }
 
@@ -26,7 +32,7 @@ namespace bamboo::mfa {
         logger()->debug("Read {} fonts.", value.size());
     }
 
-    export void load(Stream& stream, Sound& value) {
+    export void load(Stream& stream, Sample& value) {
         stream
             >> value.handle
             >> value.checksum
@@ -35,16 +41,17 @@ namespace bamboo::mfa {
             >> value.flags
             >> value.frequency
             >> args(value.name, string_type_pascal_c);
-        stream >> args(value.data, value.size - (value.flags[Sound::play_from_disk] ? 0 : (value.name.size() + 1) * 2));
+        stream
+            >> args(value.data, value.size - (value.flags[Sample::play_from_disk] ? 0 : (value.name.size() + 1) * 2));
 
         --value.handle;
 
-        logger()->debug("Read sound {:?}.", to_string(value.name));
+        logger()->debug("Read sample {:?}.", to_string(value.name));
     }
 
-    export void load(Stream& stream, SoundBank& value) {
-        stream >> signature<"APMS"> >> static_cast<std::vector<Sound>&>(value);
-        logger()->debug("Read {} sounds.", value.size());
+    export void load(Stream& stream, SampleBank& value) {
+        stream >> signature<"APMS"> >> static_cast<std::vector<Sample>&>(value);
+        logger()->debug("Read {} samples.", value.size());
     }
 
     export void load(Stream& stream, Music& value) {
@@ -76,7 +83,8 @@ namespace bamboo::mfa {
             >> value.height
             >> value.format
             >> value.flags
-            >> skip<i16> >> value.origin_x
+            >> skip<i16> // unused
+            >> value.origin_x
             >> value.origin_y
             >> value.action_x
             >> value.action_y
@@ -85,13 +93,14 @@ namespace bamboo::mfa {
         if (!value.flags[Image::lzx]) {
             stream >> args(value.data, value.size);
         } else {
-            u32 decomp_size;
+            i32 decomp_size;
             std::vector<unsigned char> raw_data;
             stream >> decomp_size >> args(raw_data, value.size - sizeof(decomp_size));
 
             value.data.resize(decomp_size);
             auto actual_size{ static_cast<mz_ulong>(decomp_size) };
-            if (mz_uncompress(value.data.data(), &actual_size, raw_data.data(), static_cast<mz_ulong>(raw_data.size())) != MZ_OK
+            if (mz_uncompress(value.data.data(), &actual_size, raw_data.data(), static_cast<mz_ulong>(raw_data.size()))
+                    != MZ_OK
                 || decomp_size != actual_size) {
                 throw std::runtime_error{ "Failed to decompress image data." };
             }
@@ -103,7 +112,10 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, ImageBank& value) {
-        stream >> signature<"AGMI"> >> skip<i32> >> value.palette >> static_cast<std::vector<Image>&>(value);
+        stream
+            >> signature<"AGMI"> >> stream.project->graphic_mode
+            >> value.palette
+            >> static_cast<std::vector<Image>&>(value);
         logger()->debug("Read {} images.", value.size());
     }
 

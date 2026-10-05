@@ -13,9 +13,10 @@ namespace bamboo {
         FontDesc data;
     };
 
+    // cFontBank
     export struct FontBank : std::vector<Font> {};
 
-    export struct Sound {
+    export struct Sample {
         enum Flag {
             wave,
             midi,
@@ -42,7 +43,8 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
-    export struct SoundBank : std::vector<Sound> {};
+    // cSampleBank
+    export struct SampleBank : std::vector<Sample> {};
 
     export struct Music {
         u32 handle;
@@ -55,6 +57,7 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
+    // cMusicBank
     export struct MusicBank : std::vector<Music> {};
 
     export struct Image {
@@ -98,6 +101,7 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
+    // cImageBank
     export struct ImageBank : std::vector<Image> {
         Palette palette;
     };

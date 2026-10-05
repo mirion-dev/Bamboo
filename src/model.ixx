@@ -229,14 +229,14 @@ namespace bamboo {
         i16 format_subversion;
         i32 editor_version;
         i32 editor_build;
-        Language language;      // About
+        Language language;        // About
         std::wstring name;        // About
         std::wstring description; // About
         std::wstring path;        // About
         PreviewImage preview_image;
-        FontBank font_bank;   // Data Elements - Fonts
-        SoundBank sound_bank; // Data Elements - Sounds
-        MusicBank music_bank; // Data Elements - Music
+        FontBank font_bank;    // Data Elements - Fonts
+        SampleBank sound_bank; // Data Elements - Sounds
+        MusicBank music_bank;  // Data Elements - Music
         ImageBank icon_bank;
         ImageBank image_bank;
         std::wstring author;     // About
