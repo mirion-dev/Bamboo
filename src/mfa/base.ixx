@@ -62,14 +62,14 @@ namespace bamboo::mfa {
     export template <StringTypeEnum Type = {}, usize N = {}>
     void load(Stream& stream, std::wstring& value, StringType<Type, N> = {}) {
         if constexpr (Type == StringTypeEnum::pascal) {
-            static constexpr u32 MASK_UNICODE{ 1u << 31 };
+            static constexpr u32 WIDE{ 1u << 31 };
 
             i32 size;
             stream >> size;
-            if (!(size & MASK_UNICODE)) {
-                throw std::runtime_error{ "ASCII strings are unsupported." };
+            if (!(size & WIDE)) {
+                throw std::runtime_error{ "Narrow strings are unsupported." };
             }
-            resize_load(stream, value, size & ~MASK_UNICODE);
+            resize_load(stream, value, size & ~WIDE);
         } else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
             wchar_t ch;
@@ -92,7 +92,7 @@ namespace bamboo::mfa {
             }
             value.resize(end);
         } else {
-            static_assert(false, "Unknown StringTypeEnum.");
+            static_assert(false, "Unknown string type.");
         }
     }
 
@@ -147,7 +147,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Palette& value) {
-        stream >> value.version >> value.num_entries >> args(value.palette_entry, value.num_entries);
+        stream >> value.version >> args(value.palette_entry, size_type<u16>);
     }
 
 }

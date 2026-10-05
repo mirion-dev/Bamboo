@@ -111,7 +111,6 @@ namespace bamboo {
     // LOGPALETTE
     export struct Palette {
         u16 version;
-        u16 num_entries;
         std::vector<PaletteEntry> palette_entry;
     };
 
