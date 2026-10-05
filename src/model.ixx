@@ -45,46 +45,15 @@ namespace bamboo {
 
     export struct MenuItems : std::vector<MenuItem> {};
 
-    struct MenuItem {
-        enum Flag {
-            grayed, // Options
-            _1,
-            _2,
-            checked, // Options
-            parent,
-            _5,
-            _6,
-            last
-        };
-
-        Flags<u16> flags;
-        u16 id;
-        std::wstring name;
+    struct MenuItem : MenuEntry {
         MenuItems children;
-    };
-
-    export struct MenuAccel {
-        enum Flag {
-            virtual_key,
-            no_invert,
-            shift, // Accelerator
-            ctrl,  // Accelerator
-            alt,   // Accelerator
-            _5,
-            _6,
-            last
-        };
-
-        Flags<u16> flags;
-        i16 key;
-        u16 id;
     };
 
     export struct MenuAccels : std::vector<MenuAccel> {};
 
     export struct MenuImage {
         u16 id;
-        u32 image; // Bitmap
+        u32 image;
     };
 
     export struct MenuImages : std::vector<MenuImage> {};
@@ -96,6 +65,7 @@ namespace bamboo {
         i32 item_size;
         i32 accel_offset;
         i32 accel_size;
+        MenuHeader header;
         MenuItems items;
         MenuAccels accels;
         i32 window_menu_index;

@@ -107,4 +107,56 @@ namespace bamboo {
         std::vector<PaletteEntry> palette_entry;
     };
 
+    // MENUITEMTEMPLATEHEADER
+    export struct MenuHeader {
+        using unpadded = void;
+
+        u16 version;
+        u16 offset;
+    };
+
+    // MENUITEMTEMPLATE
+    export struct MenuEntry {
+        enum Flag {
+            grayed,
+            disabled,
+            bitmap,
+            checked,
+            popup,
+            menu_bar_break,
+            menu_break,
+            end,
+            owner_draw,
+            radio_check,
+            _10,
+            separator,
+            default_,
+            right_order,
+            right_justify,
+            mouse_select
+        };
+
+        Flags<u16> flags;
+        u16 id;
+        std::wstring string;
+    };
+
+    // ACCEL
+    export struct MenuAccel {
+        enum Flag {
+            virtual_key,
+            no_invert,
+            shift,
+            control,
+            alt,
+            _5,
+            _6,
+            end
+        };
+
+        Flags<u8> flags;
+        u16 key;
+        u16 id;
+    };
+
 }

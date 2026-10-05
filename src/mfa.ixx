@@ -51,29 +51,18 @@ namespace bamboo::mfa {
         logger()->debug("Read {} controls.", value.size());
     }
 
-    export void load(Stream& stream, MenuItem& value) {
-        stream >> value.flags;
-        if (!value.flags[MenuItem::parent]) {
-            stream >> value.id;
-        }
-        stream >> args(value.name, string_type_c);
-        if (value.flags[MenuItem::parent]) {
-            stream >> value.children;
-        }
-
-        logger()->debug("Read menu item {:?}.", to_string(value.name));
-    }
-
     export void load(Stream& stream, MenuItems& value) {
         value.clear();
 
         do {
-            stream >> value.emplace_back();
-        } while (!value.back().flags[MenuItem::last]);
-    }
+            MenuItem& item{ value.emplace_back() };
+            stream >> static_cast<MenuEntry&>(item);
+            if (item.flags[MenuItem::popup]) {
+                stream >> item.children;
+            }
 
-    export void load(Stream& stream, MenuAccel& value) {
-        stream >> value.flags >> value.key >> value.id >> skip<i16>;
+            logger()->debug("Read menu item {:?}.", to_string(item.string));
+        } while (!value.back().flags[MenuItem::end]);
     }
 
     export void load(Stream& stream, MenuAccels& value) {
@@ -81,11 +70,14 @@ namespace bamboo::mfa {
 
         do {
             stream >> value.emplace_back();
-        } while (!value.back().flags[MenuAccel::last]);
+        } while (!value.back().flags[MenuAccel::end]);
     }
 
     export void load(Stream& stream, MenuImage& value) {
-        stream >> value.id >> skip<i16> >> value.image;
+        stream
+            >> value.id
+            >> skip<i16> // Padding
+            >> value.image;
     }
 
     export void load(Stream& stream, MenuBar& value) {
@@ -97,14 +89,19 @@ namespace bamboo::mfa {
             throw std::runtime_error{ "Corrupt menu header." };
         }
 
-        stream >> move(begin + value.item_offset) >> skip<i32> >> value.items;
-        if (stream.tellg() != begin + value.item_offset + value.item_size) {
-            throw std::runtime_error{ "Corrupt menu items." };
+        if (value.item_size != 0) {
+            stream >> move(begin + value.item_offset) >> value.header;
+            stream >> move(static_cast<usize>(stream.tellg()) + value.header.offset) >> value.items;
+            if (stream.tellg() != begin + value.item_offset + value.item_size) {
+                throw std::runtime_error{ "Corrupt menu items" };
+            }
         }
 
-        stream >> move(begin + value.accel_offset) >> value.accels;
-        if (stream.tellg() != begin + value.accel_offset + value.accel_size) {
-            throw std::runtime_error{ "Corrupt menu accelerators." };
+        if (value.accel_size != 0) {
+            stream >> move(begin + value.accel_offset) >> value.accels;
+            if (stream.tellg() != begin + value.accel_offset + value.accel_size) {
+                throw std::runtime_error{ "Corrupt menu accelerators" };
+            }
         }
 
         stream >> move(begin + value.size) >> value.window_menu_index >> value.images;

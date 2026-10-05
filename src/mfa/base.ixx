@@ -131,4 +131,21 @@ namespace bamboo::mfa {
         stream >> value.version >> args(value.palette_entry, size_type<u16>);
     }
 
+    export void load(Stream& stream, MenuEntry& value) {
+        stream >> value.flags;
+        if (!value.flags[MenuEntry::popup]) {
+            stream >> value.id;
+        }
+        stream >> args(value.string, string_type_c);
+    }
+
+    export void load(Stream& stream, MenuAccel& value) {
+        stream
+            >> value.flags
+            >> skip<i8> // Padding
+            >> value.key
+            >> value.id
+            >> skip<i16>; // Padding
+    }
+
 }
