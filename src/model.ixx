@@ -110,7 +110,7 @@ namespace bamboo {
             multiple_document_interface,
             keep_screen_ratio,
             antialiasing_when_resizing,
-            _w17,
+            force_global_refresh,
             right_to_left_reading,
             right_to_left_layout,
             _w20,
