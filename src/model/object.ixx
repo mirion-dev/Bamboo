@@ -19,7 +19,7 @@ namespace bamboo {
         std::array<char, 4> id;
         i32 duration; // Duration
         Flags<u32> flags;
-        ColorRef color; // From / To
+        Color color; // From / To
         std::vector<unsigned char> param;
     };
 
@@ -79,7 +79,7 @@ namespace bamboo {
 
     export struct Content {
         u32 font;
-        ColorRef color;
+        Color color;
         Flags<u32> flags;
         i32 relief;
         Paragraphs paragraphs;
@@ -97,10 +97,10 @@ namespace bamboo {
         i32 height;
         i32 shape;
         i32 border_size;
-        ColorRef border_color;
+        Color border_color;
         i32 fill_type;
-        ColorRef color1;
-        ColorRef color2;
+        Color color1;
+        Color color2;
         Flags<u32> flags;
         u32 image;
     };
@@ -158,7 +158,7 @@ namespace bamboo {
 
         Flags<u32> flags;
         Flags<u32> new_flags;
-        ColorRef background_color;             // Display
+        Color background_color;             // Display
         std::array<i16, 8> qualifiers;      // Events
         Values values;                      // Values
         Values strings;                     // Values
@@ -189,7 +189,7 @@ namespace bamboo {
         i32 player;
         std::vector<u32> images;
         i32 use_text;
-        ColorRef color;
+        Color color;
         u32 font;
         i32 width;
         i32 height;
@@ -205,8 +205,8 @@ namespace bamboo {
         i32 max;
         i32 display_type;
         i32 fill_type;
-        ColorRef color1;
-        ColorRef color2;
+        Color color1;
+        Color color2;
         i32 vertical_gradient;
         i32 bar_direction;
         i32 width;
@@ -224,7 +224,7 @@ namespace bamboo {
         i32 width;
         i32 height;
         Flags<u32> flags;
-        ColorRef color;
+        Color color;
         std::vector<unsigned char> data;
     };
 

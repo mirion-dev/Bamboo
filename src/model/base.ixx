@@ -58,13 +58,13 @@ namespace bamboo {
     export struct Values : std::vector<Value> {};
 
     // COLORREF
-    export using ColorRef = u32;
+    export using Color = u32;
 
     // LCID
-    export using LangCodeId = u32;
+    export using Language = u32;
 
     // BITMAPINFOHEADER
-    export struct BitmapInfoHeader {
+    export struct BitmapHeader {
         using unpadded = void;
 
         u32 size;
@@ -81,7 +81,7 @@ namespace bamboo {
     };
 
     // LOGFONTW
-    export struct LogicalFont {
+    export struct FontDesc {
         i32 height;
         i32 width;
         i32 escapement;
@@ -109,7 +109,7 @@ namespace bamboo {
     };
 
     // LOGPALETTE
-    export struct LogicalPalette {
+    export struct Palette {
         u16 version;
         u16 num_entries;
         std::vector<PaletteEntry> palette_entry;

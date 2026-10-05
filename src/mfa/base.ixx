@@ -128,7 +128,7 @@ namespace bamboo::mfa {
         }
     }
 
-    export void load(Stream& stream, LogicalFont& value) {
+    export void load(Stream& stream, FontDesc& value) {
         stream
             >> value.height
             >> value.width
@@ -146,7 +146,7 @@ namespace bamboo::mfa {
             >> args(value.face_name, string_type_fixed_c<32>);
     }
 
-    export void load(Stream& stream, LogicalPalette& value) {
+    export void load(Stream& stream, Palette& value) {
         stream >> value.version >> value.num_entries >> args(value.palette_entry, value.num_entries);
     }
 

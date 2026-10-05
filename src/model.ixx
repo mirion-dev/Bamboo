@@ -13,7 +13,7 @@ namespace bamboo {
 
     export struct PreviewImage {
         i32 size;
-        BitmapInfoHeader header;
+        BitmapHeader header;
         std::vector<unsigned char> data;
     };
 
@@ -229,7 +229,7 @@ namespace bamboo {
         i16 format_subversion;
         i32 editor_version;
         i32 editor_build;
-        LangCodeId language;      // About
+        Language language;      // About
         std::wstring name;        // About
         std::wstring description; // About
         std::wstring path;        // About
@@ -245,7 +245,7 @@ namespace bamboo {
         std::wstring version;    // About
         i32 window_width;        // Window
         i32 window_height;       // Window
-        ColorRef border_color;      // Window
+        Color border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
         std::wstring help_file; // About

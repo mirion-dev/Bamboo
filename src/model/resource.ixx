@@ -10,7 +10,7 @@ namespace bamboo {
         u32 handle;
         u32 checksum;
         u32 references;
-        LogicalFont data;
+        FontDesc data;
     };
 
     export struct FontBank : std::vector<Font> {};
@@ -94,12 +94,12 @@ namespace bamboo {
         i16 origin_y;
         i16 action_x;
         i16 action_y;
-        ColorRef transparent_color;
+        Color transparent_color;
         std::vector<unsigned char> data;
     };
 
     export struct ImageBank : std::vector<Image> {
-        LogicalPalette palette;
+        Palette palette;
     };
 
 }
