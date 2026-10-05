@@ -21,16 +21,20 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, PreviewImage& value) {
         stream >> value.size;
-        if (value.size != 0) {
-            stream >> value.header >> args(value.data, value.size - sizeof(value.header));
+        if (value.size == 0) {
+            return;
         }
+
+        stream >> value.header >> args(value.data, value.size - sizeof(value.header));
     }
 
     export void load(Stream& stream, Installer& value) {
         stream >> value.size;
-        if (value.size != 0) {
-            stream >> args(value.data, value.size); // Unanalyzed
+        if (value.size == 0) {
+            return;
         }
+
+        stream >> args(value.data, value.size); // Unanalyzed
     }
 
     export void load(Stream& stream, BinaryFiles& value) {

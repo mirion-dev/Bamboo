@@ -24,6 +24,7 @@ namespace bamboo {
 
     export struct BinaryFiles : std::vector<std::wstring> {};
 
+    // CPlayerControl
     export struct Control {
         enum class Type : i32 {
             mouse,
