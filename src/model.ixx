@@ -114,7 +114,8 @@ namespace bamboo {
 
     export struct Extensions : std::vector<Extension> {};
 
-    export struct Project {
+    // CApplication
+    export struct Application {
         enum WindowFlag {
             maximized_on_boot_up,
             resize_display_to_fill_window_size,
@@ -248,16 +249,15 @@ namespace bamboo {
         Color border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
-        std::wstring help_file; // About
-        std::wstring vitalize_preview_file;
+        std::wstring help_file;      // About
         i32 init_score;              // Runtime
         i32 init_lives;              // Runtime
         i32 frame_rate;              // Runtime
         BuildType build_type;        // Settings
         std::wstring build_filename; // Settings
-        std::wstring effects_folder;
-        std::wstring command_line; // Settings
-        std::wstring about;        // About
+        std::wstring effects_folder; // Settings
+        std::wstring command_line;   // Settings
+        std::wstring about;          // About
         std::vector<unsigned char> installer;
         BinaryFiles binary_files;        // Data Elements - Binary Data
         Controls controls;               // Runtime

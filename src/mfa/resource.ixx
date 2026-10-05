@@ -106,14 +106,14 @@ namespace bamboo::mfa {
             }
         }
 
-        if (stream.project->editor_build < 284) {
+        if (stream.app->editor_build < 284) {
             ++value.handle;
         }
     }
 
     export void load(Stream& stream, ImageBank& value) {
         stream
-            >> signature<"AGMI"> >> stream.project->graphic_mode
+            >> signature<"AGMI"> >> stream.app->graphic_mode
             >> value.palette
             >> static_cast<std::vector<Image>&>(value);
         logger()->debug("Read {} images.", value.size());

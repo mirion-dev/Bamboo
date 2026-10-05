@@ -16,7 +16,7 @@ namespace bamboo::mfa {
 
     export class Stream : public bamboo::Stream {
     public:
-        Project* project;
+        Application* app;
 
         using bamboo::Stream::Stream;
     };

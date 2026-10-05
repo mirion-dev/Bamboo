@@ -120,10 +120,10 @@ namespace bamboo::mfa {
         logger()->debug("Read {} extensions.", value.size());
     }
 
-    export void load(Stream& stream, Project& value) {
+    export void load(Stream& stream, Application& value) {
         Timer timer;
 
-        stream.project = &value;
+        stream.app = &value;
         stream
             >> signature<"MFU2"> >> value.format_version
             >> value.format_subversion
@@ -156,7 +156,7 @@ namespace bamboo::mfa {
             >> value.window_flags
             >> value.flags
             >> value.help_file
-            >> value.vitalize_preview_file
+            >> skip<std::wstring> // unused
             >> value.init_score
             >> value.init_lives
             >> value.frame_rate

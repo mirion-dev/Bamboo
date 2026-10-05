@@ -73,8 +73,8 @@ int main(int argc, char** argv) {
         auto mfa_stream{ std::make_shared<bamboo::mfa::Stream>(result["path"].as<std::string>()) };
         bamboo::logger()->set_stream(std::weak_ptr{ mfa_stream });
 
-        bamboo::Project project;
-        *mfa_stream >> project;
+        bamboo::Application app;
+        *mfa_stream >> app;
     } catch (const std::exception& error) {
         bamboo::logger()->error(std::string{ error.what() } + '.');
         std::println(std::cerr, "See log for more details.");
