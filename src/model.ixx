@@ -17,6 +17,11 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
+    export struct Installer {
+        i32 size;
+        std::vector<unsigned char> data;
+    };
+
     export struct BinaryFiles : std::vector<std::wstring> {};
 
     export struct Control {
@@ -249,16 +254,16 @@ namespace bamboo {
         Color border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
-        std::wstring help_file;      // About
-        i32 init_score;              // Runtime
-        i32 init_lives;              // Runtime
-        i32 frame_rate;              // Runtime
-        BuildType build_type;        // Settings
-        std::wstring build_filename; // Settings
-        std::wstring effects_folder; // Settings
-        std::wstring command_line;   // Settings
-        std::wstring about;          // About
-        std::vector<unsigned char> installer;
+        std::wstring help_file;          // About
+        i32 init_score;                  // Runtime
+        i32 init_lives;                  // Runtime
+        i32 frame_rate;                  // Runtime
+        BuildType build_type;            // Settings
+        std::wstring build_filename;     // Settings
+        std::wstring effects_folder;     // Settings
+        std::wstring command_line;       // Settings
+        std::wstring about;              // About
+        Installer installer;             // File - Build
         BinaryFiles binary_files;        // Data Elements - Binary Data
         Controls controls;               // Runtime
         MenuBar menu_bar;                // Window

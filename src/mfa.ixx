@@ -26,6 +26,13 @@ namespace bamboo::mfa {
         }
     }
 
+    export void load(Stream& stream, Installer& value) {
+        stream >> value.size;
+        if (value.size != 0) {
+            stream >> args(value.data, value.size); // Unanalyzed
+        }
+    }
+
     export void load(Stream& stream, BinaryFiles& value) {
         stream >> static_cast<std::vector<std::wstring>&>(value);
         logger()->debug("Read {} binary files.", value.size());
@@ -156,7 +163,7 @@ namespace bamboo::mfa {
             >> value.window_flags
             >> value.flags
             >> value.help_file
-            >> skip<std::wstring> // unused
+            >> skip<std::wstring> // Unused
             >> value.init_score
             >> value.init_lives
             >> value.frame_rate
