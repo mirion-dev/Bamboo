@@ -113,7 +113,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, ImageBank& value) {
         stream
-            >> signature<"AGMI"> >> stream.app->graphic_mode
+            >> signature<"AGMI"> >> skip<i32> // Duplicate (app.graphic_mode)
             >> value.palette
             >> static_cast<std::vector<Image>&>(value);
         logger()->debug("Read {} images.", value.size());

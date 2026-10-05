@@ -152,9 +152,9 @@ namespace bamboo::mfa {
             >> value.music_bank
             >> value.icon_bank
             >> value.image_bank
-            >> value.name
+            >> skip<std::wstring> // Duplicate (name)
             >> value.author
-            >> value.description
+            >> skip<std::wstring> // Duplicate (description)
             >> value.copyright
             >> value.company
             >> value.version
