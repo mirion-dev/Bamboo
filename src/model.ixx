@@ -234,9 +234,9 @@ namespace bamboo {
         std::wstring description; // About
         std::wstring path;        // About
         PreviewImage preview_image;
-        FontBank font_bank;    // Data Elements - Fonts
-        SampleBank sound_bank; // Data Elements - Sounds
-        MusicBank music_bank;  // Data Elements - Music
+        FontBank font_bank;     // Data Elements - Fonts
+        SampleBank sample_bank; // Data Elements - Sounds
+        MusicBank music_bank;   // Data Elements - Music
         ImageBank icon_bank;
         ImageBank image_bank;
         std::wstring author;     // About

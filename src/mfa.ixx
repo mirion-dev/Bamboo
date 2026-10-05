@@ -140,7 +140,7 @@ namespace bamboo::mfa {
 
         stream
             >> value.font_bank
-            >> value.sound_bank
+            >> value.sample_bank
             >> value.music_bank
             >> value.icon_bank
             >> value.image_bank
