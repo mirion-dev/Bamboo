@@ -86,7 +86,7 @@ namespace bamboo::mfa {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> value.header_size >> value.item_offset >> value.item_size >> value.accel_offset >> value.accel_size;
         if (stream.tellg() != begin + value.header_size) {
-            throw std::runtime_error{ "Corrupt menu header." };
+            throw std::runtime_error{ "Corrupt menu header" };
         }
 
         if (value.item_size != 0) {

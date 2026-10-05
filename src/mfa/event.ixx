@@ -35,7 +35,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw std::runtime_error{ "Corrupt condition." };
+            throw std::runtime_error{ "Corrupt condition" };
         }
     }
 
@@ -54,7 +54,7 @@ namespace bamboo::mfa {
             >> args(value.params, value.params_num);
 
         if (stream.tellg() != begin + value.size) {
-            throw std::runtime_error{ "Corrupt action." };
+            throw std::runtime_error{ "Corrupt action" };
         }
     }
 
@@ -73,7 +73,7 @@ namespace bamboo::mfa {
             >> args(value.actions, value.action_num);
 
         if (stream.tellg() != begin + std::abs(value.size)) {
-            throw std::runtime_error{ "Corrupt event." };
+            throw std::runtime_error{ "Corrupt event" };
         }
     }
 
@@ -161,7 +161,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace_back();
         }
         if (stream.tellg() != end) {
-            throw std::runtime_error{ "Corrupt events block." };
+            throw std::runtime_error{ "Corrupt events block" };
         }
     }
 

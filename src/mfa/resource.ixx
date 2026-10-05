@@ -102,7 +102,7 @@ namespace bamboo::mfa {
             if (mz_uncompress(value.data.data(), &actual_size, raw_data.data(), static_cast<mz_ulong>(raw_data.size()))
                     != MZ_OK
                 || decomp_size != actual_size) {
-                throw std::runtime_error{ "Failed to decompress image data." };
+                throw std::runtime_error{ "Failed to decompress image data" };
             }
         }
 
