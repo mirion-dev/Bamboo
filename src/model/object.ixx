@@ -23,6 +23,13 @@ namespace bamboo {
         std::vector<unsigned char> param;
     };
 
+    export struct Value {
+        std::wstring name;
+        std::variant<i32, f64, std::wstring> value;
+    };
+
+    export struct Values : std::vector<Value> {};
+
     export struct Movement {
         std::wstring name;
         std::wstring extension;

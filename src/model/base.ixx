@@ -50,13 +50,6 @@ namespace bamboo {
         }
     };
 
-    export struct Value {
-        std::wstring name;
-        std::variant<i32, f64, std::wstring> value;
-    };
-
-    export struct Values : std::vector<Value> {};
-
     // COLORREF
     export using Color = u32;
 

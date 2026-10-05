@@ -109,25 +109,6 @@ namespace bamboo::mfa {
         stream >> has_value >> bamboo::args(value, has_value);
     }
 
-    export void load(Stream& stream, Value& value) {
-        i32 type;
-        stream >> value.name >> type;
-
-        switch (type) {
-        case 0:
-            stream >> value.value.emplace<i32>();
-            break;
-        case 1:
-            stream >> value.value.emplace<f64>();
-            break;
-        case 2:
-            stream >> value.value.emplace<std::wstring>();
-            break;
-        default:
-            throw std::runtime_error{ std::format("Unknown value type {}.", type) };
-        }
-    }
-
     export void load(Stream& stream, FontDesc& value) {
         stream
             >> value.height
