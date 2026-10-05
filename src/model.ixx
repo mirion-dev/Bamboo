@@ -85,7 +85,7 @@ namespace bamboo {
         std::wstring name;
         u32 magic_num;
         std::wstring subtype;
-        i32 is_unicode;
+        u32 is_unicode;
     };
 
     export struct Extensions : std::vector<Extension> {};
