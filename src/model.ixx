@@ -39,6 +39,7 @@ namespace bamboo {
         std::vector<i32> keys;
     };
 
+    // CPlayerControlArray
     export struct Controls : std::vector<Control> {};
 
     export struct MenuItem;
@@ -51,11 +52,13 @@ namespace bamboo {
 
     export struct MenuAccels : std::vector<MenuAccel> {};
 
+    // CMenuImage
     export struct MenuImage {
         u16 id;
         u32 image;
     };
 
+    // CMenuImageSet
     export struct MenuImages : std::vector<MenuImage> {};
 
     export struct MenuBar {
@@ -72,13 +75,16 @@ namespace bamboo {
         MenuImages images;
     };
 
+    // CCustomQualifier
     export struct Qualifier {
         std::wstring name;
         u32 icon;
     };
 
+    // CCustomQualifierArray
     export struct Qualifiers : std::vector<Qualifier> {};
 
+    // CDiskExtension
     export struct Extension {
         u32 handle;
         std::wstring filename;
