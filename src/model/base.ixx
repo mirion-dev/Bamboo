@@ -141,8 +141,8 @@ namespace bamboo {
         std::wstring string;
     };
 
-    // ACCEL
-    export struct MenuAccel {
+    // ACCELTABLEENTRY
+    export struct alignas(i32) MenuAccel {
         enum Flag {
             virtual_key,
             no_invert,
@@ -154,8 +154,8 @@ namespace bamboo {
             end
         };
 
-        Flags<u8> flags;
-        u16 key;
+        Flags<u16> flags;
+        u16 ansi;
         u16 id;
     };
 
