@@ -18,7 +18,18 @@ namespace bamboo {
     export struct FontBank : std::vector<Font> {};
 
     // cSoundElement
-    export struct Sample {
+    export struct Sound {
+        u32 handle;
+        u32 checksum;
+        u32 references;
+        i32 size;
+        Flags<u32> flags;
+        i32 frequency;
+        std::wstring name;
+        std::vector<unsigned char> data;
+    };
+
+    export struct Sample : Sound {
         enum Flag {
             wave,
             midi,
@@ -34,31 +45,12 @@ namespace bamboo {
             _11,
             loaded
         };
-
-        u32 handle;
-        u32 checksum;
-        u32 references;
-        i32 size;
-        Flags<u32> flags;
-        i32 frequency;
-        std::wstring name;
-        std::vector<unsigned char> data;
     };
+
+    export struct Music : Sound {};
 
     // cSampleBank
     export struct SampleBank : std::vector<Sample> {};
-
-    // cSoundElement
-    export struct Music {
-        u32 handle;
-        u32 checksum;
-        u32 references;
-        i32 size;
-        Flags<u32> flags;
-        i32 frequency;
-        std::wstring name;
-        std::vector<unsigned char> data;
-    };
 
     // cMusicBank
     export struct MusicBank : std::vector<Music> {};
