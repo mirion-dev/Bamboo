@@ -60,24 +60,39 @@ namespace bamboo {
     export template <StringLiteral Expected>
     constexpr Signature<Expected> signature;
 
-    export template <class S, class C, std::integral Size>
-    void resize_load(S& stream, C& container, Size size) {
-        using T = std::remove_pointer_t<decltype(container.data())>;
+    export template <class C, std::integral Size>
+        requires requires(C& container, Size size) {
+            container.resize(size);
+            container.data();
+        }
+    struct Resize {
+    private:
+        using T = std::remove_pointer_t<decltype(std::declval<C>().data())>;
 
         static constexpr usize MAX_SIZE{ binary_copyable<T> ? (1 << 26) / sizeof(T) : 1 << 16 };
 
-        if (size < 0) {
-            throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
-        }
+    public:
+        C& container;
+        Size size;
 
-        if (size >= MAX_SIZE) {
-            throw std::runtime_error{
-                std::format("Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE)
-            };
-        }
+        template <class S>
+            requires loadable<S, T*, Size>
+        void load(S& stream) const {
+            if (size < 0) {
+                throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
+            }
 
-        container.resize(size);
-        stream >> bamboo::args(container.data(), size);
-    }
+            if (size >= MAX_SIZE) {
+                throw std::runtime_error{ std::format(
+                    "Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE
+                ) };
+            }
+
+            container.resize(size);
+            stream >> bamboo::args(container.data(), size);
+        }
+    };
+
+    export auto resize{ []<class C, class Size>(C& container, Size size) { return Resize{ container, size }; } };
 
 }

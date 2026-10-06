@@ -34,7 +34,7 @@ namespace bamboo::mfa {
 
     export template <class T, std::integral Size>
     void load(Stream& stream, std::vector<T>& value, Size size) {
-        bamboo::resize_load(stream, value, size);
+        stream >> resize(value, size);
     }
 
     export template <class T, std::integral Size = i32>
@@ -69,27 +69,30 @@ namespace bamboo::mfa {
             if (!(size & WIDE)) {
                 throw std::runtime_error{ "Narrow strings are unsupported" };
             }
-            resize_load(stream, value, size & ~WIDE);
+
+            stream >> resize(value, size & ~WIDE);
         } else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
+
             wchar_t ch;
             while (stream >> ch, ch != '\0') {
                 value.push_back(ch);
             }
         } else if constexpr (Type == StringTypeEnum::pascal_c) {
             i32 size;
-            stream >> size;
-            resize_load(stream, value, size);
+            stream >> size >> resize(value, size);
             if (value.empty() || value.back() != '\0') {
                 throw std::runtime_error{ "A Pascal-C string must be null-terminated" };
             }
+
             value.pop_back();
         } else if constexpr (Type == StringTypeEnum::fixed_c) {
-            resize_load(stream, value, N);
+            stream >> resize(value, N);
             usize end{ value.find(L'\0') };
             if (end == -1) {
                 throw std::runtime_error{ "A fixed C string must be null-terminated" };
             }
+
             value.resize(end);
         } else {
             static_assert(false, "Unknown string type.");
