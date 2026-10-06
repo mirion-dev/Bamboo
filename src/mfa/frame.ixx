@@ -70,7 +70,8 @@ namespace bamboo::mfa {
             >> value.flags
             >> value.max_objects
             >> value.password
-            >> skip<std::vector<unsigned char>> >> value.editor_x
+            >> skip<std::vector<unsigned char>> // Unused (metadata)
+            >> value.editor_x
             >> value.editor_y
             >> value.palette
             >> value.icon

@@ -165,7 +165,7 @@ namespace bamboo::mfa {
             >> value.window_flags
             >> value.flags
             >> value.help_file
-            >> skip<std::wstring> // Unused
+            >> skip<std::wstring> // Unused (vitalize_preview_file)
             >> value.init_score
             >> value.init_lives
             >> value.frame_rate

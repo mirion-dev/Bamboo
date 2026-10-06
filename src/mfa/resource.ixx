@@ -21,7 +21,7 @@ namespace bamboo::mfa {
             >> value.handle
             >> value.checksum
             >> value.references
-            >> skip<i32> // Unused
+            >> skip<i32> // Unused (size)
             >> value.data;
 
         logger()->debug("Read font {:?}.", to_string(value.data.face_name));
@@ -92,7 +92,7 @@ namespace bamboo::mfa {
             >> value.height
             >> value.format
             >> value.flags
-            >> skip<i16> // Unused
+            >> skip<i16> // Padding
             >> value.origin_x
             >> value.origin_y
             >> value.action_x
