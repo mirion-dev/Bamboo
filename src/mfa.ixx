@@ -133,7 +133,8 @@ namespace bamboo::mfa {
 
         stream.app = &value;
         stream
-            >> signature<"MFU2"> >> value.format_version
+            >> signature<"MFU2"> // Multimedia FUsion 2
+            >> value.format_version
             >> value.format_subversion
             >> value.editor_version
             >> value.editor_build

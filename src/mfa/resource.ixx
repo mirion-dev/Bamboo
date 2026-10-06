@@ -28,7 +28,10 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, FontBank& value) {
-        stream >> signature<"ATNF"> >> static_cast<std::vector<Font>&>(value);
+        stream
+            >> signature<"ATNF"> // FoNT Array
+            >> static_cast<std::vector<Font>&>(value);
+
         logger()->debug("Read {} fonts.", value.size());
     }
 
@@ -49,11 +52,6 @@ namespace bamboo::mfa {
         logger()->debug("Read sample {:?}.", to_string(value.name));
     }
 
-    export void load(Stream& stream, SampleBank& value) {
-        stream >> signature<"APMS"> >> static_cast<std::vector<Sample>&>(value);
-        logger()->debug("Read {} samples.", value.size());
-    }
-
     export void load(Stream& stream, Music& value) {
         stream
             >> value.handle
@@ -68,8 +66,19 @@ namespace bamboo::mfa {
         logger()->debug("Read music {:?}.", to_string(value.name));
     }
 
+    export void load(Stream& stream, SampleBank& value) {
+        stream
+            >> signature<"APMS"> // SaMPle Array
+            >> static_cast<std::vector<Sample>&>(value);
+
+        logger()->debug("Read {} samples.", value.size());
+    }
+
     export void load(Stream& stream, MusicBank& value) {
-        stream >> signature<"ASUM"> >> static_cast<std::vector<Music>&>(value);
+        stream
+            >> signature<"ASUM"> // MUSic Array
+            >> static_cast<std::vector<Music>&>(value);
+
         logger()->debug("Read {} music.", value.size());
     }
 
@@ -113,9 +122,11 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, ImageBank& value) {
         stream
-            >> signature<"AGMI"> >> skip<i32> // Duplicate (app.graphic_mode)
+            >> signature<"AGMI"> // IMaGe Array
+            >> skip<i32>         // Duplicate (app.graphic_mode)
             >> value.palette
             >> static_cast<std::vector<Image>&>(value);
+
         logger()->debug("Read {} images.", value.size());
     }
 
