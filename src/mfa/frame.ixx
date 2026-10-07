@@ -28,18 +28,23 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Folder& value) {
-        stream >> value.header;
-        if (value.header == 0x70000004) {
-            stream >> value.name >> value.objects;
-            logger()->debug("Read folder {:?}.", to_string(value.name));
+        stream >> value.name >> value.children;
+        logger()->debug("Read folder entry {:?}.", to_string(value.name));
+    }
+
+    export void load(Stream& stream, Entry& value) {
+        i32 type;
+        stream >> type;
+        if (type == 0x70000004) {
+            stream >> value.emplace<Folder>();
         } else {
-            stream >> value.objects.emplace_back();
+            stream >> value.emplace<u32>();
         }
     }
 
-    export void load(Stream& stream, Folders& value) {
-        stream >> static_cast<std::vector<Folder>&>(value);
-        logger()->debug("Read {} folders.", value.size());
+    export void load(Stream& stream, Entries& value) {
+        stream >> static_cast<std::vector<Entry>&>(value);
+        logger()->debug("Read {} entries.", value.size());
     }
 
     export void load(Stream& stream, Instance& value) {
@@ -80,7 +85,7 @@ namespace bamboo::mfa {
             >> value.fade_in
             >> value.fade_out
             >> value.objects
-            >> value.folders
+            >> value.entries
             >> value.instances
             >> value.events
             >> value.chunks;

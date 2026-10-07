@@ -8,6 +8,7 @@ import bamboo.model.event;
 
 namespace bamboo {
 
+    // CLayer
     export struct Layer {
         enum Flag {
             visible,
@@ -26,16 +27,20 @@ namespace bamboo {
         f32 y_coefficient; // Settings
     };
 
+    // CLayerArray
     export struct Layers : std::vector<Layer> {};
 
+    // CFrameFolder
     export struct Folder {
-        u32 header;
         std::wstring name;
-        std::vector<u32> objects;
+        std::vector<u32> children;
     };
 
-    export struct Folders : std::vector<Folder> {};
+    export struct Entry : std::variant<u32, Folder> {};
 
+    export struct Entries : std::vector<Entry> {};
+
+    // CFrameItemInstance
     export struct Instance {
         enum Flag {
             _0,
@@ -57,6 +62,7 @@ namespace bamboo {
 
     export struct Instances : std::vector<Instance> {};
 
+    // CFrame
     export struct Frame {
         enum Flag {
             grab_desktop_at_start,                           // Runtime
@@ -94,7 +100,7 @@ namespace bamboo {
         std::optional<Transition> fade_in;  // Settings
         std::optional<Transition> fade_out; // Settings
         Objects objects;
-        Folders folders;
+        Entries entries;
         Instances instances;
         EventBlocks events;
         Chunks chunks;
