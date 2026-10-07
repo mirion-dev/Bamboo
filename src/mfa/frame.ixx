@@ -55,9 +55,9 @@ namespace bamboo::mfa {
             >> value.handle
             >> value.flags
             >> value.value
-            >> value.parent_type
+            >> value.type
             >> value.object
-            >> value.parent;
+            >> value.relative;
     }
 
     export void load(Stream& stream, Instances& value) {

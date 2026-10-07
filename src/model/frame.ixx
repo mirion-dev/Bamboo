@@ -11,8 +11,8 @@ namespace bamboo {
     // CLayer
     export struct Layer {
         enum Flag {
-            visible,
-            locked,
+            visible, // Layers Toolbar
+            locked,  // Layers Toolbar
             _2,
             not_visible_at_start,         // Settings
             do_not_save_background,       // Settings
@@ -45,8 +45,14 @@ namespace bamboo {
         enum Flag {
             _0,
             _1,
-            locked,
-            create_only
+            locked,           // Context Menu
+            created_by_events // Events - Create Object
+        };
+
+        enum class Type {
+            placed,
+            create_object_at_actual_x_y_coordinates,
+            create_object_relative_to
         };
 
         i32 x; // Size / Position
@@ -55,9 +61,9 @@ namespace bamboo {
         u32 handle;
         Flags<u16> flags;
         i16 value; // Values
-        i32 parent_type;
+        Type type; // Events - Create Object
         u32 object;
-        u32 parent;
+        u32 relative; // Events - Create Object
     };
 
     export struct Instances : std::vector<Instance> {};
