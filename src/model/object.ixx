@@ -24,9 +24,8 @@ namespace bamboo {
     };
 
     // CItemValue
-    export struct Value {
+    export struct Value : std::variant<i32, f64, std::wstring> {
         std::wstring name;
-        std::variant<i32, f64, std::wstring> value;
     };
 
     // CItemValueArray

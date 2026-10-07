@@ -33,13 +33,13 @@ namespace bamboo::mfa {
 
         switch (type) {
         case 0:
-            stream >> value.value.emplace<i32>();
+            stream >> value.emplace<i32>();
             break;
         case 1:
-            stream >> value.value.emplace<f64>();
+            stream >> value.emplace<f64>();
             break;
         case 2:
-            stream >> value.value.emplace<std::wstring>();
+            stream >> value.emplace<std::wstring>();
             break;
         default:
             throw std::runtime_error{ std::format("Unknown value type {}.", type) };
