@@ -19,7 +19,7 @@ namespace bamboo::mfa {
         stream
             >> value.filename
             >> value.name
-            >> value.dll_handle
+            >> value.file_handle
             >> value.id
             >> value.duration
             >> value.flags

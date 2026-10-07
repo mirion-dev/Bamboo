@@ -15,7 +15,7 @@ namespace bamboo {
 
         std::wstring filename;
         std::wstring name; // Transition
-        i32 dll_handle;
+        i32 file_handle;
         std::array<char, 4> id;
         i32 duration; // Duration
         Flags<u32> flags;
@@ -23,13 +23,16 @@ namespace bamboo {
         std::vector<unsigned char> param;
     };
 
+    // CItemValue
     export struct Value {
         std::wstring name;
         std::variant<i32, f64, std::wstring> value;
     };
 
+    // CItemValueArray
     export struct Values : std::vector<Value> {};
 
+    // CMovement
     export struct Movement {
         std::wstring name;
         std::wstring extension;
@@ -37,15 +40,19 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
+    // CMovementArray
     export struct Movements : std::vector<Movement> {};
 
+    // CBehavior
     export struct Behavior {
         std::wstring name;
         std::vector<unsigned char> data;
     };
 
+    // CBehaviorArray
     export struct Behaviors : std::vector<Behavior> {};
 
+    // CDirection
     export struct Direction {
         i32 index;
         i32 max_speed;
@@ -55,15 +62,19 @@ namespace bamboo {
         std::vector<u32> frames;
     };
 
+    // CDirSet
     export struct Directions : std::vector<Direction> {};
 
+    // CAnimation
     export struct Animation {
         std::wstring name;
         Directions directions;
     };
 
+    // CAnimSet
     export struct Animations : std::vector<Animation> {};
 
+    // CText
     export struct Paragraph {
         enum Flag {
             mfa_correct,
@@ -84,6 +95,7 @@ namespace bamboo {
 
     export struct Paragraphs : std::vector<Paragraph> {};
 
+    // CTextGroup
     export struct Content {
         u32 font;
         Color color;
@@ -92,6 +104,7 @@ namespace bamboo {
         Paragraphs paragraphs;
     };
 
+    // CQuickBackdropItem
     export struct QuickBackdrop {
         enum Flag {
             vertical_gradient,
@@ -112,6 +125,7 @@ namespace bamboo {
         u32 image;
     };
 
+    // CBackdropItem
     export struct Backdrop {
         enum class ObstacleType : i32 {
             none,
@@ -175,16 +189,19 @@ namespace bamboo {
         std::optional<Transition> fade_out; // Display
     };
 
+    // CActiveItem
     export struct ActiveObject : ObjectBase {
         std::optional<Animations> animations;
     };
 
+    // CStringItem
     export struct StringObject : ObjectBase {
         i32 width;
         i32 height;
         Content content;
     };
 
+    // CQuestionItem
     export struct QuestionAnswerObject : ObjectBase {
         i32 width;
         i32 height;
@@ -192,6 +209,7 @@ namespace bamboo {
         Content answer;
     };
 
+    // CPlayerCounterItem
     export struct ScoreLivesObject : ObjectBase {
         i32 player;
         std::vector<u32> images;
@@ -202,10 +220,13 @@ namespace bamboo {
         i32 height;
     };
 
+    // CScoreItem
     export struct ScoreObject : ScoreLivesObject {};
 
+    // CLivesItem
     export struct LivesObject : ScoreLivesObject {};
 
+    // CCounterItem
     export struct CounterObject : ObjectBase {
         i32 value;
         i32 min;
@@ -222,6 +243,7 @@ namespace bamboo {
         u32 font;
     };
 
+    // CRTFItem
     export struct FormattedTextObject : ObjectBase {
         enum Flag {
             _0,
@@ -235,6 +257,7 @@ namespace bamboo {
         std::vector<unsigned char> data;
     };
 
+    // CCCAItem
     export struct SubapplicationObject : ObjectBase {
         enum Flag {
             share_global_values,
@@ -274,6 +297,7 @@ namespace bamboo {
         i32 start_frame;
     };
 
+    // CExtendItem
     export struct ExtensionObject : ActiveObject {
         i32 type;
         std::wstring name;
