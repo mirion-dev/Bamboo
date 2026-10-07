@@ -64,8 +64,8 @@ namespace bamboo {
         i32 max_speed;
         i32 min_speed;
         i32 repeat;
-        i32 repeat_frame;
-        std::vector<u32> frames;
+        i32 repeat_from;
+        std::vector<u32> images;
     };
 
     // CDirSet
@@ -102,7 +102,7 @@ namespace bamboo {
     export struct Paragraphs : std::vector<Paragraph> {};
 
     // CTextGroup
-    export struct Content {
+    export struct Text {
         u32 font;
         Color color;
         Flags<u32> flags;
@@ -253,13 +253,13 @@ namespace bamboo {
 
     // CStringItem
     export struct StringObject : TextObject {
-        Content content;
+        Text string;
     };
 
     // CQuestionItem
     export struct QuestionAnswerObject : TextObject {
-        Content question;
-        Content answer;
+        Text question;
+        Text answer;
     };
 
     // CRTFItem

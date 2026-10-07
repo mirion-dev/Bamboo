@@ -77,8 +77,8 @@ namespace bamboo::mfa {
             >> value.max_speed
             >> value.min_speed
             >> value.repeat
-            >> value.repeat_frame
-            >> value.frames;
+            >> value.repeat_from
+            >> value.images;
     }
 
     export void load(Stream& stream, Animation& value) {
@@ -89,7 +89,7 @@ namespace bamboo::mfa {
         stream >> value.value >> value.flags;
     }
 
-    export void load(Stream& stream, Content& value) {
+    export void load(Stream& stream, Text& value) {
         stream >> value.font >> value.color >> value.flags >> value.relief >> value.paragraphs;
     }
 
@@ -165,7 +165,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, StringObject& value) {
-        stream >> static_cast<TextObject&>(value) >> value.content;
+        stream >> static_cast<TextObject&>(value) >> value.string;
     }
 
     export void load(Stream& stream, QuestionAnswerObject& value) {
