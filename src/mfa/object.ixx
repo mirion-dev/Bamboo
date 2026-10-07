@@ -30,7 +30,6 @@ namespace bamboo::mfa {
     export void load(Stream& stream, Value& value) {
         i32 type;
         stream >> value.name >> type;
-
         switch (type) {
         case 0:
             stream >> value.emplace<i32>();
@@ -76,10 +75,27 @@ namespace bamboo::mfa {
         stream >> value.font >> value.color >> value.flags >> value.relief >> value.paragraphs;
     }
 
-    export void load(Stream& stream, QuickBackdrop& value) {
+    export void load(Stream& stream, ObjectBase& value) {
         stream
-            >> value.obstacle_type
-            >> value.collision_type
+            >> value.handle
+            >> value.name
+            >> value.transparent
+            >> value.ink_effect
+            >> value.ink_effect_param
+            >> value.antialiasing
+            >> value.flags
+            >> skip<i32> >> value.icon
+            >> value.chunks;
+        ;
+    }
+
+    export void load(Stream& stream, StaticObject& value) {
+        stream >> static_cast<ObjectBase&>(value) >> value.obstacle_type >> value.collision_type;
+    }
+
+    export void load(Stream& stream, QuickBackdropObject& value) {
+        stream
+            >> static_cast<StaticObject&>(value)
             >> value.width
             >> value.height
             >> value.shape
@@ -92,12 +108,13 @@ namespace bamboo::mfa {
             >> value.image;
     }
 
-    export void load(Stream& stream, Backdrop& value) {
-        stream >> value.obstacle_type >> value.collision_with_box >> value.image;
+    export void load(Stream& stream, BackdropObject& value) {
+        stream >> static_cast<StaticObject&>(value) >> value.image;
     }
 
-    export void load(Stream& stream, ObjectBase& value) {
+    export void load(Stream& stream, DynamicObject& value) {
         stream
+            >> static_cast<ObjectBase&>(value)
             >> value.flags
             >> value.new_flags
             >> value.background_color
@@ -110,21 +127,40 @@ namespace bamboo::mfa {
             >> value.fade_out;
     }
 
-    export void load(Stream& stream, ActiveObject& value) {
-        stream >> static_cast<ObjectBase&>(value) >> value.animations;
+    export void load(Stream& stream, AnimatedObject& value) {
+        stream >> static_cast<DynamicObject&>(value) >> value.animations;
+    }
+
+    export void load(Stream& stream, ExtensionObject& value) {
+        stream >> static_cast<AnimatedObject&>(value) >> value.type;
+
+        if (value.type == -1) {
+            stream >> value.name >> value.filename >> value.magic_num >> value.subtype;
+        }
+
+        stream >> value.real_size >> value.size >> skip<i32> >> value.version >> value.id >> value.private_data;
+        stream >> args(value.data, value.real_size - 20);
+    }
+
+    export void load(Stream& stream, TextObject& value) {
+        stream >> static_cast<DynamicObject&>(value) >> value.width >> value.height;
     }
 
     export void load(Stream& stream, StringObject& value) {
-        stream >> static_cast<ObjectBase&>(value) >> value.width >> value.height >> value.content;
+        stream >> static_cast<TextObject&>(value) >> value.content;
     }
 
     export void load(Stream& stream, QuestionAnswerObject& value) {
-        stream >> static_cast<ObjectBase&>(value) >> value.width >> value.height >> value.question >> value.answer;
+        stream >> static_cast<TextObject&>(value) >> value.question >> value.answer;
     }
 
-    export void load(Stream& stream, ScoreLivesObject& value) {
+    export void load(Stream& stream, RichTextObject& value) {
+        stream >> static_cast<TextObject&>(value) >> value.flags >> value.color >> value.data;
+    }
+
+    export void load(Stream& stream, PlayerCounterObject& value) {
         stream
-            >> static_cast<ObjectBase&>(value)
+            >> static_cast<DynamicObject&>(value)
             >> value.player
             >> value.images
             >> value.use_text
@@ -136,7 +172,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, CounterObject& value) {
         stream
-            >> static_cast<ObjectBase&>(value)
+            >> static_cast<DynamicObject&>(value)
             >> value.value
             >> value.min
             >> value.max
@@ -152,35 +188,14 @@ namespace bamboo::mfa {
             >> value.font;
     }
 
-    export void load(Stream& stream, FormattedTextObject& value) {
-        stream
-            >> static_cast<ObjectBase&>(value)
-            >> value.width
-            >> value.height
-            >> value.flags
-            >> value.color
-            >> value.data;
-    }
-
     export void load(Stream& stream, SubapplicationObject& value) {
-        stream >> static_cast<ObjectBase&>(value) >> value.name >> value.width >> value.height >> value.flags;
+        stream >> static_cast<DynamicObject&>(value) >> value.name >> value.width >> value.height >> value.flags;
 
         if (value.flags[SubapplicationObject::internal]) {
             stream >> value.start_frame;
         }
 
         stream >> skip<i32>;
-    }
-
-    export void load(Stream& stream, ExtensionObject& value) {
-        stream >> static_cast<ActiveObject&>(value) >> value.type;
-
-        if (value.type == -1) {
-            stream >> value.name >> value.filename >> value.magic_num >> value.subtype;
-        }
-
-        stream >> value.real_size >> value.size >> skip<i32> >> value.version >> value.id >> value.private_data;
-        stream >> args(value.data, value.real_size - 20);
     }
 
     export void load(Stream& stream, Chunk& value) {
@@ -202,25 +217,18 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Object& value) {
-        i32 type;
-        stream
-            >> type
-            >> value.handle
-            >> value.name
-            >> value.transparent
-            >> value.ink_effect
-            >> value.ink_effect_param
-            >> value.antialiasing
-            >> value.flags
-            >> skip<i32> >> value.icon
-            >> value.chunks;
+        static constexpr std::array OBJECT_TYPE{ "quick backdrop",    "backdrop",       "active",   "string",
+                                                 "question & answer", "score",          "lives",    "counter",
+                                                 "rich text",         "subapplication", "extension" };
 
+        i32 type;
+        stream >> type;
         switch (type) {
         case 0:
-            stream >> value.emplace<QuickBackdrop>();
+            stream >> value.emplace<QuickBackdropObject>();
             break;
         case 1:
-            stream >> value.emplace<Backdrop>();
+            stream >> value.emplace<BackdropObject>();
             break;
         case 2:
             stream >> value.emplace<ActiveObject>();
@@ -241,7 +249,7 @@ namespace bamboo::mfa {
             stream >> value.emplace<CounterObject>();
             break;
         case 8:
-            stream >> value.emplace<FormattedTextObject>();
+            stream >> value.emplace<RichTextObject>();
             break;
         case 9:
             stream >> value.emplace<SubapplicationObject>();
@@ -251,7 +259,11 @@ namespace bamboo::mfa {
             stream >> value.emplace<ExtensionObject>();
         }
 
-        logger()->debug("Read object {:?}.", to_string(value.name));
+        logger()->debug(
+            "Read {} object {:?}.",
+            OBJECT_TYPE[std::max(type, 10)],
+            to_string(std::visit([](auto& value) -> ObjectBase& { return value; }, value).name)
+        );
     }
 
     export void load(Stream& stream, Objects& value) {

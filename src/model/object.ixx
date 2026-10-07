@@ -103,15 +103,58 @@ namespace bamboo {
         Paragraphs paragraphs;
     };
 
+    export struct Chunk {
+        i8 id;
+        std::vector<unsigned char> data;
+    };
+
+    export struct Chunks : std::vector<Chunk> {};
+
+    // CFrameItem
+    export struct ObjectBase {
+        enum Flag {
+            load_on_call, // Runtime
+            _1,
+            global_object, // Runtime
+            _3,
+            editor_synchronization_no,                 // Runtime
+            editor_synchronization_same_name_and_type, // Runtime
+            _6,
+            do_not_auto_update // About
+        };
+
+        u32 handle;
+        std::wstring name; // About
+        u32 transparent;   // Display
+        i32 ink_effect;
+        i32 ink_effect_param;
+        u32 antialiasing; // Display
+        Flags<u32> flags;
+        u32 icon; // About
+        Chunks chunks;
+    };
+
+    // CStaticItem
+    export struct StaticObject : ObjectBase {
+        enum class ObstacleType : i32 {
+            none,
+            solid,
+            platform,
+            ladder,
+            transparent
+        };
+
+        i32 obstacle_type;
+        i32 collision_type;
+    };
+
     // CQuickBackdropItem
-    export struct QuickBackdrop {
+    export struct QuickBackdropObject : StaticObject {
         enum Flag {
             vertical_gradient,
             integral_dimensions
         };
 
-        i32 obstacle_type;
-        i32 collision_type;
         i32 width;
         i32 height;
         i32 shape;
@@ -125,21 +168,12 @@ namespace bamboo {
     };
 
     // CBackdropItem
-    export struct Backdrop {
-        enum class ObstacleType : i32 {
-            none,
-            solid,
-            platform,
-            ladder,
-            transparent
-        };
-
-        ObstacleType obstacle_type; // Runtime
-        u32 collision_with_box;     // Runtime
-        u32 image;                  // Settings
+    export struct BackdropObject : StaticObject {
+        u32 image; // Settings
     };
 
-    export struct ObjectBase {
+    // CDynamicItem
+    export struct DynamicObject : ObjectBase {
         enum Flag {
             display_in_front,
             background,
@@ -188,28 +222,60 @@ namespace bamboo {
         std::optional<Transition> fade_out; // Display
     };
 
-    // CActiveItem
-    export struct ActiveObject : ObjectBase {
+    // CAnimatedItem
+    export struct AnimatedObject : DynamicObject {
         std::optional<Animations> animations;
     };
 
-    // CStringItem
-    export struct StringObject : ObjectBase {
+    // CActiveItem
+    export struct ActiveObject : AnimatedObject {};
+
+    // CExtendItem
+    export struct ExtensionObject : AnimatedObject {
+        i32 type;
+        std::wstring name;
+        std::wstring filename;
+        i32 magic_num;
+        std::wstring subtype;
+        i32 real_size;
+        i32 size;
+        i32 version;
+        i32 id;
+        i32 private_data;
+        std::vector<unsigned char> data;
+    };
+
+    // CTextItem
+    export struct TextObject : DynamicObject {
         i32 width;
         i32 height;
+    };
+
+    // CStringItem
+    export struct StringObject : TextObject {
         Content content;
     };
 
     // CQuestionItem
-    export struct QuestionAnswerObject : ObjectBase {
-        i32 width;
-        i32 height;
+    export struct QuestionAnswerObject : TextObject {
         Content question;
         Content answer;
     };
 
+    // CRTFItem
+    export struct RichTextObject : TextObject {
+        enum Flag {
+            _0,
+            auto_scrollbar
+        };
+
+        Flags<u32> flags;
+        Color color;
+        std::vector<unsigned char> data;
+    };
+
     // CPlayerCounterItem
-    export struct ScoreLivesObject : ObjectBase {
+    export struct PlayerCounterObject : DynamicObject {
         i32 player;
         std::vector<u32> images;
         i32 use_text;
@@ -220,13 +286,13 @@ namespace bamboo {
     };
 
     // CScoreItem
-    export struct ScoreObject : ScoreLivesObject {};
+    export struct ScoreObject : PlayerCounterObject {};
 
     // CLivesItem
-    export struct LivesObject : ScoreLivesObject {};
+    export struct LivesObject : PlayerCounterObject {};
 
     // CCounterItem
-    export struct CounterObject : ObjectBase {
+    export struct CounterObject : DynamicObject {
         i32 value;
         i32 min;
         i32 max;
@@ -242,22 +308,8 @@ namespace bamboo {
         u32 font;
     };
 
-    // CRTFItem
-    export struct FormattedTextObject : ObjectBase {
-        enum Flag {
-            _0,
-            auto_scrollbar
-        };
-
-        i32 width;
-        i32 height;
-        Flags<u32> flags;
-        Color color;
-        std::vector<unsigned char> data;
-    };
-
     // CCCAItem
-    export struct SubapplicationObject : ObjectBase {
+    export struct SubapplicationObject : DynamicObject {
         enum Flag {
             share_global_values,
             share_player_lives,
@@ -296,63 +348,20 @@ namespace bamboo {
         i32 start_frame;
     };
 
-    // CExtendItem
-    export struct ExtensionObject : ActiveObject {
-        i32 type;
-        std::wstring name;
-        std::wstring filename;
-        i32 magic_num;
-        std::wstring subtype;
-        i32 real_size;
-        i32 size;
-        i32 version;
-        i32 id;
-        i32 private_data;
-        std::vector<unsigned char> data;
-    };
-
-    export struct Chunk {
-        i8 id;
-        std::vector<unsigned char> data;
-    };
-
-    export struct Chunks : std::vector<Chunk> {};
-
     export struct Object : std::variant<
-                               QuickBackdrop,
-                               Backdrop,
+                               QuickBackdropObject,
+                               BackdropObject,
                                ActiveObject,
                                StringObject,
                                QuestionAnswerObject,
                                ScoreObject,
                                LivesObject,
                                CounterObject,
-                               FormattedTextObject,
+                               RichTextObject,
                                SubapplicationObject,
                                ExtensionObject
                            > {
-
-        enum Flag {
-            load_on_call, // Runtime
-            _1,
-            global_object, // Runtime
-            _3,
-            editor_synchronization_no,                 // Runtime
-            editor_synchronization_same_name_and_type, // Runtime
-            _6,
-            do_not_auto_update // About
-        };
-
         u32 extension;
-        u32 handle;
-        std::wstring name; // About
-        u32 transparent;   // Display
-        i32 ink_effect;
-        i32 ink_effect_param;
-        u32 antialiasing; // Display
-        Flags<u32> flags;
-        u32 icon; // About
-        Chunks chunks;
     };
 
     export struct Objects : std::vector<Object> {};
