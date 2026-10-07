@@ -6,6 +6,41 @@ import bamboo.model.base;
 
 namespace bamboo {
 
+    export struct Chunk {
+        u8 id;
+        std::vector<unsigned char> data;
+    };
+
+    export struct Chunks : std::vector<Chunk> {};
+
+    // CItemValue
+    export struct Value : std::variant<i32, f64, std::wstring> {
+        std::wstring name;
+    };
+
+    // CItemValueArray
+    export struct Values : std::vector<Value> {};
+
+    // CMovement
+    export struct Movement {
+        std::wstring name;
+        std::wstring extension_name;
+        u32 id;
+        std::vector<unsigned char> data;
+    };
+
+    // CMovementArray
+    export struct Movements : std::vector<Movement> {};
+
+    // CBehavior
+    export struct Behavior {
+        std::wstring name;
+        std::vector<unsigned char> data;
+    };
+
+    // CBehaviorArray
+    export struct Behaviors : std::vector<Behavior> {};
+
     export struct Transition {
         enum Flag {
             _0,
@@ -22,34 +57,6 @@ namespace bamboo {
         Color color; // From / To
         std::vector<unsigned char> param;
     };
-
-    // CItemValue
-    export struct Value : std::variant<i32, f64, std::wstring> {
-        std::wstring name;
-    };
-
-    // CItemValueArray
-    export struct Values : std::vector<Value> {};
-
-    // CMovement
-    export struct Movement {
-        std::wstring name;
-        std::wstring extension;
-        i32 id;
-        std::vector<unsigned char> data;
-    };
-
-    // CMovementArray
-    export struct Movements : std::vector<Movement> {};
-
-    // CBehavior
-    export struct Behavior {
-        std::wstring name;
-        std::vector<unsigned char> data;
-    };
-
-    // CBehaviorArray
-    export struct Behaviors : std::vector<Behavior> {};
 
     // CDirection
     export struct Direction {
@@ -102,13 +109,6 @@ namespace bamboo {
         i32 relief;
         Paragraphs paragraphs;
     };
-
-    export struct Chunk {
-        i8 id;
-        std::vector<unsigned char> data;
-    };
-
-    export struct Chunks : std::vector<Chunk> {};
 
     // CFrameItem
     export struct ObjectBase {
@@ -240,7 +240,7 @@ namespace bamboo {
         i32 real_size;
         i32 size;
         i32 version;
-        i32 id;
+        u32 id;
         i32 private_data;
         std::vector<unsigned char> data;
     };

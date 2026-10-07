@@ -15,16 +15,22 @@ import bamboo.mfa.base;
 
 namespace bamboo::mfa {
 
-    export void load(Stream& stream, Transition& value) {
-        stream
-            >> value.filename
-            >> value.name
-            >> value.file_handle
-            >> value.id
-            >> value.duration
-            >> value.flags
-            >> value.color
-            >> value.param;
+    export void load(Stream& stream, Chunk& value) {
+        stream >> value.id;
+        if (value.id != 0) {
+            stream >> value.data; // Unanalyzed
+        }
+    }
+
+    export void load(Stream& stream, Chunks& value) {
+        value.clear();
+
+        Chunk chunk;
+        while (stream >> chunk, chunk.id != 0) {
+            value.emplace_back(std::move(chunk));
+        }
+
+        logger()->debug("Read {} chunks.", value.size());
     }
 
     export void load(Stream& stream, Value& value) {
@@ -46,11 +52,23 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Movement& value) {
-        stream >> value.name >> value.extension >> value.id >> value.data;
+        stream >> value.name >> value.extension_name >> value.id >> value.data; // Unanalyzed
     }
 
     export void load(Stream& stream, Behavior& value) {
-        stream >> value.name >> value.data;
+        stream >> value.name >> value.data; // Unanalyzed
+    }
+
+    export void load(Stream& stream, Transition& value) {
+        stream
+            >> value.filename
+            >> value.name
+            >> value.file_handle
+            >> value.id
+            >> value.duration
+            >> value.flags
+            >> value.color
+            >> value.param;
     }
 
     export void load(Stream& stream, Direction& value) {
@@ -196,24 +214,6 @@ namespace bamboo::mfa {
         }
 
         stream >> skip<i32>;
-    }
-
-    export void load(Stream& stream, Chunk& value) {
-        stream >> value.id;
-        if (value.id != 0) {
-            stream >> value.data;
-        }
-    }
-
-    export void load(Stream& stream, Chunks& value) {
-        value.clear();
-
-        Chunk chunk;
-        while (stream >> chunk, chunk.id != 0) {
-            value.emplace_back(std::move(chunk));
-        }
-
-        logger()->debug("Read {} chunks.", value.size());
     }
 
     export void load(Stream& stream, Object& value) {
