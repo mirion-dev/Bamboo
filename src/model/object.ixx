@@ -44,17 +44,17 @@ namespace bamboo {
     export struct Transition {
         enum Flag {
             _0,
-            use_color, // From / To
+            use_color,
             unicode
         };
 
         std::wstring filename;
-        std::wstring name; // Transition
+        std::wstring name;
         i32 file_handle;
         std::array<char, 4> id;
-        i32 duration; // Duration
+        i32 duration;
         Flags<u32> flags;
-        Color color; // From / To
+        Color color;
         std::vector<unsigned char> param;
     };
 
