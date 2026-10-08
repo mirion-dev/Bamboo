@@ -150,7 +150,7 @@ namespace bamboo {
             control,
             alt,
             _5,
-            _6,
+            permanent,
             end
         };
 
