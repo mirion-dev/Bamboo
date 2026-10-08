@@ -85,12 +85,12 @@ namespace bamboo::mfa {
         stream >> value.name >> value.directions;
     }
 
-    export void load(Stream& stream, Paragraph& value) {
-        stream >> value.value >> value.flags;
+    export void load(Stream& stream, Text& value) {
+        stream >> value.string >> value.flags;
     }
 
-    export void load(Stream& stream, Text& value) {
-        stream >> value.font >> value.color >> value.flags >> value.relief >> value.paragraphs;
+    export void load(Stream& stream, TextGroup& value) {
+        stream >> value.font >> value.color >> value.flags >> value.relief >> value.texts;
     }
 
     export void load(Stream& stream, ObjectBase& value) {
@@ -168,7 +168,7 @@ namespace bamboo::mfa {
         stream >> static_cast<TextObject&>(value) >> value.string;
     }
 
-    export void load(Stream& stream, QuestionAnswerObject& value) {
+    export void load(Stream& stream, QuestionObject& value) {
         stream >> static_cast<TextObject&>(value) >> value.question >> value.answer;
     }
 
@@ -217,9 +217,9 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Object& value) {
-        static constexpr std::array OBJECT_TYPE{ "quick backdrop",    "backdrop",       "active",   "string",
-                                                 "question & answer", "score",          "lives",    "counter",
-                                                 "rich text",         "subapplication", "extension" };
+        static constexpr std::array OBJECT_TYPE{ "quick backdrop", "backdrop",       "active",   "string",
+                                                 "question",       "score",          "lives",    "counter",
+                                                 "rich text",      "subapplication", "extension" };
 
         i32 type;
         stream >> type;
@@ -237,7 +237,7 @@ namespace bamboo::mfa {
             stream >> value.emplace<StringObject>();
             break;
         case 4:
-            stream >> value.emplace<QuestionAnswerObject>();
+            stream >> value.emplace<QuestionObject>();
             break;
         case 5:
             stream >> value.emplace<ScoreObject>();

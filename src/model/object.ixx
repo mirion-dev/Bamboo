@@ -81,9 +81,9 @@ namespace bamboo {
     export struct Animations : std::vector<Animation> {};
 
     // CText
-    export struct Paragraph {
+    export struct Text {
         enum Flag {
-            mfa_correct,
+            correct,
             _1,
             _2,
             _3,
@@ -91,23 +91,23 @@ namespace bamboo {
             _5,
             _6,
             _7,
-            correct,
+            ccn_correct,
             relief
         };
 
-        std::wstring value;
+        std::wstring string;
         Flags<u32> flags;
     };
 
-    export struct Paragraphs : std::vector<Paragraph> {};
+    export struct Texts : std::vector<Text> {};
 
     // CTextGroup
-    export struct Text {
+    export struct TextGroup {
         u32 font;
         Color color;
         Flags<u32> flags;
         i32 relief;
-        Paragraphs paragraphs;
+        Texts texts;
     };
 
     // CFrameItem
@@ -253,13 +253,13 @@ namespace bamboo {
 
     // CStringItem
     export struct StringObject : TextObject {
-        Text string;
+        TextGroup string;
     };
 
     // CQuestionItem
-    export struct QuestionAnswerObject : TextObject {
-        Text question;
-        Text answer;
+    export struct QuestionObject : TextObject {
+        TextGroup question;
+        TextGroup answer;
     };
 
     // CRTFItem
@@ -353,7 +353,7 @@ namespace bamboo {
                                BackdropObject,
                                ActiveObject,
                                StringObject,
-                               QuestionAnswerObject,
+                               QuestionObject,
                                ScoreObject,
                                LivesObject,
                                CounterObject,
