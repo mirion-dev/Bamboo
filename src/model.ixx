@@ -215,19 +215,19 @@ namespace bamboo {
         Language language;        // About
         std::wstring name;        // About
         std::wstring description; // About
-        std::wstring path;        // About
+        std::wstring filename;    // About
         PreviewImage preview_image;
-        FontBank font_bank;     // Data Elements - Fonts
-        SampleBank sample_bank; // Data Elements - Sounds
-        MusicBank music_bank;   // Data Elements - Music
+        FontBank font_bank;     // View - Data Elements - Fonts
+        SampleBank sample_bank; // View - Data Elements - Sounds
+        MusicBank music_bank;   // View - Data Elements - Music
         ImageBank icon_bank;
         ImageBank image_bank;
         std::wstring author;     // About
         std::wstring copyright;  // About
         std::wstring company;    // About
         std::wstring version;    // About
-        i32 window_width;        // Window
-        i32 window_height;       // Window
+        i32 width;               // Window
+        i32 height;              // Window
         Color border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
@@ -241,16 +241,16 @@ namespace bamboo {
         std::wstring command_line;       // Settings
         std::wstring about;              // About
         Installer installer;             // File - Build
-        BinaryFiles binary_files;        // Data Elements - Binary Data
+        BinaryFiles binary_files;        // View - Data Elements - Binary Data
         Controls controls;               // Runtime
         MenuBar menu_bar;                // Window
         Values global_values;            // Values
         Values global_strings;           // Values
         GlobalEventBlocks global_events; // Events
         GraphicMode graphic_mode;        // Settings
-        std::vector<u32> window_icons;   // About
+        std::vector<u32> icons;          // About
         Qualifiers qualifiers;           // Events
-        Extensions extensions;           // Data Elements - Extensions
+        Extensions extensions;           // View - Data Elements - Extensions
         Frames frames;
         Chunks chunks;
     };

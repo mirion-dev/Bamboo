@@ -141,7 +141,7 @@ namespace bamboo::mfa {
             >> value.language
             >> value.name
             >> value.description
-            >> value.path
+            >> value.filename
             >> value.preview_image;
 
         logger()->info("Project name: {}.", to_string(value.name));
@@ -159,8 +159,8 @@ namespace bamboo::mfa {
             >> value.copyright
             >> value.company
             >> value.version
-            >> value.window_width
-            >> value.window_height
+            >> value.width
+            >> value.height
             >> value.border_color
             >> value.window_flags
             >> value.flags
@@ -182,7 +182,7 @@ namespace bamboo::mfa {
             >> value.global_strings
             >> value.global_events
             >> value.graphic_mode
-            >> value.window_icons
+            >> value.icons
             >> value.qualifiers
             >> value.extensions
             >> value.frames
