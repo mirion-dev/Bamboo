@@ -345,41 +345,42 @@ namespace bamboo {
     // CCCAItem
     export struct SubapplicationObject : DynamicObject {
         enum Flag {
-            share_global_values,
-            share_player_lives,
-            share_player_scores,
-            share_window_attributes,
-            stretch,
-            popup,
-            caption,
-            tool_caption,
-            border,
-            resize_window,
-            system_menu,
-            disable_close,
-            modal,
-            dialogue_frame,
-            internal,
-            hide_on_close,
-            custom_size,
-            internal_about_box,
-            clip_siblings,
-            share_player_controls,
-            mdi,
-            docked,
-            mfa_check,
-            docked_vertical,
-            docked_horizontal,
-            reopen,
-            sprite,
-            ignore_resize
+            share_global_values_strings,                 // Settings
+            share_player_lives,                          // Settings
+            share_window_attributes,                     // CCAF_* (SDK)
+            share_player_scores,                         // Settings
+            stretch_frame_to_object_size,                // Settings
+            popup_window,                                // Settings
+            caption,                                     // Settings
+            tool_caption,                                // Settings
+            border,                                      // Settings
+            resizable,                                   // Settings
+            system_menu,                                 // Settings
+            disable_close,                               // Settings
+            modal,                                       // Settings
+            dialog_frame,                                // Settings
+            source_frame_from_this_application,          // Settings
+            hidden_on_close,                             // Settings
+            customizable_size,                           // Settings
+            internal_about_box,                          // CCAF_* (SDK)
+            clip_siblings,                               // Settings
+            share_player_controls,                       // Settings
+            mdi_child_window,                            // Settings
+            docked,                                      // Settings
+            docked_top,                                  // Settings
+            docked_right,                                // Settings
+            reopen,                                      // CCAF_* (SDK)
+            run_even_if_not_active,                      // Settings
+            display_as_sprite,                           // Settings
+            windows_ignore_parents_resize_display_option // Settings
         };
 
-        std::wstring name;
-        i32 width;
-        i32 height;
+        std::wstring path; // Settings
+        i32 width;         // Size / Position
+        i32 height;        // Size / Position
         Flags<u32> flags;
-        i32 start_frame;
+        u32 frame; // Settings
+        u32 icon;  // Settings
     };
 
     export struct Object : std::variant<
@@ -394,9 +395,7 @@ namespace bamboo {
                                RichTextObject,
                                SubapplicationObject,
                                ExtensionObject
-                           > {
-        u32 extension;
-    };
+                           > {};
 
     export struct Objects : std::vector<Object> {};
 

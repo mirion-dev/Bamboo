@@ -214,13 +214,13 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, SubapplicationObject& value) {
-        stream >> static_cast<DynamicObject&>(value) >> value.name >> value.width >> value.height >> value.flags;
+        stream >> static_cast<DynamicObject&>(value) >> value.path >> value.width >> value.height >> value.flags;
 
-        if (value.flags[SubapplicationObject::internal]) {
-            stream >> value.start_frame;
+        if (value.flags[SubapplicationObject::source_frame_from_this_application]) {
+            stream >> value.frame;
         }
 
-        stream >> skip<i32>;
+        stream >> value.icon;
     }
 
     export void load(Stream& stream, Object& value) {
@@ -263,7 +263,6 @@ namespace bamboo::mfa {
             stream >> value.emplace<SubapplicationObject>();
             break;
         default:
-            value.extension = type - 32;
             stream >> value.emplace<ExtensionObject>();
         }
 
