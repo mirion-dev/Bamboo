@@ -177,16 +177,16 @@ namespace bamboo {
             motif
         };
 
-        i32 width;             // Size / Position
-        i32 height;            // Size / Position
-        Shape shape;           // Settings
-        i32 border_width;      // Settings
-        Color border_color;    // Settings
-        FillType fill_type;    // Settings
-        Color fill_color;      // Settings
-        Color fill_color2;     // Settings
-        Flags<u32> fill_flags; // Settings
-        u32 motif_image;       // Settings
+        i32 width;          // Size / Position
+        i32 height;         // Size / Position
+        Shape shape;        // Settings
+        i32 border_width;   // Settings
+        Color border_color; // Settings
+        FillType fill_type; // Settings
+        Color color;        // Settings
+        Color color2;       // Settings
+        Flags<u32> flags;   // Settings
+        u32 image;          // Settings
     };
 
     // CBackdropItem
@@ -271,7 +271,7 @@ namespace bamboo {
 
     // CStringItem
     export struct StringObject : TextObject {
-        Content content; // Settings & Text Options
+        Content content; // Settings & Text
     };
 
     // CQuestionItem
@@ -294,13 +294,13 @@ namespace bamboo {
 
     // CPlayerCounterItem
     export struct PlayerCounterObject : DynamicObject {
-        i32 player;
-        std::vector<u32> images;
-        i32 use_text;
-        Color color;
-        u32 font;
-        i32 width;
-        i32 height;
+        u32 player;              // Settings
+        std::vector<u32> images; // Settings
+        u32 use_text;            // Settings
+        Color color;             // Text
+        u32 font;                // Text
+        i32 width;               // Size / Position
+        i32 height;              // Size / Position
     };
 
     // CScoreItem
@@ -311,19 +311,35 @@ namespace bamboo {
 
     // CCounterItem
     export struct CounterObject : DynamicObject {
-        i32 value;
-        i32 min;
-        i32 max;
-        i32 display_type;
-        i32 fill_type;
-        Color color1;
-        Color color2;
-        i32 vertical_gradient;
-        i32 bar_direction;
-        i32 width;
-        i32 height;
-        std::vector<u32> images;
-        u32 font;
+        enum class DisplayType : i32 {
+            hidden,
+            numbers,
+            vertical_bar,
+            horizontal_bar,
+            animation,
+            text
+        };
+
+        enum class FillType : i32 {
+            none,
+            solid_color,
+            gradient,
+            motif
+        };
+
+        i32 init;                 // Settings
+        i32 min;                  // Settings
+        i32 max;                  // Settings
+        DisplayType display_type; // Settings
+        FillType fill_type;       // Settings
+        Color color;              // Settings
+        Color color2;             // Settings
+        u32 vertical_gradient;    // Settings
+        u32 reverse;              // Settings
+        i32 width;                // Size / Position
+        i32 height;               // Size / Position
+        std::vector<u32> images;  // Settings
+        u32 font;                 // Text
     };
 
     // CCCAItem

@@ -124,10 +124,10 @@ namespace bamboo::mfa {
             >> value.border_width
             >> value.border_color
             >> value.fill_type
-            >> value.fill_color
-            >> value.fill_color2
-            >> value.fill_flags
-            >> value.motif_image;
+            >> value.color
+            >> value.color2
+            >> value.flags
+            >> value.image;
     }
 
     export void load(Stream& stream, BackdropObject& value) {
@@ -198,15 +198,15 @@ namespace bamboo::mfa {
     export void load(Stream& stream, CounterObject& value) {
         stream
             >> static_cast<DynamicObject&>(value)
-            >> value.value
+            >> value.init
             >> value.min
             >> value.max
             >> value.display_type
             >> value.fill_type
-            >> value.color1
+            >> value.color
             >> value.color2
             >> value.vertical_gradient
-            >> value.bar_direction
+            >> value.reverse
             >> value.width
             >> value.height
             >> value.images
