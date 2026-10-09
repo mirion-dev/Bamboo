@@ -89,8 +89,8 @@ namespace bamboo::mfa {
         stream >> value.string >> value.flags;
     }
 
-    export void load(Stream& stream, TextGroup& value) {
-        stream >> value.font >> value.color >> value.flags >> value.relief >> value.texts;
+    export void load(Stream& stream, Content& value) {
+        stream >> value.font >> value.color >> value.flags >> value.is_relief >> value.texts;
     }
 
     export void load(Stream& stream, ObjectBase& value) {
@@ -165,7 +165,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, StringObject& value) {
-        stream >> static_cast<TextObject&>(value) >> value.string;
+        stream >> static_cast<TextObject&>(value) >> value.content;
     }
 
     export void load(Stream& stream, QuestionObject& value) {

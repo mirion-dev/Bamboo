@@ -92,7 +92,7 @@ namespace bamboo {
             _6,
             _7,
             ccn_correct,
-            relief
+            ccn_relief
         };
 
         std::wstring string;
@@ -102,11 +102,11 @@ namespace bamboo {
     export struct Texts : std::vector<Text> {};
 
     // CTextGroup
-    export struct TextGroup {
+    export struct Content {
         u32 font;
         Color color;
         Flags<u32> flags;
-        i32 relief;
+        u32 is_relief;
         Texts texts;
     };
 
@@ -253,13 +253,13 @@ namespace bamboo {
 
     // CStringItem
     export struct StringObject : TextObject {
-        TextGroup string;
+        Content content; // Settings
     };
 
     // CQuestionItem
     export struct QuestionObject : TextObject {
-        TextGroup question;
-        TextGroup answer;
+        Content question;
+        Content answer;
     };
 
     // CRTFItem
