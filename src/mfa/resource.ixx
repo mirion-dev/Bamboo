@@ -20,7 +20,7 @@ namespace bamboo::mfa {
         stream
             >> value.handle
             >> value.checksum
-            >> value.references
+            >> value.ref_count
             >> skip<i32> // Unused (size)
             >> value.data;
 
@@ -39,7 +39,7 @@ namespace bamboo::mfa {
         stream
             >> value.handle
             >> value.checksum
-            >> value.references
+            >> value.ref_count
             >> value.size
             >> value.flags
             >> value.frequency
@@ -56,7 +56,7 @@ namespace bamboo::mfa {
         stream
             >> value.handle
             >> value.checksum
-            >> value.references
+            >> value.ref_count
             >> value.size
             >> value.flags
             >> value.frequency
@@ -86,7 +86,7 @@ namespace bamboo::mfa {
         stream
             >> value.handle
             >> value.checksum
-            >> value.references
+            >> value.ref_count
             >> value.size
             >> value.width
             >> value.height

@@ -80,6 +80,17 @@ namespace bamboo {
     // CAnimSet
     export struct Animations : std::vector<Animation> {};
 
+    // extHeader (SDK)
+    export struct ExtensionHeader {
+        using unpadded = void;
+
+        u32 size;
+        u32 max_size;
+        u32 version;
+        u32 id;
+        u32 private_data;
+    };
+
     // CText
     export struct Text {
         std::wstring string;
@@ -172,7 +183,7 @@ namespace bamboo {
         i32 border_width;      // Settings
         Color border_color;    // Settings
         FillType fill_type;    // Settings
-        Color fill_color1;     // Settings
+        Color fill_color;      // Settings
         Color fill_color2;     // Settings
         Flags<u32> fill_flags; // Settings
         u32 motif_image;       // Settings
@@ -209,7 +220,7 @@ namespace bamboo {
             do_not_reset_current_frame_duration_when_the_animation_is_modified // Runtime
         };
 
-        enum NewFlag {
+        enum Flag2 {
             do_not_save_background,    // Display
             wipe_with_color,           // Display
             do_not_use_fine_detection, // Runtime
@@ -222,9 +233,9 @@ namespace bamboo {
         };
 
         Flags<u32> flags;
-        Flags<u32> new_flags;
+        Flags<u32> flags2;
         Color background_color;             // Display
-        std::array<i16, 8> qualifiers;      // Events
+        std::array<u16, 8> qualifiers;      // Events
         Values values;                      // Values
         Values strings;                     // Values
         Movements movements;                // Movement
@@ -248,11 +259,8 @@ namespace bamboo {
         std::wstring filename;
         i32 magic_num;
         std::wstring subtype;
-        i32 real_size;
         i32 size;
-        i32 version;
-        u32 id;
-        i32 private_data;
+        ExtensionHeader header;
         std::vector<unsigned char> data;
     };
 

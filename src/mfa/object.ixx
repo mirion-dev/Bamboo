@@ -124,7 +124,7 @@ namespace bamboo::mfa {
             >> value.border_width
             >> value.border_color
             >> value.fill_type
-            >> value.fill_color1
+            >> value.fill_color
             >> value.fill_color2
             >> value.fill_flags
             >> value.motif_image;
@@ -138,10 +138,11 @@ namespace bamboo::mfa {
         stream
             >> static_cast<ObjectBase&>(value)
             >> value.flags
-            >> value.new_flags
+            >> value.flags2
             >> value.background_color
             >> value.qualifiers
-            >> skip<i16> >> value.values
+            >> skip<i16> // End mark of qualifiers
+            >> value.values
             >> value.strings
             >> value.movements
             >> value.behaviors
@@ -160,8 +161,10 @@ namespace bamboo::mfa {
             stream >> value.name >> value.filename >> value.magic_num >> value.subtype;
         }
 
-        stream >> value.real_size >> value.size >> skip<i32> >> value.version >> value.id >> value.private_data;
-        stream >> args(value.data, value.real_size - 20);
+        stream
+            >> skip<i32> // Duplicate (header.size)
+            >> value.header;
+        stream >> args(value.data, value.size - sizeof(ExtensionHeader));
     }
 
     export void load(Stream& stream, TextObject& value) {

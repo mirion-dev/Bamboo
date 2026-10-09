@@ -10,7 +10,7 @@ namespace bamboo {
     export struct Font {
         u32 handle;
         u32 checksum;
-        u32 references;
+        u32 ref_count;
         FontDesc data;
     };
 
@@ -21,7 +21,7 @@ namespace bamboo {
     export struct Sound {
         u32 handle;
         u32 checksum;
-        u32 references;
+        u32 ref_count;
         i32 size;
         Flags<u32> flags;
         i32 frequency;
@@ -67,7 +67,7 @@ namespace bamboo {
             alpha,
             _5,
             ace,
-            rgba
+            mac
         };
 
         enum class Format : i8 {
@@ -85,7 +85,7 @@ namespace bamboo {
 
         u32 handle;
         u32 checksum;
-        u32 references;
+        u32 ref_count;
         i32 size;
         i16 width;
         i16 height;
