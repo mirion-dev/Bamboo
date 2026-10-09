@@ -7,6 +7,7 @@ export module bamboo.mfa.base;
 
 import std;
 import bamboo.types;
+import bamboo.utils;
 import bamboo.log;
 import bamboo.stream;
 import bamboo.stream_utils;
@@ -66,11 +67,13 @@ namespace bamboo::mfa {
 
             i32 size;
             stream >> size;
-            if (!(size & WIDE)) {
-                throw std::runtime_error{ "Narrow strings are unsupported" };
+            if (size & WIDE) {
+                stream >> resize(value, size & ~WIDE);
+            } else {
+                std::string str;
+                stream >> resize(str, size);
+                value = to_wstring(str);
             }
-
-            stream >> resize(value, size & ~WIDE);
         } else if constexpr (Type == StringTypeEnum::c) {
             value.clear();
 
@@ -106,9 +109,9 @@ namespace bamboo::mfa {
         }
     }
 
-    export template <class T>
-    void load(Stream& stream, std::optional<T>& value) {
-        u8 has_value;
+    export template <class T, std::integral Size = u8>
+    void load(Stream& stream, std::optional<T>& value, SizeType<Size> = {}) {
+        Size has_value;
         stream >> has_value >> bamboo::args(value, has_value);
     }
 
