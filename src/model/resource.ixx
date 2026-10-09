@@ -39,11 +39,13 @@ namespace bamboo {
             play_from_disk, // Options
             file,
             unicode_file,
-            _8,
+            has_name,
             _9,
             _10,
             _11,
-            loaded
+            loaded,
+            _13,
+            name_crop
         };
     };
 

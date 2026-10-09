@@ -86,7 +86,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Text& value) {
-        stream >> value.string >> value.flags;
+        stream >> value.string >> value.is_correct;
     }
 
     export void load(Stream& stream, Content& value) {
@@ -112,7 +112,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, StaticObject& value) {
-        stream >> static_cast<ObjectBase&>(value) >> value.obstacle_type >> value.collision_type;
+        stream >> static_cast<ObjectBase&>(value) >> value.obstacle_type >> value.collision_with_box;
     }
 
     export void load(Stream& stream, QuickBackdropObject& value) {
@@ -121,13 +121,13 @@ namespace bamboo::mfa {
             >> value.width
             >> value.height
             >> value.shape
-            >> value.border_size
+            >> value.border_width
             >> value.border_color
             >> value.fill_type
-            >> value.color1
-            >> value.color2
-            >> value.flags
-            >> value.image;
+            >> value.fill_color1
+            >> value.fill_color2
+            >> value.fill_flags
+            >> value.motif_image;
     }
 
     export void load(Stream& stream, BackdropObject& value) {
@@ -177,7 +177,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, RichTextObject& value) {
-        stream >> static_cast<TextObject&>(value) >> value.flags >> value.color >> value.data;
+        stream >> static_cast<TextObject&>(value) >> value.flags >> value.background_color >> value.data;
     }
 
     export void load(Stream& stream, PlayerCounterObject& value) {

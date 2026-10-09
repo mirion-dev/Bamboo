@@ -82,27 +82,24 @@ namespace bamboo {
 
     // CText
     export struct Text {
-        enum Flag {
-            correct,
-            _1,
-            _2,
-            _3,
-            _4,
-            _5,
-            _6,
-            _7,
-            ccn_correct,
-            ccn_relief
-        };
-
         std::wstring string;
-        Flags<u32> flags;
+        u32 is_correct;
     };
 
     export struct Texts : std::vector<Text> {};
 
     // CTextGroup
     export struct Content {
+        enum Flag {
+            alignment_horizontal_center,
+            alignment_horizontal_right,
+            alignment_vertical_center,
+            alignment_vertical_bottom,
+            correct,
+            relief,
+            right_to_left
+        };
+
         u32 font;
         Color color;
         Flags<u32> flags;
@@ -138,14 +135,14 @@ namespace bamboo {
     export struct StaticObject : ObjectBase {
         enum class ObstacleType : i32 {
             none,
-            solid,
+            obstacle,
             platform,
             ladder,
             transparent
         };
 
-        i32 obstacle_type;
-        i32 collision_type;
+        ObstacleType obstacle_type; // Runtime
+        u32 collision_with_box;     // Runtime
     };
 
     // CQuickBackdropItem
@@ -155,16 +152,30 @@ namespace bamboo {
             integral_dimensions
         };
 
-        i32 width;
-        i32 height;
-        i32 shape;
-        i32 border_size;
-        Color border_color;
-        i32 fill_type;
-        Color color1;
-        Color color2;
-        Flags<u32> flags;
-        u32 image;
+        enum class Shape : i32 {
+            none,
+            line,
+            rectangle,
+            ellipse
+        };
+
+        enum class FillType : i32 {
+            none,
+            solid_color,
+            gradient,
+            motif
+        };
+
+        i32 width;             // Size / Position
+        i32 height;            // Size / Position
+        Shape shape;           // Settings
+        i32 border_width;      // Settings
+        Color border_color;    // Settings
+        FillType fill_type;    // Settings
+        Color fill_color1;     // Settings
+        Color fill_color2;     // Settings
+        Flags<u32> fill_flags; // Settings
+        u32 motif_image;       // Settings
     };
 
     // CBackdropItem
@@ -247,13 +258,13 @@ namespace bamboo {
 
     // CTextItem
     export struct TextObject : DynamicObject {
-        i32 width;
-        i32 height;
+        i32 width;  // Size / Position
+        i32 height; // Size / Position
     };
 
     // CStringItem
     export struct StringObject : TextObject {
-        Content content; // Settings
+        Content content; // Settings & Text Options
     };
 
     // CQuestionItem
@@ -266,12 +277,12 @@ namespace bamboo {
     export struct RichTextObject : TextObject {
         enum Flag {
             _0,
-            auto_scrollbar
+            auto_vertical_scrollbar
         };
 
-        Flags<u32> flags;
-        Color color;
-        std::vector<unsigned char> data;
+        Flags<u32> flags;       // Settings
+        Color background_color; // Settings
+        std::wstring data;
     };
 
     // CPlayerCounterItem
