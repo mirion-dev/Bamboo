@@ -20,19 +20,19 @@ namespace bamboo {
     // cSoundElement
     export struct Sound {
         enum Flag {
-            wave,
-            midi,
+            wave, // SP_* (SDK)
+            midi, // SP_* (SDK)
             _2,
             _3,
             load_on_call,   // Options
             play_from_disk, // Options
-            file,
-            unicode_file,
+            file,           // SNDF_* (SDK)
+            unicode_file,   // SNDF_* (SDK)
             has_name,
             _9,
             _10,
             _11,
-            loaded,
+            loaded, // SNDF_* (SDK)
             _13,
             name_crop
         };

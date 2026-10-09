@@ -46,7 +46,7 @@ namespace bamboo {
             _0,
             _1,
             locked,           // Context Menu
-            created_by_events // Events - Create Object
+            created_by_events // Event Editor - Create Object
         };
 
         enum class Type {
@@ -61,9 +61,9 @@ namespace bamboo {
         u32 handle;
         Flags<u16> flags;
         i16 value; // Values
-        Type type; // Events - Create Object
+        Type type; // Event Editor - Create Object
         u32 object;
-        u32 relative; // Events - Create Object
+        u32 relative; // Event Editor - Create Object
     };
 
     export struct Instances : std::vector<Instance> {};

@@ -121,8 +121,8 @@ namespace bamboo {
     // CFrameItem
     export struct ObjectBase {
         enum Flag {
-            load_on_call, // Runtime
-            discardable,
+            load_on_call,  // Runtime
+            discardable,   // OIF_* (SDK)
             global_object, // Runtime
             _3,
             editor_synchronization_no,                 // Runtime
@@ -197,26 +197,26 @@ namespace bamboo {
     // CDynamicItem
     export struct DynamicObject : ObjectBase {
         enum Flag {
-            display_in_front,
-            background,
-            save_background,                        // Display
-            create_before_frame_fade_in_transition, // Runtime
-            has_movements,
-            has_animations,
-            tab_stop_focus,
-            is_window_process,
-            has_values,
-            has_sprites,
-            internal_save_background,
-            do_not_follow_the_frame,                     // Runtime
-            display_as_background,                       // Display
-            do_not_destroy_object_if_too_far_from_frame, // Runtime
-            inactivate_if_too_far_from_window_no,        // Runtime
-            inactivate_if_too_far_from_window_yes,       // Runtime
-            has_text,
-            do_not_create_at_start, // Runtime
-            fake_sprite,
-            fake_collisions,
+            display_in_front,                                                  // OEFLAG_* (SDK)
+            background,                                                        // OEFLAG_* (SDK)
+            save_background,                                                   // Display
+            create_before_frame_fade_in_transition,                            // Runtime
+            has_movements,                                                     // OEFLAG_* (SDK)
+            has_animations,                                                    // OEFLAG_* (SDK)
+            tab_stop_focus,                                                    // OEFLAG_* (SDK)
+            is_window_process,                                                 // OEFLAG_* (SDK)
+            has_values,                                                        // OEFLAG_* (SDK)
+            has_sprites,                                                       // OEFLAG_* (SDK)
+            internal_save_background,                                          // OEFLAG_* (SDK)
+            do_not_follow_the_frame,                                           // Runtime
+            display_as_background,                                             // Display
+            do_not_destroy_object_if_too_far_from_frame,                       // Runtime
+            inactivate_if_too_far_from_window_no,                              // Runtime
+            inactivate_if_too_far_from_window_yes,                             // Runtime
+            has_text,                                                          // OEFLAG_* (SDK)
+            do_not_create_at_start,                                            // Runtime
+            fake_sprite,                                                       // OEFLAG_* (SDK)
+            fake_collisions,                                                   // OEFLAG_* (SDK)
             do_not_reset_current_frame_duration_when_the_animation_is_modified // Runtime
         };
 
