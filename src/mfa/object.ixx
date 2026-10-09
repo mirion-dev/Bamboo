@@ -224,9 +224,10 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Object& value) {
-        static constexpr std::array OBJECT_TYPE{ "quick backdrop", "backdrop",       "active",   "string",
-                                                 "question",       "score",          "lives",    "counter",
-                                                 "rich text",      "subapplication", "extension" };
+        static constexpr std::array OBJECT_INFO{ "quick backdrop object", "backdrop object", "active object",
+                                                 "string object",         "question object", "score object",
+                                                 "lives object",          "counter object",  "rich text object",
+                                                 "subapplication object", "extension object" };
 
         i32 type;
         stream >> type;
@@ -267,8 +268,8 @@ namespace bamboo::mfa {
         }
 
         logger()->debug(
-            "Read {} object {:?}.",
-            OBJECT_TYPE[std::max(type, 10)],
+            "Read {} {:?}.",
+            OBJECT_INFO[std::max(type, 10)],
             to_string(std::visit([](auto& value) -> ObjectBase& { return value; }, value).name)
         );
     }
