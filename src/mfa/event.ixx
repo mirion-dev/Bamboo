@@ -184,8 +184,7 @@ namespace bamboo::mfa {
     export void load(Stream& stream, DataBlock& value) {
         stream >> value.header;
         if (value.header == -1) {
-            stream >> args(value.items, size_type<i16>);
-            stream >> args(value.folders, size_type<i16>);
+            stream >> args(value.items, type<i16>) >> args(value.folders, type<i16>);
         } else {
             stream >> args(value.items, value.header);
         }

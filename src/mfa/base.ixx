@@ -22,16 +22,16 @@ namespace bamboo::mfa {
         using bamboo::Stream::Stream;
     };
 
+    export template <std::integral T>
+    struct Type {};
+
+    export template <std::integral T>
+    constexpr Type<T> type;
+
     export template <class T, usize N>
     void load(Stream& stream, std::array<T, N>& value) {
         stream >> bamboo::args(value.data(), N);
     }
-
-    export template <std::integral T>
-    struct SizeType {};
-
-    export template <std::integral T>
-    constexpr SizeType<T> size_type;
 
     export template <class T, std::integral Size>
     void load(Stream& stream, std::vector<T>& value, Size size) {
@@ -39,7 +39,7 @@ namespace bamboo::mfa {
     }
 
     export template <class T, std::integral Size = i32>
-    void load(Stream& stream, std::vector<T>& value, SizeType<Size> = {}) {
+    void load(Stream& stream, std::vector<T>& value, Type<Size> = {}) {
         Size size;
         stream >> size >> bamboo::args(value, size);
     }
@@ -109,9 +109,9 @@ namespace bamboo::mfa {
         }
     }
 
-    export template <class T, std::integral Size = u8>
-    void load(Stream& stream, std::optional<T>& value, SizeType<Size> = {}) {
-        Size has_value;
+    export template <class T, std::integral Flag = u8>
+    void load(Stream& stream, std::optional<T>& value, Type<Flag> = {}) {
+        Flag has_value;
         stream >> has_value >> bamboo::args(value, has_value);
     }
 
@@ -134,7 +134,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Palette& value) {
-        stream >> value.version >> args(value.palette_entry, size_type<u16>);
+        stream >> value.version >> args(value.palette_entry, type<u16>);
     }
 
     export void load(Stream& stream, MenuEntry& value) {
