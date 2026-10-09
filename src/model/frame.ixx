@@ -55,9 +55,9 @@ namespace bamboo {
             create_object_relative_to
         };
 
-        i32 x; // Size / Position
-        i32 y; // Size / Position
-        u32 layer;
+        i32 x;     // Size / Position
+        i32 y;     // Size / Position
+        u32 layer; // Layers Toolbar
         u32 handle;
         Flags<u16> flags;
         i16 value; // Values
