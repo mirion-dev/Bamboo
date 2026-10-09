@@ -347,8 +347,8 @@ namespace bamboo {
         enum Flag {
             share_global_values_strings,                 // Settings
             share_player_lives,                          // Settings
-            share_window_attributes,                     // CCAF_* (SDK)
             share_player_scores,                         // Settings
+            share_window_attributes,                     // CCAF_* (SDK)
             stretch_frame_to_object_size,                // Settings
             popup_window,                                // Settings
             caption,                                     // Settings
