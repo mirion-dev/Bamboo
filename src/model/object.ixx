@@ -122,7 +122,7 @@ namespace bamboo {
     export struct ObjectBase {
         enum Flag {
             load_on_call, // Runtime
-            _1,
+            discardable,
             global_object, // Runtime
             _3,
             editor_synchronization_no,                 // Runtime
@@ -205,18 +205,18 @@ namespace bamboo {
             has_animations,
             tab_stop_focus,
             is_window_process,
-            has_alterables_values_strings_flags,
-            uses_images,
+            has_values,
+            has_sprites,
             internal_save_background,
             do_not_follow_the_frame,                     // Runtime
             display_as_background,                       // Display
             do_not_destroy_object_if_too_far_from_frame, // Runtime
             inactivate_if_too_far_from_window_no,        // Runtime
             inactivate_if_too_far_from_window_yes,       // Runtime
-            uses_text,
-            create_at_start, // Runtime
-            _18,
-            _19,
+            has_text,
+            do_not_create_at_start, // Runtime
+            fake_sprite,
+            fake_collisions,
             do_not_reset_current_frame_duration_when_the_animation_is_modified // Runtime
         };
 
@@ -259,7 +259,6 @@ namespace bamboo {
         std::wstring filename;
         i32 magic_num;
         std::wstring subtype;
-        i32 size;
         ExtensionHeader header;
         std::vector<unsigned char> data;
     };

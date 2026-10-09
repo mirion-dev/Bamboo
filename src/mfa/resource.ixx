@@ -42,7 +42,7 @@ namespace bamboo::mfa {
             >> value.ref_count
             >> value.size
             >> value.flags
-            >> value.frequency
+            >> skip<i32> // Unused (SDK)
             >> args(value.name, string_type_pascal_c);
         stream
             >> args(value.data, value.size - (value.flags[Sample::play_from_disk] ? 0 : (value.name.size() + 1) * 2));
@@ -59,7 +59,7 @@ namespace bamboo::mfa {
             >> value.ref_count
             >> value.size
             >> value.flags
-            >> value.frequency
+            >> skip<i32> // Unused (SDK)
             >> args(value.name, string_type_pascal_c);
         stream >> args(value.data, value.size - (value.name.size() + 1) * 2);
 
@@ -92,7 +92,7 @@ namespace bamboo::mfa {
             >> value.height
             >> value.format
             >> value.flags
-            >> skip<i16> // Padding
+            >> skip<i16> // Unused (SDK)
             >> value.origin_x
             >> value.origin_y
             >> value.action_x

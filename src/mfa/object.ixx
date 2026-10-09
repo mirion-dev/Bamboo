@@ -164,7 +164,7 @@ namespace bamboo::mfa {
         stream
             >> skip<i32> // Duplicate (header.size)
             >> value.header;
-        stream >> args(value.data, value.size - sizeof(ExtensionHeader));
+        stream >> args(value.data, value.header.size - sizeof(ExtensionHeader));
     }
 
     export void load(Stream& stream, TextObject& value) {
