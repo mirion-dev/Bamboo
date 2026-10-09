@@ -199,8 +199,8 @@ namespace bamboo {
         enum Flag {
             display_in_front,
             background,
-            save_background, // Display
-            run_before_fade_in,
+            save_background,                        // Display
+            create_before_frame_fade_in_transition, // Runtime
             has_movements,
             has_animations,
             tab_stop_focus,
