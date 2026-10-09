@@ -104,7 +104,11 @@ namespace bamboo::mfa {
             }
         }
 
-        stream >> move(begin + value.size) >> value.window_menu_index >> value.images;
+        if (stream.tellg() != begin + value.size) {
+            throw std::runtime_error{ "Corrupt menu" };
+        }
+
+        stream >> value.window_menu_index >> value.images;
         logger()->debug("Read a menu bar.");
     }
 
