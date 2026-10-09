@@ -215,7 +215,7 @@ namespace bamboo {
         Language language;        // About
         std::wstring name;        // About
         std::wstring description; // About
-        std::wstring filename;    // About
+        std::wstring path;        // About
         PreviewImage preview_image;
         FontBank font_bank;     // View - Data Elements - Fonts
         SampleBank sample_bank; // View - Data Elements - Sounds

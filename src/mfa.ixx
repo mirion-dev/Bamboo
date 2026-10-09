@@ -145,7 +145,7 @@ namespace bamboo::mfa {
             >> value.language
             >> value.name
             >> value.description
-            >> value.filename
+            >> value.path
             >> value.preview_image;
 
         logger()->info("Project name: {}.", to_string(value.name));
