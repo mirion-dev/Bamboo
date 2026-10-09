@@ -94,17 +94,21 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, ObjectBase& value) {
+        i32 effect_param;
         stream
             >> value.handle
             >> value.name
             >> value.transparent
-            >> value.ink_effect
-            >> value.ink_effect_param
+            >> value.effect
+            >> effect_param
             >> value.antialiasing
             >> value.flags
-            >> skip<i32> >> value.icon
+            >> args(value.icon, type<u32>)
             >> value.chunks;
-        ;
+
+        if (value.effect == 1) {
+            value.blend_coefficent = std::clamp(effect_param * 2, 0, 255);
+        }
     }
 
     export void load(Stream& stream, StaticObject& value) {

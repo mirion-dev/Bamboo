@@ -120,17 +120,17 @@ namespace bamboo {
             editor_synchronization_no,                 // Runtime
             editor_synchronization_same_name_and_type, // Runtime
             _6,
-            do_not_auto_update // About
+            do_not_auto_update_icon // About
         };
 
         u32 handle;
-        std::wstring name; // About
-        u32 transparent;   // Display
-        i32 ink_effect;
-        i32 ink_effect_param;
-        u32 antialiasing; // Display
+        std::wstring name;    // About
+        u32 transparent;      // Display
+        i32 effect;           // Display
+        i32 blend_coefficent; // Display
+        u32 antialiasing;     // Display
         Flags<u32> flags;
-        u32 icon; // About
+        std::optional<u32> icon; // About
         Chunks chunks;
     };
 
