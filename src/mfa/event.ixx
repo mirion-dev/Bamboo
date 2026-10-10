@@ -16,7 +16,7 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Parameter& value) {
-        stream >> value.size >> args(value.data, value.size - 2);
+        stream >> value.size >> args(value.data, value.size - 2); // Unanalyzed
     }
 
     export void load(Stream& stream, Condition& value) {
@@ -65,14 +65,15 @@ namespace bamboo::mfa {
             >> value.condition_num
             >> value.action_num
             >> value.flags
-            >> value.restricted
-            >> value.restrict_cpt
+            >> value.inhibit
+            >> value.inhibit_cpt
             >> value.id
             >> value.undo
             >> args(value.conditions, value.condition_num)
             >> args(value.actions, value.action_num);
 
-        if (stream.tellg() != begin + std::abs(value.size)) {
+        value.size = std::abs(value.size);
+        if (stream.tellg() != begin + value.size) {
             throw std::runtime_error{ "Corrupt event" };
         }
     }
@@ -83,7 +84,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Remark& value) {
-        stream >> value.handle >> value.value;
+        stream >> value.handle >> value.string;
     }
 
     export void load(Stream& stream, Remarks& value) {
@@ -110,7 +111,7 @@ namespace bamboo::mfa {
         stream >> buffer;
 
         std::string_view id{ buffer.data(), buffer.size() };
-        if (id == "OIC2") {
+        if (id == "OIC2") { // Object ICon 2
             stream >> value.icon_buffer;
         }
     }
@@ -121,7 +122,6 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, EventObject& value) {
         stream >> value.handle >> value.object_type >> value.item_type >> value.name >> value.type_name >> value.flags;
-
         switch (value.object_type) {
         case 1:
             stream >> value.data.emplace<EventObjectRef>();
@@ -133,7 +133,7 @@ namespace bamboo::mfa {
             stream >> value.data.emplace<EventObjectQualifier>();
             break;
         default:
-            throw std::runtime_error{ std::format("Unknown event object type {}.", value.object_type) };
+            throw std::runtime_error{ std::format("Unknown event object type {}", value.object_type) };
         }
 
         logger()->debug("Read event object {:?}.", to_string(value.name));
@@ -142,15 +142,6 @@ namespace bamboo::mfa {
     export void load(Stream& stream, EventObjects& value) {
         stream >> static_cast<std::vector<EventObject>&>(value);
         logger()->debug("Read {} event objects.", value.size());
-    }
-
-    export void load(Stream& stream, EventItem& value) {
-        stream >> value.type >> value.handle >> value.flags;
-    }
-
-    export void load(Stream& stream, EventItems& value) {
-        stream >> static_cast<std::vector<EventItem>&>(value);
-        logger()->debug("Read {} event items.", value.size());
     }
 
     export void load(Stream& stream, EventsBlock& value) {
@@ -169,28 +160,15 @@ namespace bamboo::mfa {
         stream >> value.data;
     }
 
-    export void load(Stream& stream, GroupsBlock& value) {
-        stream >> value.data_size >> value.max_handles >> args(value.data, value.data_size);
-    }
-
     export void load(Stream& stream, ObjectsBlock& value) {
         stream >> value.data;
     }
 
-    export void load(Stream& stream, ConditionsBlock& value) {
+    export void load(Stream& stream, ColumnsBlock& value) {
         stream >> value.editor_data >> value.condition_width >> value.object_height >> skip<std::array<char, 12>>;
     }
 
-    export void load(Stream& stream, DataBlock& value) {
-        stream >> value.header;
-        if (value.header == -1) {
-            stream >> args(value.items, type<i16>) >> args(value.folders, type<i16>);
-        } else {
-            stream >> args(value.items, value.header);
-        }
-    }
-
-    export void load(Stream& stream, TabsBlock& value) {
+    export void load(Stream& stream, TablesBlock& value) {
         stream
             >> skip<u16> >> value.editor_x
             >> value.editor_y
@@ -207,72 +185,157 @@ namespace bamboo::mfa {
             >> value.event_line_type;
     }
 
+    export void load(Stream& stream, BookmarksBlock& value) {
+        stream >> value.data;
+    }
+
+    export void load(Stream& stream, EditorBlock& value) {
+        u16 count;
+        stream >> value.header;
+        if (value.header == static_cast<u16>(-1)) {
+            stream >> count;
+        } else {
+            count = value.header;
+        }
+
+        stream >> args(value.types, count) >> args(value.handles, count) >> args(value.flags, count);
+        if (value.header == static_cast<u16>(-1)) {
+            stream >> args(value.folders, type<u16>);
+        }
+    }
+
+    export void load(Stream& stream, TemporaryBlock& value) {
+        throw std::runtime_error{ "Unimplemented" };
+    }
+
+    export void load(Stream& stream, HeaderBlock& value) {
+        throw std::runtime_error{ "Unimplemented" };
+    }
+
+    export void load(Stream& stream, ObjectNameBlock& value) {
+        throw std::runtime_error{ "Unimplemented" };
+    }
+
+    export void load(Stream& stream, GroupsBlock& value) {
+        stream >> value.data_size >> value.max_handles >> args(value.data, value.data_size);
+    }
+
     export void load(Stream& stream, LayoutBlock& value) {
         stream >> value.data;
     }
 
-    export void load(Stream& stream, EndBlock& value) {}
-
-    export void load(Stream& stream, EventBlock& value) {
+    export void load(Stream& stream, FrameEventBlock& value) {
         std::array<char, 4> buffer;
         stream >> buffer;
 
         std::string_view id{ buffer.data(), buffer.size() };
-        std::string_view name;
-        if (id == "Evts" || id == "STVE") { // EVenTS
+        std::string_view info;
+        if (id == "Evts") {
             stream >> value.emplace<EventsBlock>();
-            name = "an events block";
-        } else if (id == "Rems" || id == "SMER") { // REMarkS
+            info = "an events block";
+        } else if (id == "Rems") {
             stream >> value.emplace<RemarksBlock>();
-            name = "a remarks block";
-        } else if (id == "SPRG") { // GRouPS
-            stream >> value.emplace<GroupsBlock>();
-            name = "a groups block";
-        } else if (id == "EvOb" || id == "SJBO") { // OBJectS
+            info = "a remarks block";
+        } else if (id == "EvOb") {
             stream >> value.emplace<ObjectsBlock>();
-            name = "an objects block";
+            info = "an objects block";
         } else if (id == "EvCs") {
-            stream >> value.emplace<ConditionsBlock>();
-            name = "a conditions block";
-        } else if (id == "EvEd") {
-            stream >> value.emplace<DataBlock>();
-            name = "a data block";
+            stream >> value.emplace<ColumnsBlock>();
+            info = "a columns block";
         } else if (id == "EvTs") {
-            stream >> value.emplace<TabsBlock>();
-            name = "a tabs block";
+            stream >> value.emplace<TablesBlock>();
+            info = "a tables block";
         } else if (id == "EvLs") {
             stream >> value.emplace<LinesBlock>();
-            name = "a lines block";
-        } else if (id == "E2Ts" || id == "TYAL") { // LAYouT
-            stream >> value.emplace<LayoutBlock>();
-            name = "a layout block";
+            info = "a lines block";
+        } else if (id == "E2Ts") {
+            stream >> value.emplace<BookmarksBlock>();
+            info = "a bookmarks block";
+        } else if (id == "EvEd") {
+            stream >> value.emplace<EditorBlock>();
+            info = "an editor block";
+        } else if (id == "EvTe") {
+            stream >> value.emplace<TemporaryBlock>();
+            info = "a temporary block";
         } else if (id == "!DNE") { // END!
-            stream >> value.emplace<EndBlock>();
-            name = "an end block";
+            value.emplace<EndBlock>();
+            info = "an end block";
         } else {
-            throw std::runtime_error{ std::format("Unknown event block {:?}.", id) };
+            throw std::runtime_error{ std::format("Unknown event block {:?}", id) };
         }
 
-        logger()->debug("Read {}.", name);
+        logger()->debug("Read {}.", info);
     }
 
-    export void load(Stream& stream, EventBlocks& value) {
+    export void load(Stream& stream, FrameEvents& value) {
         value.clear();
 
         stream >> value.size;
-        if (value.size != 0) {
-            EventBlock event;
-            while (stream >> event, !std::holds_alternative<EndBlock>(event)) {
-                value.emplace_back(std::move(event));
-            }
+        if (value.size == 0) {
+            return;
+        }
+
+        FrameEventBlock block;
+        while (stream >> block, !std::holds_alternative<EndBlock>(block)) {
+            value.emplace_back(std::move(block));
         }
 
         logger()->debug("Read {} event blocks.", value.vector::size());
     }
 
-    export void load(Stream& stream, GlobalEventBlocks& value) {
-        auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> static_cast<EventBlocks&>(value) >> move(begin + value.size + 4);
+    export void load(Stream& stream, GlobalEventBlock& value) {
+        std::array<char, 4> buffer;
+        stream >> buffer;
+
+        std::string_view id{ buffer.data(), buffer.size() };
+        std::string_view info;
+        if (id == "DAEH") { // HEADer
+            stream >> value.emplace<HeaderBlock>();
+            info = "a header block";
+        } else if (id == "NJBO") { // OBJect Name
+            stream >> value.emplace<ObjectNameBlock>();
+            info = "an object name block";
+        } else if (id == "STVE") { // EVenTS
+            stream >> value.emplace<EventsBlock>();
+            info = "an events block";
+        } else if (id == "SMER") { // REMarkS
+            stream >> value.emplace<RemarksBlock>();
+            info = "a remarks block";
+        } else if (id == "SJBO") { // OBJectS
+            stream >> value.emplace<ObjectsBlock>();
+            info = "an objects block";
+        } else if (id == "SPRG") { // GRouPS
+            stream >> value.emplace<GroupsBlock>();
+            info = "a groups block";
+        } else if (id == "TYAL") { // LAYouT
+            stream >> value.emplace<LayoutBlock>();
+            info = "a layout block";
+        } else if (id == "!DNE") { // END!
+            value.emplace<EndBlock>();
+            info = "an end block";
+        } else {
+            throw std::runtime_error{ std::format("Unknown global event block {:?}", id) };
+        }
+
+        logger()->debug("Read {}.", info);
+    }
+
+    export void load(Stream& stream, GlobalEvents& value) {
+        value.clear();
+
+        stream >> value.size;
+        if (value.size == 0) {
+            return;
+        }
+
+        stream >> signature<"KLBE">; // Event BLocK
+
+        GlobalEventBlock block;
+        while (stream >> block, !std::holds_alternative<EndBlock>(block)) {
+            value.emplace_back(std::move(block));
+        }
+
+        logger()->debug("Read {} global event blocks.", value.vector::size());
     }
 
 }

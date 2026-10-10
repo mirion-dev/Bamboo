@@ -15,15 +15,15 @@ namespace bamboo {
 
     export struct Condition {
         u16 size;
-        i16 object_type;
+        u16 object_type;
         i16 number;
         u16 object;
         i16 object_list;
         u8 flags;
         u8 other_flags;
-        i8 params_num;
-        i8 def_type;
-        i16 id;
+        u8 params_num;
+        u8 def_type;
+        u16 id;
         Parameters params;
     };
 
@@ -31,20 +31,22 @@ namespace bamboo {
 
     export struct Action {
         u16 size;
-        i16 object_type;
+        u16 object_type;
         i16 number;
         u16 object;
         i16 object_list;
         u8 flags;
         u8 other_flags;
-        i8 params_num;
-        i8 def_type;
+        u8 params_num;
+        u8 def_type;
         Parameters params;
     };
 
     export struct Actions : std::vector<Action> {};
 
+    // eventGroup (SDK)
     export struct Event {
+        // EVGFLAGS_* (SDK)
         enum Flag {
             once,
             not_always,
@@ -56,21 +58,21 @@ namespace bamboo {
             break_,
             break_point,
             always_clean,
-            has_or,
-            has_stop,
-            has_or_logical,
+            or_in_group,
+            stop_in_group,
+            or_logical,
             grouped,
             inactive,
             has_parent
         };
 
-        i8 condition_num;
-        i8 action_num;
-        u16 size;
+        i16 size;
+        u8 condition_num;
+        u8 action_num;
         Flags<u16> flags;
-        i16 restricted;
-        i16 restrict_cpt;
-        i16 id;
+        i16 inhibit;
+        u16 inhibit_cpt;
+        u16 id;
         i16 undo;
         Conditions conditions;
         Actions actions;
@@ -81,7 +83,7 @@ namespace bamboo {
     // CEvtRemark
     export struct Remark {
         u32 handle;
-        std::wstring value;
+        std::wstring string;
     };
 
     // CEvtRemarkList
@@ -90,7 +92,7 @@ namespace bamboo {
     export struct Group {
         u32 handle;
         std::wstring name;
-        std::array<char16_t, 75> uuid;
+        std::array<wchar_t, 75> uuid;
     };
 
     export struct Groups : std::vector<Group> {};
@@ -111,8 +113,8 @@ namespace bamboo {
     // COI
     export struct EventObject {
         u32 handle;
-        i16 object_type;
-        i16 item_type;
+        u16 object_type;
+        u16 item_type;
         std::wstring name;
         std::wstring type_name;
         Flags<u16> flags;
@@ -121,14 +123,6 @@ namespace bamboo {
 
     // COIList
     export struct EventObjects : std::vector<EventObject> {};
-
-    export struct EventItem {
-        i16 type;
-        u16 handle;
-        Flags<u16> flags;
-    };
-
-    export struct EventItems : std::vector<EventItem> {};
 
     export struct EventsBlock {
         u32 size;
@@ -139,41 +133,59 @@ namespace bamboo {
         Remarks data;
     };
 
-    export struct GroupsBlock {
-        i32 data_size;
-        i32 max_handles;
-        Groups data;
-    };
-
     export struct ObjectsBlock {
         EventObjects data;
     };
 
-    export struct ConditionsBlock {
+    export struct ColumnsBlock {
         i32 editor_data;
         i16 condition_width;
         i16 object_height;
     };
 
-    export struct DataBlock {
-        i16 header;
-        EventItems items;
-        std::vector<std::wstring> folders;
-    };
-
-    export struct TabsBlock {
+    export struct TablesBlock {
         i32 editor_x;
         i32 editor_y;
-        i32 editor_caret_type;
+        u32 editor_caret_type;
         i32 editor_caret_x;
         i32 editor_caret_y;
     };
 
     export struct LinesBlock {
         i32 editor_line_y;
-        i32 editor_line_type;
+        u32 editor_line_type;
         i32 event_line_y;
-        i32 event_line_type;
+        u32 event_line_type;
+    };
+
+    export struct BookmarksBlock {
+        std::vector<unsigned char> data;
+    };
+
+    export struct EditorBlock {
+        u16 header;
+        std::vector<u16> types;
+        std::vector<u16> handles;
+        std::vector<Flags<u16>> flags;
+        std::vector<std::wstring> folders;
+    };
+
+    export struct TemporaryBlock {
+        // Unanalyzed
+    };
+
+    export struct HeaderBlock {
+        // Unanalyzed
+    };
+
+    export struct ObjectNameBlock {
+        // Unanalyzed
+    };
+
+    export struct GroupsBlock {
+        u32 data_size;
+        u32 max_handles;
+        Groups data;
     };
 
     export struct LayoutBlock {
@@ -182,24 +194,36 @@ namespace bamboo {
 
     export struct EndBlock {};
 
-    export struct EventBlock : std::variant<
-                                   EventsBlock,
-                                   RemarksBlock,
-                                   GroupsBlock,
-                                   ObjectsBlock,
-                                   ConditionsBlock,
-                                   DataBlock,
-                                   TabsBlock,
-                                   LinesBlock,
-                                   LayoutBlock,
-                                   EndBlock
-                               > {};
+    export struct FrameEventBlock : std::variant<
+                                        EventsBlock,
+                                        RemarksBlock,
+                                        ObjectsBlock,
+                                        ColumnsBlock,
+                                        TablesBlock,
+                                        LinesBlock,
+                                        BookmarksBlock,
+                                        EditorBlock,
+                                        TemporaryBlock,
+                                        EndBlock
+                                    > {};
 
-    // CEventPrograms
-    export struct EventBlocks : std::vector<EventBlock> {
-        i32 size;
+    export struct FrameEvents : std::vector<FrameEventBlock> {
+        u32 size;
     };
 
-    export struct GlobalEventBlocks : EventBlocks {};
+    export struct GlobalEventBlock : std::variant<
+                                         HeaderBlock,
+                                         ObjectNameBlock,
+                                         EventsBlock,
+                                         RemarksBlock,
+                                         ObjectsBlock,
+                                         GroupsBlock,
+                                         LayoutBlock,
+                                         EndBlock
+                                     > {};
+
+    export struct GlobalEvents : std::vector<GlobalEventBlock> {
+        u32 size;
+    };
 
 }
