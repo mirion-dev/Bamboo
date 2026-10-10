@@ -23,9 +23,27 @@ namespace bamboo {
 
     // CMovement
     export struct Movement {
-        std::wstring name;
+        enum class Type : u32 {
+            static_,          // Movement
+            mouse_controlled, // Movement
+            race_car,         // Movement
+            eight_directions, // Movement
+            bouncing_ball,    // Movement
+            path,             // Movement
+            intelligent,      // MVTYPE_* (SDK)
+            pinball,          // MVTYPE_* (SDK)
+            list,             // MVTYPE_* (SDK)
+            platform,         // Movement
+            go_movement,      // MVTYPE_* (SDK)
+            disappear,        // MVTYPE_* (SDK)
+            appear,           // MVTYPE_* (SDK)
+            bullet,           // MVTYPE_* (SDK)
+            extension         // MVTYPE_* (SDK)
+        };
+
+        std::wstring name; // Movement
         std::wstring extension_name;
-        u32 id;
+        Type type;
         std::vector<unsigned char> data;
     };
 
@@ -131,12 +149,30 @@ namespace bamboo {
             do_not_auto_update_icon // About
         };
 
+        // EFFECT_* (SDK)
+        enum class EffectType : u32 {
+            none,
+            semitransparent,
+            inverted,
+            xor_,
+            and_,
+            or_,
+            _6,
+            _7,
+            _8,
+            add,
+            monochrome,
+            subtract,
+            _12,
+            extension
+        };
+
         u32 handle;
-        std::wstring name;    // About
-        u32 transparent;      // Display
-        u32 effect;           // Display
-        u32 blend_coefficent; // Display
-        u32 antialiasing;     // Display
+        std::wstring name;      // About
+        u32 transparent;        // Display
+        EffectType effect_type; // Display
+        u32 blend_coefficent;   // Display
+        u32 antialiasing;       // Display
         Flags<u32> flags;
         std::optional<u32> icon; // About
         Chunks chunks;

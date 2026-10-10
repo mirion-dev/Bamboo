@@ -52,7 +52,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Movement& value) {
-        stream >> value.name >> value.extension_name >> value.id >> value.data; // Unanalyzed
+        stream >> value.name >> value.extension_name >> value.type >> value.data; // Unanalyzed
     }
 
     export void load(Stream& stream, Behavior& value) {
@@ -99,14 +99,14 @@ namespace bamboo::mfa {
             >> value.handle
             >> value.name
             >> value.transparent
-            >> value.effect
+            >> value.effect_type
             >> effect_param
             >> value.antialiasing
             >> value.flags
             >> args(value.icon, type<u32>)
             >> value.chunks;
 
-        if (value.effect == 1) {
+        if (value.effect_type == ObjectBase::EffectType::semitransparent) {
             value.blend_coefficent = std::clamp(effect_param * 2, 0, 255);
         }
     }
@@ -268,7 +268,7 @@ namespace bamboo::mfa {
 
         logger()->debug(
             "Read {} {:?}.",
-            OBJECT_INFO[std::max(type, 10)],
+            OBJECT_INFO[std::max(type, 10u)],
             to_string(std::visit([](auto& value) -> ObjectBase& { return value; }, value).name)
         );
     }
