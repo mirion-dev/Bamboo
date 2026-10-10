@@ -47,7 +47,7 @@ namespace bamboo::mfa {
             stream >> value.emplace<std::wstring>();
             break;
         default:
-            throw std::runtime_error{ std::format("Unknown value type {}.", type) };
+            throw std::runtime_error{ std::format("Unknown value type {}", type) };
         }
     }
 
@@ -268,7 +268,7 @@ namespace bamboo::mfa {
 
         logger()->debug(
             "Read {} {:?}.",
-            OBJECT_INFO[std::max(type, 10u)],
+            OBJECT_INFO[std::min(type, 10u)],
             to_string(std::visit([](auto& value) -> ObjectBase& { return value; }, value).name)
         );
     }

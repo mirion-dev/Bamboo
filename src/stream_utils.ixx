@@ -79,12 +79,12 @@ namespace bamboo {
             requires loadable<S, T*, Size>
         void load(S& stream) const {
             if (size < 0) {
-                throw std::runtime_error{ std::format("Container size cannot be negative. Found {}.", size) };
+                throw std::runtime_error{ std::format("Container size cannot be negative; found {}", size) };
             }
 
             if (size >= MAX_SIZE) {
                 throw std::runtime_error{ std::format(
-                    "Container size is too large. Found {} but max allowed {} for this type.", size, MAX_SIZE
+                    "Container size is too large; found {} but max allowed {} for this type", size, MAX_SIZE
                 ) };
             }
 
