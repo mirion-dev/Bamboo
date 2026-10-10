@@ -65,7 +65,7 @@ namespace bamboo::mfa {
         if constexpr (Type == StringTypeEnum::pascal) {
             static constexpr u32 WIDE{ 1u << 31 };
 
-            i32 size;
+            u32 size;
             stream >> size;
             if (size & WIDE) {
                 stream >> resize(value, size & ~WIDE);
@@ -82,7 +82,7 @@ namespace bamboo::mfa {
                 value.push_back(ch);
             }
         } else if constexpr (Type == StringTypeEnum::pascal_c) {
-            i32 size;
+            u32 size;
             stream >> size >> resize(value, size);
             if (value.empty() || value.back() != '\0') {
                 throw std::runtime_error{ "A Pascal-C string must be null-terminated" };

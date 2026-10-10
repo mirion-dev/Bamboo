@@ -102,11 +102,15 @@ namespace bamboo::mfa {
         if (!value.flags[Image::lzx]) {
             stream >> args(value.data, value.size);
         } else {
-            i32 decomp_size;
+            u32 decomp_size;
             std::vector<unsigned char> raw_data;
             stream >> decomp_size >> args(raw_data, value.size - sizeof(decomp_size));
 
+            if (decomp_size >= 1 << 26) {
+                throw std::runtime_error{ "Image data is too large" };
+            }
             value.data.resize(decomp_size);
+
             auto actual_size{ static_cast<mz_ulong>(decomp_size) };
             if (mz_uncompress(value.data.data(), &actual_size, raw_data.data(), static_cast<mz_ulong>(raw_data.size()))
                     != MZ_OK
