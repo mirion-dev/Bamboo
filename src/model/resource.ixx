@@ -58,6 +58,7 @@ namespace bamboo {
 
     // cImageElement, Img (SDK)
     export struct Image {
+        // IF_* (SDK)
         enum Flag {
             rle,
             rlew,

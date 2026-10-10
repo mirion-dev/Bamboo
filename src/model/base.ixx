@@ -108,7 +108,7 @@ namespace bamboo {
     };
 
     // MENUITEMTEMPLATEHEADER
-    export struct MenuHeader {
+    export struct MenuEntryHeader {
         using unpadded = void;
 
         u16 version;

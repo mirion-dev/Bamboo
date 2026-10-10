@@ -26,6 +26,7 @@ namespace bamboo {
 
     // CPlayerControl
     export struct Control {
+        // CTRLTYPE_* (SDK)
         enum class Type : u32 {
             mouse,
             joystick1,
@@ -41,6 +42,17 @@ namespace bamboo {
 
     // CPlayerControlArray
     export struct Controls : std::vector<Control> {};
+
+    // MenuHdr (SDK)
+    export struct MenuHeader {
+        using unpadded = void;
+
+        u32 size;
+        u32 item_offset;
+        u32 item_size;
+        u32 accel_offset;
+        u32 accel_size;
+    };
 
     export struct MenuItem;
 
@@ -63,12 +75,8 @@ namespace bamboo {
 
     export struct MenuBar {
         u32 size;
-        u32 header_size;
-        i32 item_offset;
-        u32 item_size;
-        i32 accel_offset;
-        u32 accel_size;
         MenuHeader header;
+        MenuEntryHeader item_header;
         MenuItems items;
         MenuAccels accels;
         u32 window_menu_index;
@@ -158,6 +166,7 @@ namespace bamboo {
             record_slowest_app_loops                  // Settings
         };
 
+        // BUILDTYPE_* (SDK)
         enum class BuildType : u32 {
             windows_exe_application,
             windows_screen_saver,

@@ -84,22 +84,22 @@ namespace bamboo::mfa {
         stream >> value.size;
 
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> value.header_size >> value.item_offset >> value.item_size >> value.accel_offset >> value.accel_size;
-        if (stream.tellg() != begin + value.header_size) {
+        stream >> value.header;
+        if (stream.tellg() != begin + value.header.size) {
             throw std::runtime_error{ "Corrupt menu header" };
         }
 
-        if (value.item_size != 0) {
-            stream >> move(begin + value.item_offset) >> value.header;
-            stream >> move(static_cast<usize>(stream.tellg()) + value.header.offset) >> value.items;
-            if (stream.tellg() != begin + value.item_offset + value.item_size) {
+        if (value.header.item_size != 0) {
+            stream >> move(begin + value.header.item_offset) >> value.item_header;
+            stream >> move(static_cast<usize>(stream.tellg()) + value.item_header.offset) >> value.items;
+            if (stream.tellg() != begin + value.header.item_offset + value.header.item_size) {
                 throw std::runtime_error{ "Corrupt menu items" };
             }
         }
 
-        if (value.accel_size != 0) {
-            stream >> move(begin + value.accel_offset) >> value.accels;
-            if (stream.tellg() != begin + value.accel_offset + value.accel_size) {
+        if (value.header.accel_size != 0) {
+            stream >> move(begin + value.header.accel_offset) >> value.accels;
+            if (stream.tellg() != begin + value.header.accel_offset + value.header.accel_size) {
                 throw std::runtime_error{ "Corrupt menu accelerators" };
             }
         }

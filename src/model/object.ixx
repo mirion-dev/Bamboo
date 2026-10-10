@@ -144,6 +144,7 @@ namespace bamboo {
 
     // CStaticItem
     export struct StaticObject : ObjectBase {
+        // OBSTACLE_* (SDK)
         enum class ObstacleType : u32 {
             none,
             obstacle,
@@ -163,6 +164,7 @@ namespace bamboo {
             integral_dimensions
         };
 
+        // SHAPE_* (SDK)
         enum class Shape : u32 {
             none,
             line,
@@ -170,6 +172,7 @@ namespace bamboo {
             ellipse
         };
 
+        // FILLTYPE_* (SDK)
         enum class FillType : u32 {
             none,
             solid_color,
@@ -283,11 +286,12 @@ namespace bamboo {
     // CRTFItem
     export struct RichTextObject : TextObject {
         enum Flag {
-            _0,
-            auto_vertical_scrollbar
+            transparent,              // RTFOPT_* (SDK)
+            auto_vertical_scrollbar,  // Settings
+            auto_horizontal_scrollbar // RTFOPT_* (SDK)
         };
 
-        Flags<u32> flags;       // Settings
+        Flags<u32> flags;
         Color background_color; // Settings
         std::wstring data;
     };
@@ -311,6 +315,7 @@ namespace bamboo {
 
     // CCounterItem
     export struct CounterObject : DynamicObject {
+        // CTA_* (SDK)
         enum class DisplayType : u32 {
             hidden,
             numbers,
@@ -320,6 +325,7 @@ namespace bamboo {
             text
         };
 
+        // FILLTYPE_* (SDK)
         enum class FillType : u32 {
             none,
             solid_color,
