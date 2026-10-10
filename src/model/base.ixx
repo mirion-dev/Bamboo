@@ -142,7 +142,7 @@ namespace bamboo {
     };
 
     // ACCELTABLEENTRY
-    export struct alignas(i32) MenuAccel {
+    export struct alignas(u32) MenuAccel {
         enum Flag {
             virtual_key,
             no_invert,

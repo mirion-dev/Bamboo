@@ -6,7 +6,7 @@ import bamboo.model.base;
 
 namespace bamboo {
 
-    // cFontElement
+    // cFontElement, FontW (SDK)
     export struct Font {
         u32 handle;
         u32 checksum;
@@ -17,7 +17,7 @@ namespace bamboo {
     // cFontBank
     export struct FontBank : std::vector<Font> {};
 
-    // cSoundElement
+    // cSoundElement, Sound (SDK)
     export struct Sound {
         enum Flag {
             wave, // SP_* (SDK)
@@ -56,7 +56,7 @@ namespace bamboo {
     // cMusicBank
     export struct MusicBank : std::vector<Music> {};
 
-    // cImageElement
+    // cImageElement, Img (SDK)
     export struct Image {
         enum Flag {
             rle,
@@ -69,7 +69,7 @@ namespace bamboo {
             mac
         };
 
-        enum class Format : i8 {
+        enum class Format : u8 {
             rgba8888,
             rgba4444,
             rgba5551,

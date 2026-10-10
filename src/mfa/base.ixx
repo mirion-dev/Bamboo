@@ -38,7 +38,7 @@ namespace bamboo::mfa {
         stream >> resize(value, size);
     }
 
-    export template <class T, std::integral Size = i32>
+    export template <class T, std::integral Size = u32>
     void load(Stream& stream, std::vector<T>& value, Type<Size> = {}) {
         Size size;
         stream >> size >> bamboo::args(value, size);
@@ -109,9 +109,9 @@ namespace bamboo::mfa {
         }
     }
 
-    export template <class T, std::integral Flag = u8>
-    void load(Stream& stream, std::optional<T>& value, Type<Flag> = {}) {
-        Flag has_value;
+    export template <class T, std::integral Bool = u8>
+    void load(Stream& stream, std::optional<T>& value, Type<Bool> = {}) {
+        Bool has_value;
         stream >> has_value >> bamboo::args(value, has_value);
     }
 

@@ -50,9 +50,9 @@ namespace bamboo {
 
         std::wstring filename;
         std::wstring name;
-        i32 file_handle;
+        u32 file_handle;
         std::array<char, 4> id;
-        i32 duration;
+        u32 duration;
         Flags<u32> flags;
         Color color;
         std::vector<unsigned char> param;
@@ -60,11 +60,11 @@ namespace bamboo {
 
     // CDirection
     export struct Direction {
-        i32 index;
-        i32 max_speed;
-        i32 min_speed;
-        i32 repeat;
-        i32 repeat_from;
+        u32 index;
+        u32 max_speed;
+        u32 min_speed;
+        u32 repeat;
+        u32 repeat_from;
         std::vector<u32> images;
     };
 
@@ -134,8 +134,8 @@ namespace bamboo {
         u32 handle;
         std::wstring name;    // About
         u32 transparent;      // Display
-        i32 effect;           // Display
-        i32 blend_coefficent; // Display
+        u32 effect;           // Display
+        u32 blend_coefficent; // Display
         u32 antialiasing;     // Display
         Flags<u32> flags;
         std::optional<u32> icon; // About
@@ -144,7 +144,7 @@ namespace bamboo {
 
     // CStaticItem
     export struct StaticObject : ObjectBase {
-        enum class ObstacleType : i32 {
+        enum class ObstacleType : u32 {
             none,
             obstacle,
             platform,
@@ -163,14 +163,14 @@ namespace bamboo {
             integral_dimensions
         };
 
-        enum class Shape : i32 {
+        enum class Shape : u32 {
             none,
             line,
             rectangle,
             ellipse
         };
 
-        enum class FillType : i32 {
+        enum class FillType : u32 {
             none,
             solid_color,
             gradient,
@@ -254,10 +254,10 @@ namespace bamboo {
 
     // CExtendItem
     export struct ExtensionObject : AnimatedObject {
-        i32 type;
+        u32 type;
         std::wstring name;
         std::wstring filename;
-        i32 magic_num;
+        u32 magic_num;
         std::wstring subtype;
         ExtensionHeader header;
         std::vector<unsigned char> data;
@@ -311,7 +311,7 @@ namespace bamboo {
 
     // CCounterItem
     export struct CounterObject : DynamicObject {
-        enum class DisplayType : i32 {
+        enum class DisplayType : u32 {
             hidden,
             numbers,
             vertical_bar,
@@ -320,7 +320,7 @@ namespace bamboo {
             text
         };
 
-        enum class FillType : i32 {
+        enum class FillType : u32 {
             none,
             solid_color,
             gradient,

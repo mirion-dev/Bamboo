@@ -26,7 +26,7 @@ namespace bamboo {
 
     // CPlayerControl
     export struct Control {
-        enum class Type : i32 {
+        enum class Type : u32 {
             mouse,
             joystick1,
             joystick2,
@@ -36,7 +36,7 @@ namespace bamboo {
         };
 
         Type type;
-        std::vector<i32> keys;
+        std::vector<u32> keys;
     };
 
     // CPlayerControlArray
@@ -71,7 +71,7 @@ namespace bamboo {
         MenuHeader header;
         MenuItems items;
         MenuAccels accels;
-        i32 window_menu_index;
+        u32 window_menu_index;
         MenuImages images;
     };
 
@@ -158,7 +158,7 @@ namespace bamboo {
             record_slowest_app_loops                  // Settings
         };
 
-        enum class BuildType : i32 {
+        enum class BuildType : u32 {
             windows_exe_application,
             windows_screen_saver,
             subapplication,
@@ -197,7 +197,7 @@ namespace bamboo {
             android_app_bundle_with_expansion
         };
 
-        enum class GraphicMode : i32 {
+        enum class GraphicMode : u32 {
             _0,
             _1,
             _2,
@@ -208,10 +208,10 @@ namespace bamboo {
             color65536
         };
 
-        i16 format_version;
-        i16 format_subversion;
-        i32 editor_version;
-        i32 editor_build;
+        u16 format_version;
+        u16 format_subversion;
+        u32 editor_version;
+        u32 editor_build;
         Language language;        // About
         std::wstring name;        // About
         std::wstring description; // About
@@ -231,26 +231,26 @@ namespace bamboo {
         Color border_color;      // Window
         Flags<u32> window_flags; // Window
         Flags<u32> flags;
-        std::wstring help_file;          // About
-        i32 init_score;                  // Runtime
-        i32 init_lives;                  // Runtime
-        i32 frame_rate;                  // Runtime
-        BuildType build_type;            // Settings
-        std::wstring build_filename;     // Settings
-        std::wstring effects_folder;     // Settings
-        std::wstring command_line;       // Settings
-        std::wstring about;              // About
-        Installer installer;             // File - Build
-        BinaryFiles binary_files;        // View - Data Elements - Binary Data
-        Controls controls;               // Runtime
-        MenuBar menu_bar;                // Window
-        Values global_values;            // Values
-        Values global_strings;           // Values
-        GlobalEventBlocks global_events; // Events
-        GraphicMode graphic_mode;        // Settings
-        std::vector<u32> icons;          // About
-        Qualifiers qualifiers;           // Events
-        Extensions extensions;           // View - Data Elements - Extensions
+        std::wstring help_file;      // About
+        i32 init_score;              // Runtime
+        i32 init_lives;              // Runtime
+        i32 frame_rate;              // Runtime
+        BuildType build_type;        // Settings
+        std::wstring build_filename; // Settings
+        std::wstring effects_folder; // Settings
+        std::wstring command_line;   // Settings
+        std::wstring about;          // About
+        Installer installer;         // File - Build
+        BinaryFiles binary_files;    // View - Data Elements - Binary Data
+        Controls controls;           // Runtime
+        MenuBar menu_bar;            // Window
+        Values global_values;        // Values
+        Values global_strings;       // Values
+        GlobalEvents global_events;  // Events
+        GraphicMode graphic_mode;    // Settings
+        std::vector<u32> icons;      // About
+        Qualifiers qualifiers;       // Events
+        Extensions extensions;       // View - Data Elements - Extensions
         Frames frames;
         Chunks chunks;
     };

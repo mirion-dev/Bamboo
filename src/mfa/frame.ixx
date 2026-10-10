@@ -33,7 +33,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Entry& value) {
-        i32 type;
+        u32 type;
         stream >> type;
         if (type == 0x70000004) {
             stream >> value.emplace<Folder>();

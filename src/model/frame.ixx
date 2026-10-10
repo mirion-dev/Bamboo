@@ -95,20 +95,20 @@ namespace bamboo {
         i32 height;             // Settings
         Color background_color; // Settings
         Flags<u32> flags;
-        i32 max_objects;       // Runtime
+        u32 max_objects;       // Runtime
         std::wstring password; // Runtime
         i32 editor_x;
         i32 editor_y;
         std::vector<Color> palette; // Settings
-        i32 icon;
-        i32 editor_layer;
+        u32 icon;
+        u32 editor_layer;
         Layers layers;
         std::optional<Transition> fade_in;  // Settings
         std::optional<Transition> fade_out; // Settings
         Objects objects;
         Entries entries;
         Instances instances;
-        EventBlocks events;
+        FrameEvents events;
         Chunks chunks;
     };
 

@@ -76,7 +76,7 @@ namespace bamboo::mfa {
     export void load(Stream& stream, MenuImage& value) {
         stream
             >> value.id
-            >> skip<i16> // Padding
+            >> skip<u16> // Padding
             >> value.image;
     }
 

@@ -34,7 +34,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, Value& value) {
-        i32 type;
+        u32 type;
         stream >> value.name >> type;
         switch (type) {
         case 0:
@@ -229,7 +229,7 @@ namespace bamboo::mfa {
                                                  "lives object",          "counter object",  "rich text object",
                                                  "subapplication object", "extension object" };
 
-        i32 type;
+        u32 type;
         stream >> type;
         switch (type) {
         case 0:
