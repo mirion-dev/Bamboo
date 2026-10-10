@@ -219,16 +219,16 @@ namespace bamboo::mfa {
 
         std::string_view id{ buffer.data(), buffer.size() };
         std::string_view name;
-        if (id == "Evts" || id == "STVE") {
+        if (id == "Evts" || id == "STVE") { // EVenTS
             stream >> value.emplace<EventsBlock>();
             name = "an events block";
-        } else if (id == "Rems" || id == "SMER") {
+        } else if (id == "Rems" || id == "SMER") { // REMarkS
             stream >> value.emplace<RemarksBlock>();
             name = "a remarks block";
-        } else if (id == "SPRG") {
+        } else if (id == "SPRG") { // GRouPS
             stream >> value.emplace<GroupsBlock>();
             name = "a groups block";
-        } else if (id == "EvOb" || id == "SJBO") {
+        } else if (id == "EvOb" || id == "SJBO") { // OBJectS
             stream >> value.emplace<ObjectsBlock>();
             name = "an objects block";
         } else if (id == "EvCs") {
@@ -243,10 +243,10 @@ namespace bamboo::mfa {
         } else if (id == "EvLs") {
             stream >> value.emplace<LinesBlock>();
             name = "a lines block";
-        } else if (id == "E2Ts" || id == "TYAL") {
+        } else if (id == "E2Ts" || id == "TYAL") { // LAYouT
             stream >> value.emplace<LayoutBlock>();
             name = "a layout block";
-        } else if (id == "!DNE") {
+        } else if (id == "!DNE") { // END!
             stream >> value.emplace<EndBlock>();
             name = "an end block";
         } else {
@@ -259,20 +259,20 @@ namespace bamboo::mfa {
     export void load(Stream& stream, EventBlocks& value) {
         value.clear();
 
-        stream >> value.data_size;
-        if (value.data_size != 0) {
+        stream >> value.size;
+        if (value.size != 0) {
             EventBlock event;
             while (stream >> event, !std::holds_alternative<EndBlock>(event)) {
                 value.emplace_back(std::move(event));
             }
         }
 
-        logger()->debug("Read {} event blocks.", value.size());
+        logger()->debug("Read {} event blocks.", value.vector::size());
     }
 
     export void load(Stream& stream, GlobalEventBlocks& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
-        stream >> static_cast<EventBlocks&>(value) >> move(begin + value.data_size + 4);
+        stream >> static_cast<EventBlocks&>(value) >> move(begin + value.size + 4);
     }
 
 }

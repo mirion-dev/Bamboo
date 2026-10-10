@@ -78,11 +78,13 @@ namespace bamboo {
 
     export struct Events : std::vector<Event> {};
 
+    // CEvtRemark
     export struct Remark {
         u32 handle;
         std::wstring value;
     };
 
+    // CEvtRemarkList
     export struct Remarks : std::vector<Remark> {};
 
     export struct Group {
@@ -106,6 +108,7 @@ namespace bamboo {
         u16 system_qualifier;
     };
 
+    // COI
     export struct EventObject {
         u32 handle;
         i16 object_type;
@@ -116,6 +119,7 @@ namespace bamboo {
         std::variant<EventObjectRef, EventObjectIcon, EventObjectQualifier> data;
     };
 
+    // COIList
     export struct EventObjects : std::vector<EventObject> {};
 
     export struct EventItem {
@@ -191,8 +195,9 @@ namespace bamboo {
                                    EndBlock
                                > {};
 
+    // CEventPrograms
     export struct EventBlocks : std::vector<EventBlock> {
-        i32 data_size;
+        i32 size;
     };
 
     export struct GlobalEventBlocks : EventBlocks {};
