@@ -40,7 +40,7 @@ namespace bamboo {
         u32 handle;
         u32 checksum;
         u32 ref_count;
-        i32 size;
+        u32 size;
         Flags<u32> flags;
         std::wstring name;
         std::vector<unsigned char> data;
@@ -85,7 +85,7 @@ namespace bamboo {
         u32 handle;
         u32 checksum;
         u32 ref_count;
-        i32 size;
+        u32 size;
         i16 width;
         i16 height;
         Format format;

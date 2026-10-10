@@ -192,7 +192,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, TabsBlock& value) {
         stream
-            >> skip<i16> >> value.editor_x
+            >> skip<u16> >> value.editor_x
             >> value.editor_y
             >> value.editor_caret_type
             >> value.editor_caret_x
@@ -201,7 +201,7 @@ namespace bamboo::mfa {
 
     export void load(Stream& stream, LinesBlock& value) {
         stream
-            >> skip<i16> >> value.editor_line_y
+            >> skip<u16> >> value.editor_line_y
             >> value.editor_line_type
             >> value.event_line_y
             >> value.event_line_type;

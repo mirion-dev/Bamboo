@@ -7,14 +7,14 @@ import bamboo.model.base;
 namespace bamboo {
 
     export struct Parameter {
-        i16 size;
+        u16 size;
         std::vector<unsigned char> data;
     };
 
     export struct Parameters : std::vector<Parameter> {};
 
     export struct Condition {
-        i16 size;
+        u16 size;
         i16 object_type;
         i16 number;
         u16 object;
@@ -30,7 +30,7 @@ namespace bamboo {
     export struct Conditions : std::vector<Condition> {};
 
     export struct Action {
-        i16 size;
+        u16 size;
         i16 object_type;
         i16 number;
         u16 object;
@@ -64,9 +64,9 @@ namespace bamboo {
             has_parent
         };
 
-        i16 size;
         i8 condition_num;
         i8 action_num;
+        u16 size;
         Flags<u16> flags;
         i16 restricted;
         i16 restrict_cpt;
@@ -131,7 +131,7 @@ namespace bamboo {
     export struct EventItems : std::vector<EventItem> {};
 
     export struct EventsBlock {
-        i32 size;
+        u32 size;
         Events data;
     };
 

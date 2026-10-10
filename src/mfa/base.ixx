@@ -146,7 +146,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, MenuAccel& value) {
-        stream >> value.flags >> value.ansi >> value.id >> skip<i16>; // Padding
+        stream >> value.flags >> value.ansi >> value.id >> skip<u16>; // Padding
     }
 
 }

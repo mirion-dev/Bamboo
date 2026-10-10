@@ -12,13 +12,13 @@ export import bamboo.model.frame;
 namespace bamboo {
 
     export struct PreviewImage {
-        i32 size;
+        u32 size;
         BitmapHeader header;
         std::vector<unsigned char> data;
     };
 
     export struct Installer {
-        i32 size;
+        u32 size;
         std::vector<unsigned char> data;
     };
 
@@ -62,12 +62,12 @@ namespace bamboo {
     export struct MenuImages : std::vector<MenuImage> {};
 
     export struct MenuBar {
-        i32 size;
-        i32 header_size;
+        u32 size;
+        u32 header_size;
         i32 item_offset;
-        i32 item_size;
+        u32 item_size;
         i32 accel_offset;
-        i32 accel_size;
+        u32 accel_size;
         MenuHeader header;
         MenuItems items;
         MenuAccels accels;
