@@ -19,15 +19,14 @@ namespace bamboo::mfa {
         stream
             >> value.size
             >> value.object_type
-            >> value.number
+            >> value.type
             >> value.object
             >> value.object_list
             >> value.flags
-            >> value.other_flags
-            >> value.params_num
+            >> value.param_num
             >> value.def_type
             >> value.id
-            >> args(value.params, value.params_num);
+            >> args(value.params, value.param_num);
 
         if (stream.tellg() != begin + value.size) {
             throw std::runtime_error{ "Corrupt condition" };
@@ -43,10 +42,9 @@ namespace bamboo::mfa {
             >> value.object
             >> value.object_list
             >> value.flags
-            >> value.other_flags
-            >> value.params_num
+            >> value.param_num
             >> value.def_type
-            >> args(value.params, value.params_num);
+            >> args(value.params, value.param_num);
 
         if (stream.tellg() != begin + value.size) {
             throw std::runtime_error{ "Corrupt action" };
@@ -204,7 +202,7 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, HeaderBlock& value) {
-        throw std::runtime_error{ "Unimplemented" };
+        stream >> value.unknown >> value.unknown2 >> value.flags;
     }
 
     export void load(Stream& stream, ObjectNameBlock& value) {

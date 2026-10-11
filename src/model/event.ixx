@@ -14,14 +14,36 @@ namespace bamboo {
     export struct Parameters : std::vector<Parameter> {};
 
     export struct Condition {
+        enum Flag {
+            negated,
+            negatable,
+            monitorable,
+            to_delete,
+            new_sound,
+            no_interdependence,
+            _6,
+            _7,
+            repeat,
+            done,
+            default_,
+            done_before_fade,
+            not_done_in_start,
+            always,
+            bad,
+            bad_object
+        };
+
+        enum class Type : i16 {
+            // TODO
+        };
+
         u16 size;
-        u16 object_type;
-        i16 number;
+        i16 object_type;
+        Type type;
         u16 object;
         i16 object_list;
-        u8 flags;
-        u8 other_flags;
-        u8 params_num;
+        Flags<u16> flags;
+        u8 param_num;
         u8 def_type;
         u16 id;
         Parameters params;
@@ -30,14 +52,36 @@ namespace bamboo {
     export struct Conditions : std::vector<Condition> {};
 
     export struct Action {
+        enum Flag {
+            negated,
+            negatable,
+            monitorable,
+            to_delete,
+            new_sound,
+            no_interdependence,
+            _6,
+            _7,
+            repeat,
+            done,
+            default_,
+            done_before_fade,
+            not_done_in_start,
+            always,
+            bad,
+            bad_object
+        };
+
+        enum class Type : u16 {
+            // TODO
+        };
+
         u16 size;
-        u16 object_type;
+        i16 object_type;
         i16 number;
         u16 object;
         i16 object_list;
-        u8 flags;
-        u8 other_flags;
-        u8 params_num;
+        Flags<u16> flags;
+        u8 param_num;
         u8 def_type;
         Parameters params;
     };
@@ -175,7 +219,9 @@ namespace bamboo {
     };
 
     export struct HeaderBlock {
-        // Unanalyzed
+        i16 unknown;
+        i16 unknown2;
+        Flags<u32> flags;
     };
 
     export struct ObjectNameBlock {
