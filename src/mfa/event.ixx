@@ -11,7 +11,7 @@ import bamboo.mfa.base;
 namespace bamboo::mfa {
 
     export void load(Stream& stream, Parameter& value) {
-        stream >> value.size >> args(value.data, value.size - 2); // Unanalyzed
+        stream >> value.size >> args(value.data, value.size - sizeof(value.size)); // Unanalyzed
     }
 
     export void load(Stream& stream, EventEntry& value) {

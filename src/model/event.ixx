@@ -188,6 +188,14 @@ namespace bamboo {
     };
 
     export struct HeaderBlock {
+        enum Flag {
+            has_event_group,
+            _1,
+            _2,
+            _3,
+            different_event_types
+        };
+
         u16 version;
         Flags<u32> flags;
     };
