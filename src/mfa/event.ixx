@@ -14,7 +14,7 @@ namespace bamboo::mfa {
         stream >> value.size >> args(value.data, value.size - 2); // Unanalyzed
     }
 
-    export void load(Stream& stream, Condition& value) {
+    export void load(Stream& stream, EventEntry& value) {
         auto begin{ static_cast<usize>(stream.tellg()) };
         stream
             >> value.size
@@ -23,31 +23,18 @@ namespace bamboo::mfa {
             >> value.object
             >> value.object_list
             >> value.flags
+            >> value.flags2
             >> value.param_num
-            >> value.def_type
-            >> value.id
-            >> args(value.params, value.param_num);
+            >> value.def_type;
 
-        if (stream.tellg() != begin + value.size) {
-            throw std::runtime_error{ "Corrupt condition" };
+        if (std::to_underlying(value.type) < 0) {
+            stream >> value.id;
         }
-    }
 
-    export void load(Stream& stream, Action& value) {
-        auto begin{ static_cast<usize>(stream.tellg()) };
-        stream
-            >> value.size
-            >> value.object_type
-            >> value.number
-            >> value.object
-            >> value.object_list
-            >> value.flags
-            >> value.param_num
-            >> value.def_type
-            >> args(value.params, value.param_num);
+        stream >> args(value.params, value.param_num);
 
-        if (stream.tellg() != begin + value.size) {
-            throw std::runtime_error{ "Corrupt action" };
+        if (stream.tellg() != begin + std::abs(value.size)) {
+            throw std::runtime_error{ "Corrupt event entry" };
         }
     }
 
@@ -65,8 +52,7 @@ namespace bamboo::mfa {
             >> args(value.conditions, value.condition_num)
             >> args(value.actions, value.action_num);
 
-        value.size = static_cast<i16>(std::abs(value.size));
-        if (stream.tellg() != begin + value.size) {
+        if (stream.tellg() != begin + std::abs(value.size)) {
             throw std::runtime_error{ "Corrupt event" };
         }
     }

@@ -13,80 +13,49 @@ namespace bamboo {
 
     export struct Parameters : std::vector<Parameter> {};
 
-    export struct Condition {
+    // event (SDK)
+    export struct EventEntry {
+        // EVFLAGS_* (SDK)
         enum Flag {
-            negated,
-            negatable,
-            monitorable,
-            to_delete,
-            new_sound,
-            no_interdependence,
-            _6,
-            _7,
             repeat,
             done,
             default_,
-            done_before_fade,
+            done_before_fade_in,
             not_done_in_start,
             always,
             bad,
             bad_object
         };
 
+        // EVFLAGS_*, EVFLAGS2_* (SDK)
+        enum Flag2 {
+            negated,
+            negatable,
+            monitorable,
+            to_delete,
+            new_sound,
+            no_interdependence
+        };
+
+        // CNDL_*, ACTL_* (SDK)
         enum class Type : i16 {
             // TODO
         };
 
-        u16 size;
+        i16 size;
         i16 object_type;
         Type type;
-        u16 object;
+        i16 object;
         i16 object_list;
-        Flags<u16> flags;
+        Flags<u8> flags;
+        Flags<u8> flags2;
         u8 param_num;
         u8 def_type;
         u16 id;
         Parameters params;
     };
 
-    export struct Conditions : std::vector<Condition> {};
-
-    export struct Action {
-        enum Flag {
-            negated,
-            negatable,
-            monitorable,
-            to_delete,
-            new_sound,
-            no_interdependence,
-            _6,
-            _7,
-            repeat,
-            done,
-            default_,
-            done_before_fade,
-            not_done_in_start,
-            always,
-            bad,
-            bad_object
-        };
-
-        enum class Type : u16 {
-            // TODO
-        };
-
-        u16 size;
-        i16 object_type;
-        i16 number;
-        u16 object;
-        i16 object_list;
-        Flags<u16> flags;
-        u8 param_num;
-        u8 def_type;
-        Parameters params;
-    };
-
-    export struct Actions : std::vector<Action> {};
+    export struct EventEntries : std::vector<EventEntry> {};
 
     // eventGroup (SDK)
     export struct Event {
@@ -118,8 +87,8 @@ namespace bamboo {
         u16 inhibit_cpt;
         u16 id;
         i16 undo;
-        Conditions conditions;
-        Actions actions;
+        EventEntries conditions;
+        EventEntries actions;
     };
 
     export struct Events : std::vector<Event> {};
