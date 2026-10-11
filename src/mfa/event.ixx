@@ -188,7 +188,10 @@ namespace bamboo::mfa {
     }
 
     export void load(Stream& stream, HeaderBlock& value) {
-        stream >> value.unknown >> value.unknown2 >> value.flags;
+        stream
+            >> value.version
+            >> skip<u16> // Unknown; seems to always be 1
+            >> value.flags;
     }
 
     export void load(Stream& stream, ObjectNameBlock& value) {
@@ -249,16 +252,14 @@ namespace bamboo::mfa {
     export void load(Stream& stream, FrameEvents& value) {
         value.clear();
 
-        stream
-            >> skip<u16>  // Maybe version 1030
-            >> skip<u16>; // Unknown
+        stream >> value.version >> skip<u16>; // Unknown; seems to always be 0
 
         FrameEventBlock block;
         while (stream >> block, !std::holds_alternative<EndBlock>(block)) {
             value.emplace_back(std::move(block));
         }
 
-        logger()->debug("Read {} event blocks.", value.vector::size());
+        logger()->debug("Read {} event blocks.", value.size());
     }
 
     export void load(Stream& stream, GlobalEventBlock& value) {

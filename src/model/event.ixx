@@ -188,8 +188,7 @@ namespace bamboo {
     };
 
     export struct HeaderBlock {
-        i16 unknown;
-        i16 unknown2;
+        u16 version;
         Flags<u32> flags;
     };
 
@@ -222,7 +221,9 @@ namespace bamboo {
                                         EndBlock
                                     > {};
 
-    export struct FrameEvents : std::vector<FrameEventBlock> {};
+    export struct FrameEvents : std::vector<FrameEventBlock> {
+        u16 version;
+    };
 
     export struct GlobalEventBlock : std::variant<
                                          HeaderBlock,
