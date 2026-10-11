@@ -3,6 +3,7 @@
 
 import std;
 import bamboo.log;
+import bamboo.stream;
 import bamboo.model;
 import bamboo.mfa;
 
@@ -69,14 +70,20 @@ int main(int argc, char** argv) {
         bamboo::logger()->set_level(static_cast<spdlog::level::level_enum>(iter - LEVEL.begin()));
     }
 
+    std::shared_ptr<bamboo::Stream> stream;
     try {
-        auto mfa_stream{ std::make_shared<bamboo::mfa::Stream>(result["path"].as<std::string>()) };
-        bamboo::logger()->set_stream(std::weak_ptr{ mfa_stream });
-
-        bamboo::Application app;
-        *mfa_stream >> app;
+        stream = std::make_shared<bamboo::mfa::Stream>(result["path"].as<std::string>());
     } catch (const std::exception& error) {
-        bamboo::logger()->error(std::string{ error.what() } + '.');
+        std::println(std::cerr, "{}.", error.what());
+        return EXIT_FAILURE;
+    }
+    bamboo::logger()->set_stream(std::weak_ptr{ stream });
+
+    bamboo::Application app;
+    try {
+        *std::static_pointer_cast<bamboo::mfa::Stream>(stream) >> app;
+    } catch (const std::exception& error) {
+        bamboo::logger()->error("{}.", error.what());
         std::println(std::cerr, "See log for more details.");
         return EXIT_FAILURE;
     }
