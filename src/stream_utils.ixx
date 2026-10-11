@@ -3,7 +3,6 @@ export module bamboo.stream_utils;
 import std;
 import bamboo.types;
 import bamboo.meta;
-import bamboo.stream;
 
 namespace bamboo {
 

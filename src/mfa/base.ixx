@@ -1,8 +1,3 @@
-module;
-
-#include <spdlog/spdlog.h>
-#undef pascal
-
 export module bamboo.mfa.base;
 
 import std;
@@ -11,7 +6,8 @@ import bamboo.utils;
 import bamboo.log;
 import bamboo.stream;
 import bamboo.stream_utils;
-import bamboo.model;
+import bamboo.model.base;
+import bamboo.model.app;
 
 namespace bamboo::mfa {
 

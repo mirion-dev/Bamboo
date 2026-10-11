@@ -1,16 +1,11 @@
-module;
-
-#include <spdlog/spdlog.h>
-
 export module bamboo.mfa.event;
 
 import std;
 import bamboo.types;
 import bamboo.utils;
 import bamboo.log;
-import bamboo.stream;
 import bamboo.stream_utils;
-import bamboo.model;
+import bamboo.model.event;
 import bamboo.mfa.base;
 
 namespace bamboo::mfa {
@@ -72,7 +67,7 @@ namespace bamboo::mfa {
             >> args(value.conditions, value.condition_num)
             >> args(value.actions, value.action_num);
 
-        value.size = std::abs(value.size);
+        value.size = static_cast<i16>(std::abs(value.size));
         if (stream.tellg() != begin + value.size) {
             throw std::runtime_error{ "Corrupt event" };
         }

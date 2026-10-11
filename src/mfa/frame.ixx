@@ -1,19 +1,14 @@
-module;
-
-#include <spdlog/spdlog.h>
-
 export module bamboo.mfa.frame;
 
 import std;
 import bamboo.types;
 import bamboo.utils;
 import bamboo.log;
-import bamboo.stream;
 import bamboo.stream_utils;
-import bamboo.model;
+import bamboo.model.frame;
 import bamboo.mfa.base;
-import bamboo.mfa.event;
 import bamboo.mfa.object;
+import bamboo.mfa.event;
 
 namespace bamboo::mfa {
 
