@@ -19,7 +19,7 @@ namespace bamboo::mfa {
             >> value.handle
             >> value.checksum
             >> value.ref_count
-            >> skip<u32> // Unused (size)
+            >> skip<u32> // Unused size (SDK); the engine ignores it and always uses 104 (from checksum to data)
             >> value.data;
 
         logger()->debug("Read font {:?}.", to_string(value.data.face_name));

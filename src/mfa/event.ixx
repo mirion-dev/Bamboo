@@ -265,10 +265,9 @@ namespace bamboo::mfa {
     export void load(Stream& stream, FrameEvents& value) {
         value.clear();
 
-        stream >> value.size;
-        if (value.size == 0) {
-            return;
-        }
+        stream
+            >> skip<u16>  // Maybe version 1030
+            >> skip<u16>; // Unknown
 
         FrameEventBlock block;
         while (stream >> block, !std::holds_alternative<EndBlock>(block)) {
@@ -323,11 +322,16 @@ namespace bamboo::mfa {
             return;
         }
 
+        auto begin{ static_cast<usize>(stream.tellg()) };
         stream >> signature<"KLBE">; // Event BLocK
 
         GlobalEventBlock block;
         while (stream >> block, !std::holds_alternative<EndBlock>(block)) {
             value.emplace_back(std::move(block));
+        }
+
+        if (stream.tellg() != begin + value.size) {
+            throw std::runtime_error{ "Corrupt global events" };
         }
 
         logger()->debug("Read {} global event blocks.", value.vector::size());

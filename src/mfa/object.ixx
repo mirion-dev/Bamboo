@@ -136,7 +136,7 @@ namespace bamboo::mfa {
             >> value.flags2
             >> value.background_color
             >> value.qualifiers
-            >> skip<u16> // End mark of qualifiers
+            >> skip<u16> // Unused end mark of qualifiers -1
             >> value.values
             >> value.strings
             >> value.movements

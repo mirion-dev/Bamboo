@@ -207,9 +207,7 @@ namespace bamboo {
                                         EndBlock
                                     > {};
 
-    export struct FrameEvents : std::vector<FrameEventBlock> {
-        u32 size;
-    };
+    export struct FrameEvents : std::vector<FrameEventBlock> {};
 
     export struct GlobalEventBlock : std::variant<
                                          HeaderBlock,
